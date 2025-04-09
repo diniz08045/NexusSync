@@ -1,6 +1,5 @@
 import os
 import logging
-import redis
 from elasticsearch import Elasticsearch
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
@@ -38,7 +37,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # Configure Flask-Login
 login_manager.init_app(app)
-login_manager.login_view = 'login'
+login_manager.login_view = 'user.login'  # Update with the correct blueprint route
 login_manager.login_message = 'Please log in to access this page.'
 login_manager.login_message_category = 'info'
 
@@ -51,32 +50,14 @@ app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
 app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_DEFAULT_SENDER', 'noreply@example.com')
 mail.init_app(app)
 
-# Initialize Redis for rate limiting and caching
-redis_host = os.environ.get('REDIS_HOST', 'localhost')
-redis_port = int(os.environ.get('REDIS_PORT', 6379))
-redis_client = None
-try:
-    redis_client = redis.Redis(host=redis_host, port=redis_port, db=0, decode_responses=True)
-    logger.info("Connected to Redis")
-except Exception as e:
-    logger.warning(f"Failed to connect to Redis: {e}")
-
-# Initialize rate limiter with in-memory storage if Redis fails
-try:
-    limiter = Limiter(
-        get_remote_address,
-        app=app,
-        default_limits=["200 per day", "50 per hour"],
-        storage_uri=f"redis://{redis_host}:{redis_port}"
-    )
-except Exception as e:
-    logger.warning(f"Using in-memory storage for rate limiting: {e}")
-    limiter = Limiter(
-        get_remote_address,
-        app=app,
-        default_limits=["200 per day", "50 per hour"],
-        storage_uri="memory://"
-    )
+# Use memory storage for rate limiting since Redis might not be available
+logger.info("Using in-memory storage for rate limiting")
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["200 per day", "50 per hour"],
+    storage_uri="memory://"
+)
 
 # Initialize Elasticsearch
 elasticsearch_host = os.environ.get('ELASTICSEARCH_HOST', 'localhost')
