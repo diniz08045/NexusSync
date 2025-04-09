@@ -19,104 +19,276 @@
 <body>
     {% block content_override %}
         {% if current_user.is_authenticated %}
-        <nav class="navbar navbar-expand-lg navbar-dark mb-4">
-            <div class="container-fluid">
-                <a class="navbar-brand d-flex align-items-center" href="{{ url_for('user.index') }}">
-                    <i data-feather="shield" class="me-2"></i>
-                    <span>CRM Suite</span>
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
-                        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav me-auto">
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.path == url_for('user.index') %}active{% endif %}" 
-                               href="{{ url_for('user.index') }}">
-                               <i data-feather="home" class="feather-sm me-1"></i> Dashboard
-                            </a>
-                        </li>
-                        {% if current_user.is_admin() %}
-                            <li class="nav-item">
-                                <a class="nav-link {% if request.path.startswith('/admin') %}active{% endif %}" 
-                                   href="{{ url_for('admin.index') }}">
-                                   <i data-feather="settings" class="feather-sm me-1"></i> Admin
+        <div class="d-flex wrapper">
+            <!-- Sidebar -->
+            <nav id="sidebar" class="sidebar">
+                <div class="sidebar-header">
+                    <a class="sidebar-brand d-flex align-items-center" href="{{ url_for('user.index') }}">
+                        <i data-feather="shield" class="me-2"></i>
+                        <span>CRM Suite</span>
+                    </a>
+                    <button id="sidebarCollapseBtn" class="btn btn-link d-md-none sidebar-toggle">
+                        <i data-feather="menu"></i>
+                    </button>
+                </div>
+                
+                <div class="sidebar-profile mb-4">
+                    <div class="d-flex align-items-center px-3 py-2">
+                        <div class="avatar d-inline-flex align-items-center justify-content-center bg-primary rounded-circle me-2" 
+                            style="width: 40px; height: 40px;">
+                            <span class="text-white fw-bold">{{ current_user.username[0].upper() }}</span>
+                        </div>
+                        <div class="d-flex flex-column">
+                            <span class="fw-bold">{{ current_user.username }}</span>
+                            <small class="text-muted">
+                                {% if current_user.is_admin() %}
+                                    Administrator
+                                {% else %}
+                                    Regular User
+                                {% endif %}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                
+                <ul class="sidebar-nav">
+                    <li class="sidebar-item {% if request.path == url_for('user.index') %}active{% endif %}">
+                        <a href="{{ url_for('user.index') }}" class="sidebar-link">
+                            <i data-feather="home" class="feather-sm me-2"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    
+                    <!-- Users Management Card -->
+                    <li class="sidebar-item">
+                        <a href="#userSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="sidebar-link dropdown-toggle">
+                            <i data-feather="users" class="feather-sm me-2"></i>
+                            <span>Users</span>
+                        </a>
+                        <ul class="collapse sidebar-dropdown list-unstyled" id="userSubmenu">
+                            <li>
+                                <a href="{{ url_for('user.profile') }}" class="sidebar-dropdown-link">
+                                    <i data-feather="user" class="feather-sm me-2"></i>
+                                    Profile
                                 </a>
                             </li>
-                        {% endif %}
-                    </ul>
-                    <ul class="navbar-nav">
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle position-relative" href="#" id="navbarDropdownNotifications" role="button" 
-                               data-bs-toggle="dropdown" aria-expanded="false">
-                                <i data-feather="bell" class="feather-sm"></i>
-                                {% set unread_count = current_user.unread_notifications_count() %}
-                                {% if unread_count > 0 %}
-                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                        {{ unread_count }}
-                                        <span class="visually-hidden">unread notifications</span>
-                                    </span>
-                                {% endif %}
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="navbarDropdownNotifications">
-                                <li><h6 class="dropdown-header">Notifications</h6></li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li>
-                                    <a class="dropdown-item d-flex align-items-center" href="{{ url_for('user.notifications') }}">
-                                        <i data-feather="list" class="feather-sm me-2"></i>
-                                        View All Notifications
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="nav-item dropdown ms-2">
-                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdownUser" role="button" 
-                               data-bs-toggle="dropdown" aria-expanded="false">
-                                <div class="avatar d-inline-flex align-items-center justify-content-center bg-primary rounded-circle me-2" 
-                                    style="width: 32px; height: 32px;">
-                                    <span class="text-white fw-bold">{{ current_user.username[0].upper() }}</span>
-                                </div>
-                                <span>{{ current_user.username }}</span>
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="navbarDropdownUser">
-                                <li>
-                                    <a class="dropdown-item d-flex align-items-center" href="{{ url_for('user.profile') }}">
-                                        <i data-feather="user" class="feather-sm me-2"></i>
-                                        Profile
-                                    </a>
-                                </li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li>
-                                    <a class="dropdown-item d-flex align-items-center" href="{{ url_for('user.logout') }}">
-                                        <i data-feather="log-out" class="feather-sm me-2"></i>
-                                        Logout
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
+                            <li>
+                                <a href="{{ url_for('user.edit_profile') }}" class="sidebar-dropdown-link">
+                                    <i data-feather="edit" class="feather-sm me-2"></i>
+                                    Edit Profile
+                                </a>
+                            </li>
+                            {% if current_user.is_admin() %}
+                            <li>
+                                <a href="{{ url_for('admin.list_users') }}" class="sidebar-dropdown-link">
+                                    <i data-feather="list" class="feather-sm me-2"></i>
+                                    All Users
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                    
+                    <!-- Communication Card -->
+                    <li class="sidebar-item">
+                        <a href="#communicationSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="sidebar-link dropdown-toggle">
+                            <i data-feather="message-square" class="feather-sm me-2"></i>
+                            <span>Communication</span>
+                        </a>
+                        <ul class="collapse sidebar-dropdown list-unstyled" id="communicationSubmenu">
+                            <li>
+                                <a href="{{ url_for('user.notifications') }}" class="sidebar-dropdown-link">
+                                    <i data-feather="bell" class="feather-sm me-2"></i>
+                                    Notifications
+                                    {% set unread_count = current_user.unread_notifications_count() %}
+                                    {% if unread_count > 0 %}
+                                        <span class="badge rounded-pill bg-danger ms-2">{{ unread_count }}</span>
+                                    {% endif %}
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="sidebar-dropdown-link">
+                                    <i data-feather="mail" class="feather-sm me-2"></i>
+                                    Messages
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    
+                    <!-- Security Card -->
+                    <li class="sidebar-item">
+                        <a href="#securitySubmenu" data-bs-toggle="collapse" aria-expanded="false" class="sidebar-link dropdown-toggle">
+                            <i data-feather="shield" class="feather-sm me-2"></i>
+                            <span>Security</span>
+                        </a>
+                        <ul class="collapse sidebar-dropdown list-unstyled" id="securitySubmenu">
+                            <li>
+                                <a href="{{ url_for('user.reset_password_request') }}" class="sidebar-dropdown-link">
+                                    <i data-feather="key" class="feather-sm me-2"></i>
+                                    Change Password
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="sidebar-dropdown-link">
+                                    <i data-feather="smartphone" class="feather-sm me-2"></i>
+                                    Two-Factor Auth
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    
+                    {% if current_user.is_admin() %}
+                    <!-- Admin Card -->
+                    <li class="sidebar-item">
+                        <a href="#adminSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="sidebar-link dropdown-toggle">
+                            <i data-feather="settings" class="feather-sm me-2"></i>
+                            <span>Administration</span>
+                        </a>
+                        <ul class="collapse sidebar-dropdown list-unstyled" id="adminSubmenu">
+                            <li>
+                                <a href="{{ url_for('admin.index') }}" class="sidebar-dropdown-link">
+                                    <i data-feather="home" class="feather-sm me-2"></i>
+                                    Admin Dashboard
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ url_for('admin.list_users') }}" class="sidebar-dropdown-link">
+                                    <i data-feather="users" class="feather-sm me-2"></i>
+                                    Manage Users
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ url_for('admin.active_sessions') }}" class="sidebar-dropdown-link">
+                                    <i data-feather="activity" class="feather-sm me-2"></i>
+                                    Active Sessions
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ url_for('admin.create_notification') }}" class="sidebar-dropdown-link">
+                                    <i data-feather="bell" class="feather-sm me-2"></i>
+                                    Send Notifications
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    {% endif %}
+                    
+                    <!-- System Card -->
+                    <li class="sidebar-item mt-auto">
+                        <a href="#helpSubmenu" data-bs-toggle="collapse" aria-expanded="false" class="sidebar-link dropdown-toggle">
+                            <i data-feather="help-circle" class="feather-sm me-2"></i>
+                            <span>Help & Support</span>
+                        </a>
+                        <ul class="collapse sidebar-dropdown list-unstyled" id="helpSubmenu">
+                            <li>
+                                <a href="#" class="sidebar-dropdown-link">
+                                    <i data-feather="book" class="feather-sm me-2"></i>
+                                    Documentation
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="sidebar-dropdown-link">
+                                    <i data-feather="life-buoy" class="feather-sm me-2"></i>
+                                    Support
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    
+                    <!-- Logout link at the bottom of sidebar -->
+                    <li class="sidebar-item mt-2 mb-2">
+                        <a href="{{ url_for('user.logout') }}" class="sidebar-link text-danger">
+                            <i data-feather="log-out" class="feather-sm me-2"></i>
+                            <span>Logout</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <!-- Page Content -->
+            <div id="content" class="content">
+                <!-- Top Navbar -->
+                <nav class="navbar navbar-expand-lg navbar-dark sticky-top mb-4">
+                    <div class="container-fluid">
+                        <button id="sidebarToggle" class="btn btn-link d-md-none me-2">
+                            <i data-feather="menu"></i>
+                        </button>
+                        <a class="navbar-brand d-md-none d-flex align-items-center" href="{{ url_for('user.index') }}">
+                            <i data-feather="shield" class="me-2"></i>
+                            <span>CRM Suite</span>
+                        </a>
+                        <div class="ms-auto d-flex">
+                            <div class="nav-item dropdown me-3">
+                                <a class="nav-link dropdown-toggle position-relative" href="#" id="navbarDropdownNotifications" role="button" 
+                                   data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i data-feather="bell" class="feather-sm"></i>
+                                    {% set unread_count = current_user.unread_notifications_count() %}
+                                    {% if unread_count > 0 %}
+                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                            {{ unread_count }}
+                                            <span class="visually-hidden">unread notifications</span>
+                                        </span>
+                                    {% endif %}
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="navbarDropdownNotifications">
+                                    <li><h6 class="dropdown-header">Notifications</h6></li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item d-flex align-items-center" href="{{ url_for('user.notifications') }}">
+                                            <i data-feather="list" class="feather-sm me-2"></i>
+                                            View All Notifications
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdownUser" role="button" 
+                                   data-bs-toggle="dropdown" aria-expanded="false">
+                                    <div class="avatar d-inline-flex align-items-center justify-content-center bg-primary rounded-circle me-2" 
+                                        style="width: 32px; height: 32px;">
+                                        <span class="text-white fw-bold">{{ current_user.username[0].upper() }}</span>
+                                    </div>
+                                    <span class="d-none d-md-inline">{{ current_user.username }}</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="navbarDropdownUser">
+                                    <li>
+                                        <a class="dropdown-item d-flex align-items-center" href="{{ url_for('user.profile') }}">
+                                            <i data-feather="user" class="feather-sm me-2"></i>
+                                            Profile
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item d-flex align-items-center" href="{{ url_for('user.logout') }}">
+                                            <i data-feather="log-out" class="feather-sm me-2"></i>
+                                            Logout
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
 
-        <main class="container-fluid px-4 mb-4">
-            <!-- Main content -->
-            {% block content %}{% endblock %}
-        </main>
+                <main class="container-fluid px-4 mb-4">
+                    <!-- Main content -->
+                    {% block content %}{% endblock %}
+                </main>
 
-        <footer class="footer mt-auto py-3">
-            <div class="container-fluid px-4">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div class="text-muted">&copy; {{ now.year }} CRM Suite. All rights reserved.</div>
-                    <div class="text-muted">Version 1.0.0</div>
-                </div>
+                <footer class="footer mt-auto py-3">
+                    <div class="container-fluid px-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="text-muted">&copy; {{ now.year }} CRM Suite. All rights reserved.</div>
+                            <div class="text-muted">Version 1.0.0</div>
+                        </div>
+                    </div>
+                </footer>
             </div>
-        </footer>
+        </div>
         {% else %}
             <!-- Main content when not authenticated -->
             <div class="auth-content">
@@ -131,6 +303,52 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             feather.replace();
+            
+            // Sidebar toggle functionality
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebarCollapseBtn = document.getElementById('sidebarCollapseBtn');
+            const sidebar = document.getElementById('sidebar');
+            const content = document.getElementById('content');
+            
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('collapsed');
+                    content.classList.toggle('expanded');
+                });
+            }
+            
+            if (sidebarCollapseBtn) {
+                sidebarCollapseBtn.addEventListener('click', function() {
+                    sidebar.classList.toggle('collapsed');
+                    content.classList.toggle('expanded');
+                });
+            }
+            
+            // Collapse sidebar on small screens by default
+            function checkWidth() {
+                if (window.innerWidth < 768) {
+                    sidebar.classList.add('collapsed');
+                    content.classList.add('expanded');
+                } else {
+                    sidebar.classList.remove('collapsed');
+                    content.classList.remove('expanded');
+                }
+            }
+            
+            // Initial check
+            checkWidth();
+            
+            // Check on resize
+            window.addEventListener('resize', checkWidth);
+            
+            // Auto-expand active dropdown menus
+            const activeLinks = document.querySelectorAll('.sidebar-dropdown-link.active');
+            activeLinks.forEach(function(link) {
+                const parentCollapse = link.closest('.collapse');
+                if (parentCollapse) {
+                    new bootstrap.Collapse(parentCollapse).show();
+                }
+            });
         });
     </script>
     <!-- Custom JavaScript -->

@@ -6,14 +6,121 @@ body {
     background-color: var(--bs-dark);
 }
 
-/* Sidebar (when added) */
+/* Wrapper for sidebar and content */
+.wrapper {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+    align-items: stretch;
+}
+
+/* Sidebar */
 .sidebar {
-    min-width: 250px;
-    max-width: 250px;
+    min-width: 280px;
+    max-width: 280px;
     min-height: 100vh;
-    background-color: rgba(33, 37, 41, 0.95);
+    background-color: rgba(33, 37, 41, 0.97);
     border-right: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar.collapsed {
+    margin-left: -280px;
+}
+
+/* Sidebar Header */
+.sidebar-header {
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-brand {
+    font-weight: 600;
+    font-size: 1.25rem;
+    color: var(--bs-light);
+    text-decoration: none;
+}
+
+.sidebar-toggle {
+    color: var(--bs-light);
+}
+
+/* Sidebar Navigation */
+.sidebar-nav {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.sidebar-item {
+    position: relative;
+}
+
+.sidebar-item.active > .sidebar-link {
+    background-color: rgba(var(--bs-primary-rgb), 0.15);
+    color: var(--bs-primary);
+    font-weight: 600;
+    border-left: 4px solid var(--bs-primary);
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    padding: 0.875rem 1.25rem;
+    color: var(--bs-light);
+    text-decoration: none;
+    transition: all 0.2s;
+    border-left: 4px solid transparent;
+}
+
+.sidebar-link:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--bs-primary);
+}
+
+.sidebar-dropdown {
+    background-color: rgba(0, 0, 0, 0.15);
+    padding-left: 1rem;
+}
+
+.sidebar-dropdown-link {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1.25rem;
+    color: var(--bs-light);
+    text-decoration: none;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+}
+
+.sidebar-dropdown-link:hover {
+    color: var(--bs-primary);
+}
+
+.sidebar-dropdown-link.active {
+    color: var(--bs-primary);
+    font-weight: 600;
+}
+
+/* Main content wrapper */
+.content {
+    width: 100%;
+    min-height: 100vh;
+    overflow-x: hidden;
+    transition: all 0.3s;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Navbar customizations */
