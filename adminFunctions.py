@@ -6,7 +6,7 @@ from sqlalchemy import desc
 from models import User, Role, Notification, SessionActivity
 from forms import AdminUserForm
 from app import db, limiter
-from elasticSearch import add_to_index, remove_from_index, query_index
+# ElasticSearch functionality has been removed
 
 logger = logging.getLogger(__name__)
 
@@ -83,11 +83,8 @@ def edit_user(user_id):
         
         db.session.commit()
         
-        # Update search index if Elasticsearch is available
-        try:
-            add_to_index('users', user)
-        except Exception as e:
-            logger.warning(f"Failed to update user in search index: {e}")
+        # Elasticsearch removed
+        logger.debug(f"User {user.username} updated")
         
         flash(f'User {user.username} has been updated.', 'success')
         return redirect(url_for('admin.list_users'))
@@ -123,11 +120,8 @@ def delete_user(user_id):
     
     username = user.username
     
-    # Remove from search index if Elasticsearch is available
-    try:
-        remove_from_index('users', user)
-    except Exception as e:
-        logger.warning(f"Failed to remove user from search index: {e}")
+    # Elasticsearch removed
+    logger.debug(f"User {user.username} deleted")
     
     # Delete user and all associated data
     db.session.delete(user)
@@ -205,15 +199,45 @@ def search():
         return jsonify({'results': []})
     
     try:
-        results = query_index('users', q)
+        # Use SQLAlchemy search instead of ElasticSearch
+        query = q.lower()
+        search_query = User.query.filter(
+            db.or_(
+                db.func.lower(User.username).contains(query),
+                db.func.lower(User.email).contains(query),
+                db.func.lower(User.first_name).contains(query),
+                db.func.lower(User.last_name).contains(query)
+            )
+        )
+        
+        # Get total count for pagination
+        total = search_query.count()
+        
+        # Apply pagination
+        page = request.args.get('page', 1, type=int)
+        per_page = request.args.get('per_page', 10, type=int)
+        users = search_query.paginate(page=page, per_page=per_page, error_out=False).items
+            
+        results = [{
+            'id': user.id,
+            'username': user.username,
+            'email': user.email,
+            'name': f"{user.first_name} {user.last_name}" if user.first_name and user.last_name else user.username,
+            'is_admin': user.is_admin(),
+            'is_active': user.is_active
+        } for user in users]
+        
         return jsonify({
-            'results': results
+            'results': results,
+            'total': total,
+            'page': page,
+            'per_page': per_page
         })
     except Exception as e:
         logger.error(f"Search error: {e}")
         return jsonify({
             'results': [],
-            'error': 'Search functionality is currently unavailable'
+            'error': 'Search functionality encountered an error'
         })
 
 @admin_bp.route('/create_notification', methods=['GET', 'POST'])

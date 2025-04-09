@@ -10,7 +10,7 @@ from models import User, Notification, PasswordResetToken, TwoFactorToken, Role,
 from forms import LoginForm, RegistrationForm, EditProfileForm, PasswordResetRequestForm, PasswordResetForm, TwoFactorForm
 from app import db, mail, limiter, login_manager
 from cookies import set_session_cookie, clear_session_cookie, validate_session_cookie
-from elasticSearch import add_to_index, remove_from_index, query_index
+# ElasticSearch functionality has been removed
 
 logger = logging.getLogger(__name__)
 
@@ -204,11 +204,8 @@ def register():
         db.session.add(user)
         db.session.commit()
         
-        # Add user to search index if Elasticsearch is available
-        try:
-            add_to_index('users', user)
-        except Exception as e:
-            logger.warning(f"Failed to add user to search index: {e}")
+        # Elasticsearch removed
+        logger.debug(f"User {user.username} created")
         
         # Send confirmation email
         send_confirmation_email(user)
@@ -236,11 +233,8 @@ def edit_profile():
         
         db.session.commit()
         
-        # Update user in search index if Elasticsearch is available
-        try:
-            add_to_index('users', current_user)
-        except Exception as e:
-            logger.warning(f"Failed to update user in search index: {e}")
+        # Elasticsearch removed
+        logger.debug(f"User profile updated: {current_user.username}")
         
         flash('Your profile has been updated.', 'success')
         return redirect(url_for('user.profile'))
@@ -356,24 +350,25 @@ def search():
         return jsonify({'results': []})
     
     try:
-        from elasticSearch import ES_AVAILABLE
-        
-        if not ES_AVAILABLE:
-            return jsonify({
-                'results': [],
-                'error': 'Search functionality is currently unavailable (Elasticsearch not connected)'
-            })
-            
         page = request.args.get('page', 1, type=int)
         per_page = request.args.get('per_page', 10, type=int)
         
-        user_ids, total = query_index('users', q, page, per_page)
-        users = User.query.filter(User.id.in_(user_ids)).all() if user_ids else []
+        # Use SQLAlchemy search instead of ElasticSearch
+        query = q.lower()
+        search_query = User.query.filter(
+            db.or_(
+                db.func.lower(User.username).contains(query),
+                db.func.lower(User.email).contains(query),
+                db.func.lower(User.first_name).contains(query),
+                db.func.lower(User.last_name).contains(query)
+            )
+        )
         
-        # Sort users in the same order as returned by Elasticsearch
-        if user_ids:
-            id_to_pos = {id: pos for pos, id in enumerate(user_ids)}
-            users.sort(key=lambda u: id_to_pos.get(u.id, 0))
+        # Get total count for pagination
+        total = search_query.count()
+        
+        # Apply pagination
+        users = search_query.paginate(page=page, per_page=per_page, error_out=False).items
             
         results = [{
             'id': user.id,
@@ -391,7 +386,7 @@ def search():
         logger.error(f"Search error: {e}")
         return jsonify({
             'results': [],
-            'error': 'Search functionality is currently unavailable'
+            'error': 'Search functionality encountered an error'
         })
 
 # Helper functions

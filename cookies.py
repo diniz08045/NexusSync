@@ -41,12 +41,18 @@ def set_session_cookie(user):
     session['user_agent'] = user_agent
     session['ip'] = ip_address
 
-def validate_session_cookie():
+def validate_session_cookie(user=None):
     """
     Validates the current user's session cookie.
     Returns True if the session is valid, False otherwise.
+    
+    Args:
+        user: Optional user object to validate against, defaults to current_user
     """
-    if not current_user.is_authenticated:
+    if user is None:
+        user = current_user
+    
+    if not user.is_authenticated:
         return False
     
     secret_key = current_app.secret_key
@@ -60,7 +66,7 @@ def validate_session_cookie():
         return False
     
     # Check user ID
-    if 'user_id' not in session or session['user_id'] != current_user.id:
+    if 'user_id' not in session or session['user_id'] != user.id:
         logger.warning("User ID mismatch in session")
         return False
     

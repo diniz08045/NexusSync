@@ -1,6 +1,5 @@
 import os
 import logging
-from elasticsearch import Elasticsearch
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
@@ -58,22 +57,6 @@ limiter = Limiter(
     default_limits=["200 per day", "50 per hour"],
     storage_uri="memory://"
 )
-
-# Initialize Elasticsearch
-elasticsearch_host = os.environ.get('ELASTICSEARCH_HOST', 'localhost')
-elasticsearch_port = int(os.environ.get('ELASTICSEARCH_PORT', 9200))
-elasticsearch_url = f"http://{elasticsearch_host}:{elasticsearch_port}"
-
-try:
-    es = Elasticsearch([elasticsearch_url])
-    if es.ping():
-        logger.info("Connected to Elasticsearch")
-    else:
-        logger.warning("Could not connect to Elasticsearch")
-        es = None
-except Exception as e:
-    logger.error(f"Error connecting to Elasticsearch: {e}")
-    es = None
 
 # Initialize the app with the extensions
 db.init_app(app)
