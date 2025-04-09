@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <h1 class="h3 mb-0">Active Sessions</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{{ url_for('admin.index') }}">Admin Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Active Sessions</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <div class="stat-icon bg-primary text-white">
+                            <i data-feather="users" class="feather-md"></i>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h5 class="fw-bold mb-1">Total Active Sessions</h5>
+                        <h3 class="mb-0">{{ sessions|length }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <div class="stat-icon bg-success text-white">
+                            <i data-feather="user-check" class="feather-md"></i>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h5 class="fw-bold mb-1">Unique Users</h5>
+                        <h3 class="mb-0">{{ unique_users }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <div class="stat-icon bg-info text-white">
+                            <i data-feather="clock" class="feather-md"></i>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h5 class="fw-bold mb-1">Last Hour Logins</h5>
+                        <h3 class="mb-0">{{ recent_logins }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Session Activity</h5>
+                <div class="input-group" style="max-width: 300px;">
+                    <input type="text" class="form-control" id="session-search" placeholder="Search sessions...">
+                    <span class="input-group-text bg-dark border-secondary">
+                        <i data-feather="search" class="feather-sm"></i>
+                    </span>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th scope="col">User</th>
+                                <th scope="col">Session ID</th>
+                                <th scope="col">IP Address</th>
+                                <th scope="col">User Agent</th>
+                                <th scope="col">Created</th>
+                                <th scope="col">Last Activity</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for session in sessions %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar d-inline-flex align-items-center justify-content-center bg-primary rounded-circle me-2" 
+                                            style="width: 40px; height: 40px;">
+                                            <span class="text-white fw-bold">{{ session.user.username[0].upper() }}</span>
+                                        </div>
+                                        <div>
+                                            <p class="mb-0 fw-medium">{{ session.user.username }}</p>
+                                            {% if session.user.is_admin() %}
+                                                <span class="badge bg-primary">Admin</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">User</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="text-truncate d-inline-block" style="max-width: 150px;" title="{{ session.session_id }}">
+                                        {{ session.session_id }}
+                                    </span>
+                                </td>
+                                <td>{{ session.ip_address }}</td>
+                                <td>
+                                    <span class="text-truncate d-inline-block" style="max-width: 250px;" title="{{ session.user_agent }}">
+                                        {{ session.user_agent }}
+                                    </span>
+                                </td>
+                                <td>{{ session.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>{{ session.last_activity.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-danger" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#terminateSessionModal{{ session.id }}">
+                                        <i data-feather="x-circle" class="feather-sm me-1"></i> Terminate
+                                    </button>
+                                    
+                                    <!-- Terminate Session Modal -->
+                                    <div class="modal fade" id="terminateSessionModal{{ session.id }}" tabindex="-1" aria-labelledby="terminateSessionModalLabel{{ session.id }}" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="terminateSessionModalLabel{{ session.id }}">Terminate Session</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p>Are you sure you want to terminate this session?</p>
+                                                    <div class="alert alert-warning" role="alert">
+                                                        <i data-feather="alert-triangle" class="feather-sm me-2"></i>
+                                                        The user will be logged out immediately and will need to log in again.
+                                                    </div>
+                                                    <p><strong>User:</strong> {{ session.user.username }}</p>
+                                                    <p><strong>IP Address:</strong> {{ session.ip_address }}</p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                    <a href="{{ url_for('admin.terminate_session', session_id=session.id) }}" class="btn btn-danger">Terminate Session</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Search functionality
+        const searchInput = document.getElementById('session-search');
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function() {
+                const searchTerm = this.value.toLowerCase();
+                const tableRows = document.querySelectorAll('tbody tr');
+                
+                tableRows.forEach(function(row) {
+                    const username = row.querySelector('td:first-child p').textContent.toLowerCase();
+                    const ip = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+                    const userAgent = row.querySelector('td:nth-child(4) span').getAttribute('title').toLowerCase();
+                    
+                    if (username.includes(searchTerm) || ip.includes(searchTerm) || userAgent.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        }
+    });
+</script>
+
+<style>
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+    }
+</style>
+{% endblock %}

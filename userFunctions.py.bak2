@@ -83,7 +83,7 @@ def login():
         # Record session activity
         session_activity = SessionActivity(
             user_id=user.id,
-            session_id=session.sid,
+            session_id=session.get("session_id", os.urandom(16).hex()),
             ip_address=request.remote_addr,
             user_agent=request.user_agent.string
         )
@@ -138,10 +138,14 @@ def two_factor_auth():
         user.last_ip = request.remote_addr
         user.last_user_agent = request.user_agent.string
         
+        # Generate a unique session ID if not exists
+        if 'session_id' not in session:
+            session['session_id'] = os.urandom(16).hex()
+        
         # Record session activity
         session_activity = SessionActivity(
             user_id=user.id,
-            session_id=session.sid,
+            session_id=session.get("session_id", os.urandom(16).hex()),
             ip_address=request.remote_addr,
             user_agent=request.user_agent.string
         )
@@ -169,7 +173,7 @@ def logout():
         # Update session activity record
         session_activity = SessionActivity.query.filter_by(
             user_id=current_user.id,
-            session_id=session.sid,
+            session_id=session.get("session_id", os.urandom(16).hex()),
             is_active=True
         ).first()
         
@@ -346,18 +350,6 @@ def dismiss_notification(notification_id):
     
     return jsonify({'success': True})
 
-@user_bp.route('/messages')
-@login_required
-def messages():
-    """View messages and conversations."""
-    return render_template('messages.html', title='Messages')
-
-@user_bp.route('/security/two-factor')
-@login_required
-def two_factor_settings():
-    """Configure two-factor authentication."""
-    return render_template('two_factor_settings.html', title='Two-Factor Authentication')
-
 @user_bp.route('/search')
 @login_required
 def search():
@@ -379,6 +371,43 @@ def search():
                 db.func.lower(User.last_name).contains(query)
             )
         )
+        
+        # Get total count for pagination
+        total = search_query.count()
+        
+        # Apply pagination
+        users = search_query.paginate(page=page, per_page=per_page, error_out=False).items
+            
+        results = [{
+            'id': user.id,
+            'username': user.username,
+            'name': f"{user.first_name} {user.last_name}" if user.first_name and user.last_name else user.username
+        } for user in users]
+        
+        return jsonify({
+            'results': results,
+            'total': total,
+            'page': page,
+            'per_page': per_page
+        })
+    except Exception as e:
+        logger.error(f"Search error: {e}")
+        return jsonify({
+            'results': [],
+            'error': 'Search functionality encountered an error'
+        })
+
+@user_bp.route('/messages')
+@login_required
+def messages():
+    """View messages and conversations."""
+    return render_template('messages.html', title='Messages')
+
+@user_bp.route('/security/two-factor')
+@login_required
+def two_factor_settings():
+    """Configure two-factor authentication."""
+    return render_template('two_factor_settings.html', title='Two-Factor Authentication')
         
         # Get total count for pagination
         total = search_query.count()

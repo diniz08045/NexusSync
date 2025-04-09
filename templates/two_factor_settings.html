@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <h1 class="h3 mb-0">Two-Factor Authentication</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{{ url_for('user.index') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Two-Factor Authentication</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-7 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Manage Two-Factor Authentication</h5>
+            </div>
+            <div class="card-body">
+                {% if current_user.two_factor_enabled %}
+                <div class="alert alert-success" role="alert">
+                    <div class="d-flex align-items-center">
+                        <div>
+                            <i data-feather="check-circle" class="feather-md me-2"></i>
+                        </div>
+                        <div>
+                            <h5 class="alert-heading mb-1">Two-Factor Authentication is Enabled</h5>
+                            <p class="mb-0">Your account is protected with an additional layer of security.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <p>Each time you log in, you'll need to provide:</p>
+                <ul>
+                    <li>Your password</li>
+                    <li>A one-time security code sent to your email</li>
+                </ul>
+                
+                <p>This helps protect your account even if your password is compromised.</p>
+                
+                <form id="disable-2fa-form" method="post" action="#">
+                    <div class="alert alert-warning" role="alert">
+                        <div class="d-flex align-items-center mb-2">
+                            <i data-feather="alert-triangle" class="feather-md me-2"></i>
+                            <h5 class="alert-heading mb-0">Disable Two-Factor Authentication?</h5>
+                        </div>
+                        <p class="mb-0">Disabling two-factor authentication will reduce the security of your account. Are you sure you want to proceed?</p>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <button type="submit" class="btn btn-danger">
+                            <i data-feather="shield-off" class="feather-sm me-1"></i> Disable Two-Factor Authentication
+                        </button>
+                    </div>
+                </form>
+                
+                {% else %}
+                <div class="alert alert-warning" role="alert">
+                    <div class="d-flex align-items-center">
+                        <div>
+                            <i data-feather="alert-triangle" class="feather-md me-2"></i>
+                        </div>
+                        <div>
+                            <h5 class="alert-heading mb-1">Two-Factor Authentication is Disabled</h5>
+                            <p class="mb-0">Your account is currently not protected with two-factor authentication.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <p>Two-factor authentication adds an additional layer of security to your account by requiring not only a password but also a one-time security code that will be sent to your email address.</p>
+                
+                <form id="enable-2fa-form" method="post" action="#">
+                    <div class="alert alert-info" role="alert">
+                        <div class="d-flex align-items-center mb-2">
+                            <i data-feather="info" class="feather-md me-2"></i>
+                            <h5 class="alert-heading mb-0">Enable Two-Factor Authentication</h5>
+                        </div>
+                        <p class="mb-0">When you enable two-factor authentication, you'll need to enter both your password and a one-time security code whenever you log in.</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email for receiving security codes:</label>
+                        <input type="email" class="form-control" id="email" value="{{ current_user.email }}" disabled>
+                        <div class="form-text">Security codes will be sent to this email address.</div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i data-feather="shield" class="feather-sm me-1"></i> Enable Two-Factor Authentication
+                        </button>
+                    </div>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-5 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Security Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="security-info-item mb-4">
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="security-icon me-3 bg-primary">
+                            <i data-feather="shield" class="feather-sm"></i>
+                        </div>
+                        <h6 class="mb-0">What is Two-Factor Authentication?</h6>
+                    </div>
+                    <p class="text-secondary mb-0">Two-factor authentication (2FA) is a security process in which users provide two different authentication factors to verify their identity.</p>
+                </div>
+                
+                <div class="security-info-item mb-4">
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="security-icon me-3 bg-success">
+                            <i data-feather="check-circle" class="feather-sm"></i>
+                        </div>
+                        <h6 class="mb-0">Why use Two-Factor Authentication?</h6>
+                    </div>
+                    <p class="text-secondary mb-0">2FA provides a higher level of security than password-only access. Even if your password is compromised, an attacker would still need the second factor to access your account.</p>
+                </div>
+                
+                <div class="security-info-item mb-4">
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="security-icon me-3 bg-warning">
+                            <i data-feather="key" class="feather-sm"></i>
+                        </div>
+                        <h6 class="mb-0">How it works</h6>
+                    </div>
+                    <p class="text-secondary mb-0">When you log in, we'll send a one-time security code to your registered email address. Enter this code in addition to your password to complete the login process.</p>
+                </div>
+                
+                <div class="security-info-item">
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="security-icon me-3 bg-info">
+                            <i data-feather="help-circle" class="feather-sm"></i>
+                        </div>
+                        <h6 class="mb-0">Need Assistance?</h6>
+                    </div>
+                    <p class="text-secondary mb-0">If you're having trouble with two-factor authentication, please contact our support team for help.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle enabling 2FA
+        const enableForm = document.getElementById('enable-2fa-form');
+        if (enableForm) {
+            enableForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // In a real application, this would send a request to the server
+                // to enable 2FA for the user's account
+                
+                // Show loading state
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalContent = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+                
+                // Simulate processing
+                setTimeout(function() {
+                    // Success message
+                    alert('Two-factor authentication has been enabled for your account. You will now receive security codes via email when logging in.');
+                    
+                    // Refresh the page to show the updated state
+                    window.location.reload();
+                }, 2000);
+            });
+        }
+        
+        // Handle disabling 2FA
+        const disableForm = document.getElementById('disable-2fa-form');
+        if (disableForm) {
+            disableForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (confirm('Are you sure you want to disable two-factor authentication? This will reduce the security of your account.')) {
+                    // In a real application, this would send a request to the server
+                    // to disable 2FA for the user's account
+                    
+                    // Show loading state
+                    const submitBtn = this.querySelector('button[type="submit"]');
+                    const originalContent = submitBtn.innerHTML;
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+                    
+                    // Simulate processing
+                    setTimeout(function() {
+                        // Success message
+                        alert('Two-factor authentication has been disabled for your account.');
+                        
+                        // Refresh the page to show the updated state
+                        window.location.reload();
+                    }, 2000);
+                }
+            });
+        }
+    });
+</script>
+
+<style>
+    .security-icon {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        color: white;
+    }
+</style>
+{% endblock %}
