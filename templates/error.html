@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-body text-center p-5">
+                <div class="mb-4">
+                    {% if title == 'Not Found' %}
+                        <i data-feather="search" style="width: 64px; height: 64px;"></i>
+                    {% elif title == 'Server Error' or title == 'Unexpected Error' %}
+                        <i data-feather="alert-triangle" style="width: 64px; height: 64px;"></i>
+                    {% elif title == 'Forbidden' %}
+                        <i data-feather="shield-off" style="width: 64px; height: 64px;"></i>
+                    {% elif title == 'Unauthorized' %}
+                        <i data-feather="lock" style="width: 64px; height: 64px;"></i>
+                    {% elif title == 'Too Many Requests' %}
+                        <i data-feather="clock" style="width: 64px; height: 64px;"></i>
+                    {% else %}
+                        <i data-feather="alert-circle" style="width: 64px; height: 64px;"></i>
+                    {% endif %}
+                </div>
+                
+                <h2 class="mb-3">{{ title }}</h2>
+                <p class="lead mb-4">{{ error }}</p>
+                
+                <div class="d-grid gap-2 col-md-6 mx-auto">
+                    <a href="{{ url_for('user.index') }}" class="btn btn-primary">
+                        <i data-feather="home" class="feather-sm me-1"></i> Back to Home
+                    </a>
+                    {% if title == 'Not Found' %}
+                        <button onclick="window.history.back();" class="btn btn-outline-secondary">
+                            <i data-feather="arrow-left" class="feather-sm me-1"></i> Go Back
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
