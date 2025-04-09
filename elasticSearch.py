@@ -4,9 +4,12 @@ from app import es
 
 logger = logging.getLogger(__name__)
 
+# Flag to check if ES is available
+ES_AVAILABLE = es is not None
+
 def add_to_index(index, model):
     """Add an object to the Elasticsearch index."""
-    if es is None:
+    if not ES_AVAILABLE or es is None:
         logger.warning("Elasticsearch is not available")
         return
     
@@ -24,7 +27,7 @@ def add_to_index(index, model):
 
 def remove_from_index(index, model):
     """Remove an object from the Elasticsearch index."""
-    if es is None:
+    if not ES_AVAILABLE or es is None:
         logger.warning("Elasticsearch is not available")
         return
     
@@ -36,9 +39,9 @@ def remove_from_index(index, model):
 
 def query_index(index, query, page=1, per_page=10):
     """Search for objects in the Elasticsearch index."""
-    if es is None:
+    if not ES_AVAILABLE or es is None:
         logger.warning("Elasticsearch is not available")
-        return []
+        return [], 0
     
     try:
         search = es.search(
@@ -56,14 +59,15 @@ def query_index(index, query, page=1, per_page=10):
         )
         
         ids = [int(hit['_id']) for hit in search['hits']['hits']]
-        return ids
+        total = search['hits']['total']['value'] if 'total' in search['hits'] else 0
+        return ids, total
     except Exception as e:
         logger.error(f"Error querying Elasticsearch index: {e}")
-        return []
+        return [], 0
 
 def bulk_index(index, models):
     """Index multiple objects in Elasticsearch."""
-    if es is None:
+    if not ES_AVAILABLE or es is None:
         logger.warning("Elasticsearch is not available")
         return
     
@@ -91,7 +95,7 @@ def bulk_index(index, models):
 
 def create_index(index, mapping=None):
     """Create an Elasticsearch index with optional mapping."""
-    if es is None:
+    if not ES_AVAILABLE or es is None:
         logger.warning("Elasticsearch is not available")
         return
     
@@ -104,7 +108,7 @@ def create_index(index, mapping=None):
 
 def delete_index(index):
     """Delete an Elasticsearch index."""
-    if es is None:
+    if not ES_AVAILABLE or es is None:
         logger.warning("Elasticsearch is not available")
         return
     
@@ -117,7 +121,7 @@ def delete_index(index):
 
 def reindex_all(index, model_class):
     """Reindex all objects of a model class."""
-    if es is None:
+    if not ES_AVAILABLE or es is None:
         logger.warning("Elasticsearch is not available")
         return
     

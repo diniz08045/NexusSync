@@ -356,9 +356,36 @@ def search():
         return jsonify({'results': []})
     
     try:
-        results = query_index('users', q)
+        from elasticSearch import ES_AVAILABLE
+        
+        if not ES_AVAILABLE:
+            return jsonify({
+                'results': [],
+                'error': 'Search functionality is currently unavailable (Elasticsearch not connected)'
+            })
+            
+        page = request.args.get('page', 1, type=int)
+        per_page = request.args.get('per_page', 10, type=int)
+        
+        user_ids, total = query_index('users', q, page, per_page)
+        users = User.query.filter(User.id.in_(user_ids)).all() if user_ids else []
+        
+        # Sort users in the same order as returned by Elasticsearch
+        if user_ids:
+            id_to_pos = {id: pos for pos, id in enumerate(user_ids)}
+            users.sort(key=lambda u: id_to_pos.get(u.id, 0))
+            
+        results = [{
+            'id': user.id,
+            'username': user.username,
+            'name': f"{user.first_name} {user.last_name}" if user.first_name and user.last_name else user.username
+        } for user in users]
+        
         return jsonify({
-            'results': results
+            'results': results,
+            'total': total,
+            'page': page,
+            'per_page': per_page
         })
     except Exception as e:
         logger.error(f"Search error: {e}")
@@ -456,3 +483,57 @@ def confirm_email(token):
     
     flash('Your email has been confirmed. You can now log in.', 'success')
     return redirect(url_for('user.login'))
+
+# API Routes for AJAX requests
+@user_bp.route('/api/notifications')
+@login_required
+def api_get_notifications():
+    """API endpoint to get notifications"""
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+    
+    query = current_user.notifications.filter_by(is_dismissed=False).order_by(Notification.created_at.desc())
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+    
+    notifications = [{
+        'id': n.id,
+        'title': n.title,
+        'message': n.message,
+        'is_read': n.is_read,
+        'created_at': n.created_at.isoformat()
+    } for n in pagination.items]
+    
+    return jsonify({
+        'notifications': notifications,
+        'total': pagination.total,
+        'pages': pagination.pages,
+        'current_page': page
+    })
+
+@user_bp.route('/api/notifications/<int:notification_id>/read', methods=['POST'])
+@login_required
+def api_mark_notification_read(notification_id):
+    """API endpoint to mark a notification as read"""
+    notification = Notification.query.get_or_404(notification_id)
+    
+    if notification.user_id != current_user.id:
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 403
+    
+    notification.is_read = True
+    db.session.commit()
+    
+    return jsonify({'success': True})
+
+@user_bp.route('/api/notifications/<int:notification_id>/dismiss', methods=['POST'])
+@login_required
+def api_dismiss_notification(notification_id):
+    """API endpoint to dismiss a notification"""
+    notification = Notification.query.get_or_404(notification_id)
+    
+    if notification.user_id != current_user.id:
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 403
+    
+    notification.is_dismissed = True
+    db.session.commit()
+    
+    return jsonify({'success': True})

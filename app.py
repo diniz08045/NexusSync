@@ -96,6 +96,40 @@ with app.app_context():
         db.session.add(user_role)
     
     db.session.commit()
+    
+    # Create default admin user if it doesn't exist
+    from models import User
+    from werkzeug.security import generate_password_hash
+    admin_user = User.query.filter_by(username='admin').first()
+    if not admin_user:
+        admin_user = User(
+            username='admin',
+            email='admin@example.com',
+            password_hash=generate_password_hash('admin123'),
+            first_name='Admin',
+            last_name='User',
+            is_active=True,
+            is_email_confirmed=True,
+        )
+        admin_user.roles.append(admin_role)
+        admin_user.roles.append(user_role)
+        db.session.add(admin_user)
+        
+        # Create a regular demo user
+        demo_user = User(
+            username='demo',
+            email='demo@example.com',
+            password_hash=generate_password_hash('demo123'),
+            first_name='Demo',
+            last_name='User',
+            is_active=True,
+            is_email_confirmed=True,
+        )
+        demo_user.roles.append(user_role)
+        db.session.add(demo_user)
+        
+        db.session.commit()
+        logger.info("Created default admin and demo users")
 
 # Import and register blueprints
 from userFunctions import user_bp
