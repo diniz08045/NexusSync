@@ -83,7 +83,7 @@ def login():
         # Record session activity
         session_activity = SessionActivity(
             user_id=user.id,
-            session_id=session.get("session_id", os.urandom(16).hex()),
+            session_id=session.sid,
             ip_address=request.remote_addr,
             user_agent=request.user_agent.string
         )
@@ -138,14 +138,10 @@ def two_factor_auth():
         user.last_ip = request.remote_addr
         user.last_user_agent = request.user_agent.string
         
-        # Generate a unique session ID if not exists
-        if 'session_id' not in session:
-            session['session_id'] = os.urandom(16).hex()
-        
         # Record session activity
         session_activity = SessionActivity(
             user_id=user.id,
-            session_id=session.get("session_id", os.urandom(16).hex()),
+            session_id=session.sid,
             ip_address=request.remote_addr,
             user_agent=request.user_agent.string
         )
@@ -173,7 +169,7 @@ def logout():
         # Update session activity record
         session_activity = SessionActivity.query.filter_by(
             user_id=current_user.id,
-            session_id=session.get("session_id", os.urandom(16).hex()),
+            session_id=session.sid,
             is_active=True
         ).first()
         

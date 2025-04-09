@@ -90,6 +90,7 @@ def clear_session_cookie():
     session.pop('user_id', None)
     session.pop('user_agent', None)
     session.pop('ip', None)
+    session.pop('session_id', None)
 
 def generate_csrf_token():
     """Generates a CSRF token for form submission."""
