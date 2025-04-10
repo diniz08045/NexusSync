@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime, timedelta
-from flask import Blueprint, render_template, redirect, url_for, flash, request, session
+from flask import Blueprint, render_template, redirect, url_for, flash, request, session, current_app
 from flask_login import login_user, logout_user, current_user, login_required
 from app import db
 from app.models.user import User, PasswordResetToken, TwoFactorToken
@@ -15,24 +15,67 @@ logger = logging.getLogger(__name__)
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
+@auth_bp.route('/login/', methods=['GET', 'POST'])
 def login():
     """User login page."""
+    # Apply rate limiting for login attempts
+    current_app.rate_limits['login']
+    
     if current_user.is_authenticated:
         return redirect(url_for('user.index'))
     
     form = LoginForm()
     
     if form.validate_on_submit():
+        # Get client info for security tracking
+        ip_address = request.remote_addr
+        user_agent = request.user_agent.string if request.user_agent else "Unknown"
+        
         user = User.query.filter_by(username=form.username.data).first()
         
+        # Check for too many failed attempts
+        from app.utils.security import check_login_attempts, log_security_event
+        
+        if user:
+            is_blocked, remaining_time = check_login_attempts(
+                user.id, 
+                ip_address=ip_address, 
+                max_attempts=5,
+                window_minutes=15
+            )
+            
+            if is_blocked:
+                log_security_event('login_blocked', user_id=user.id, 
+                                  details={'reason': 'too_many_attempts', 'ip': ip_address})
+                
+                flash(f'Account temporarily locked due to too many failed attempts. Please try again later.', 'danger')
+                return redirect(url_for('auth.login'))
+        
         if user is None or not user.check_password(form.password.data):
+            # Record failed login attempt
+            if user:
+                user.record_login(ip_address, user_agent, successful=False)
+                log_security_event('login_failed', user_id=user.id, 
+                                  details={'ip': ip_address, 'reason': 'invalid_password'})
+            else:
+                log_security_event('login_failed', 
+                                  details={'username': form.username.data, 'reason': 'user_not_found'})
+                
             flash('Invalid username or password.', 'danger')
-            logger.warning(f"Failed login attempt for username: {form.username.data}")
+            logger.warning(f"Failed login attempt for username: {form.username.data} from IP: {ip_address}")
+            
+            # Delay response to slow down brute force attacks
+            import time
+            time.sleep(1)
+            
             return redirect(url_for('auth.login'))
         
         if not user.is_active:
+            log_security_event('login_blocked', user_id=user.id, 
+                              details={'reason': 'account_inactive', 'ip': ip_address})
+            
             flash('Your account has been deactivated. Please contact the administrator.', 'danger')
-            logger.warning(f"Login attempt on inactive account: {user.username}")
+            logger.warning(f"Login attempt on inactive account: {user.username} from IP: {ip_address}")
             return redirect(url_for('auth.login'))
         
         # Two-factor authentication check
@@ -202,21 +245,38 @@ def logout():
     return redirect(url_for('auth.login'))
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
+@auth_bp.route('/register/', methods=['GET', 'POST'])
 def register():
     """User registration page."""
+    # Apply rate limiting for registration to prevent abuse
+    current_app.rate_limits['register']
+    
     if current_user.is_authenticated:
         return redirect(url_for('user.index'))
     
     form = RegistrationForm()
     
     if form.validate_on_submit():
+        # Get client info for security tracking
+        ip_address = request.remote_addr
+        user_agent = request.user_agent.string if request.user_agent else "Unknown"
+        
+        # Validate password complexity
+        is_valid, message = User.validate_password_complexity(form.password.data)
+        if not is_valid:
+            flash(message, 'danger')
+            return render_template('auth/register.html', title='Register', form=form, app_name="NexusSync")
+        
+        # Create the new user
         user = User(
             username=form.username.data,
             email=form.email.data,
             first_name=form.first_name.data,
             last_name=form.last_name.data,
             is_active=True,
-            is_email_confirmed=False
+            is_email_confirmed=False,
+            last_ip=ip_address,
+            last_user_agent=user_agent
         )
         user.set_password(form.password.data)
         
@@ -232,25 +292,39 @@ def register():
         # Send confirmation email
         send_confirmation_email(user)
         
-        logger.info(f"New user registered: {user.username}")
+        # Log the security event
+        from app.utils.security import log_security_event
+        log_security_event('user_registered', user_id=user.id, 
+                          details={'ip': ip_address, 'username': user.username})
+        
+        logger.info(f"New user registered: {user.username} from IP: {ip_address}")
         flash('Registration successful! Please check your email to confirm your account.', 'success')
         return redirect(url_for('auth.login'))
     
     return render_template('auth/register.html', title='Register', form=form, app_name="NexusSync")
 
 @auth_bp.route('/reset-password-request', methods=['GET', 'POST'])
+@auth_bp.route('/reset-password-request/', methods=['GET', 'POST'])
 def reset_password_request():
     """Password reset request page."""
+    # Apply strict rate limiting for password reset to prevent enumeration attacks
+    current_app.rate_limits['password_reset']
+    
     if current_user.is_authenticated:
         return redirect(url_for('user.index'))
     
     form = PasswordResetRequestForm()
     
     if form.validate_on_submit():
+        # Get client info for security tracking
+        ip_address = request.remote_addr
+        user_agent = request.user_agent.string if request.user_agent else "Unknown"
+        
+        # Find user by email
         user = User.query.filter_by(email=form.email.data).first()
         
         if user:
-            # Generate token
+            # Generate token with proper expiry
             token = PasswordResetToken.generate_token()
             password_reset = PasswordResetToken(
                 user_id=user.id,
@@ -263,16 +337,35 @@ def reset_password_request():
             # Send reset email
             send_password_reset_email(user, token)
             
-            logger.info(f"Password reset requested for: {user.email}")
+            # Log the security event
+            from app.utils.security import log_security_event
+            log_security_event('password_reset_requested', user_id=user.id, 
+                            details={'ip': ip_address})
+            
+            logger.info(f"Password reset requested for: {user.email} from IP: {ip_address}")
+        else:
+            # Log attempted reset for non-existent account (potential account enumeration)
+            logger.warning(f"Password reset attempted for non-existent email: {form.email.data} from IP: {ip_address}")
+            
+            from app.utils.security import log_security_event
+            log_security_event('password_reset_invalid_email', 
+                            details={'email': form.email.data, 'ip': ip_address})
         
         # Always show the same message even if email not found for security
+        # This prevents account enumeration
         flash('Check your email for instructions to reset your password.', 'info')
+        
+        # Add randomized delay to prevent timing attacks
+        import random
+        import time
+        time.sleep(random.uniform(0.5, 1.5))
+        
         return redirect(url_for('auth.login'))
     
     return render_template('auth/reset_password_request.html', 
-                          title='Reset Password', 
-                          form=form,
-                          app_name="NexusSync")
+                        title='Reset Password', 
+                        form=form,
+                        app_name="NexusSync")
 
 @auth_bp.route('/reset-password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
