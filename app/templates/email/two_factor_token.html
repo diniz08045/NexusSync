@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Two-Factor Authentication Code</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .code-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .code {
+            font-size: 28px;
+            font-weight: bold;
+            letter-spacing: 4px;
+            color: #0d6efd;
+            padding: 10px 20px;
+            background-color: #e8f0fe;
+            border-radius: 5px;
+            display: inline-block;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 12px;
+            color: #777;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <h2>NexusSync</h2>
+        </div>
+        
+        <p>Hello,</p>
+        
+        <p>You are receiving this email because you requested to log in to your NexusSync account. To complete the login process, please use the following verification code:</p>
+        
+        <div class="code-container">
+            <div class="code">{{ token }}</div>
+        </div>
+        
+        <p>This code will expire in 15 minutes for security reasons.</p>
+        
+        <p>If you did not attempt to log in to your NexusSync account, please ignore this email or contact our support team immediately as your account may be at risk.</p>
+        
+        <p>Thank you for using NexusSync!</p>
+        
+        <p>Best regards,<br>The NexusSync Team</p>
+        
+        <div class="footer">
+            <p>This is an automated message. Please do not reply to this email.</p>
+            <p>&copy; 2025 NexusSync. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -65,14 +65,23 @@ def login():
         user.last_user_agent = request.user_agent.string
         
         # Create session activity record
-        session_activity = SessionActivity(
-            user_id=user.id,
-            session_id=session.sid,
-            ip_address=request.remote_addr,
-            user_agent=request.user_agent.string
-        )
-        db.session.add(session_activity)
-        db.session.commit()
+        try:
+            # Use a random session ID if session.sid is not available 
+            import uuid
+            session_id = getattr(session, 'sid', str(uuid.uuid4()))
+            
+            session_activity = SessionActivity(
+                user_id=user.id,
+                session_id=session_id,
+                ip_address=request.remote_addr,
+                user_agent=request.user_agent.string
+            )
+            db.session.add(session_activity)
+            db.session.commit()
+        except Exception as e:
+            logger.error(f"Error creating session activity: {str(e)}")
+            # Ensure login still works even if session tracking fails
+            db.session.rollback()
         
         logger.info(f"User logged in: {user.username}")
         
@@ -130,14 +139,23 @@ def two_factor_auth():
         user.last_user_agent = request.user_agent.string
         
         # Create session activity record
-        session_activity = SessionActivity(
-            user_id=user.id,
-            session_id=session.sid,
-            ip_address=request.remote_addr,
-            user_agent=request.user_agent.string
-        )
-        db.session.add(session_activity)
-        db.session.commit()
+        try:
+            # Use a random session ID if session.sid is not available 
+            import uuid
+            session_id = getattr(session, 'sid', str(uuid.uuid4()))
+            
+            session_activity = SessionActivity(
+                user_id=user.id,
+                session_id=session_id,
+                ip_address=request.remote_addr,
+                user_agent=request.user_agent.string
+            )
+            db.session.add(session_activity)
+            db.session.commit()
+        except Exception as e:
+            logger.error(f"Error creating session activity: {str(e)}")
+            # Ensure login still works even if session tracking fails
+            db.session.rollback()
         
         # Clear the 2FA session data
         session.pop('two_factor_user_id', None)
@@ -157,16 +175,25 @@ def two_factor_auth():
 def logout():
     """User logout."""
     if current_user.is_authenticated:
-        # Mark session as inactive
-        session_activity = SessionActivity.query.filter_by(
-            user_id=current_user.id,
-            session_id=session.sid,
-            is_active=True
-        ).first()
-        
-        if session_activity:
-            session_activity.is_active = False
-            db.session.commit()
+        try:
+            # Use a random session ID if session.sid is not available 
+            import uuid
+            session_id = getattr(session, 'sid', str(uuid.uuid4()))
+            
+            # Mark session as inactive
+            session_activity = SessionActivity.query.filter_by(
+                user_id=current_user.id,
+                session_id=session_id,
+                is_active=True
+            ).first()
+            
+            if session_activity:
+                session_activity.is_active = False
+                db.session.commit()
+        except Exception as e:
+            logger.error(f"Error updating session activity: {str(e)}")
+            # Ensure logout still works even if session tracking fails
+            db.session.rollback()
         
         logger.info(f"User logged out: {current_user.username}")
     
