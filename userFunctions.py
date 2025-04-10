@@ -432,6 +432,39 @@ def messages():
                     }
                     conversations.insert(0, new_conv)
                 
+                # Initialize conversation in the session if it doesn't exist
+                recipient_id_str = str(recipient_id)
+                if 'conversation_messages' not in session:
+                    session['conversation_messages'] = {}
+                
+                if recipient_id_str not in session['conversation_messages']:
+                    session['conversation_messages'][recipient_id_str] = []
+                
+                # Add the message to the conversation
+                session['conversation_messages'][recipient_id_str].extend([
+                    {
+                        'sender': 'You',
+                        'text': f'Subject: {subject}',
+                        'time': 'Just now',
+                        'is_mine': True
+                    },
+                    {
+                        'sender': 'You',
+                        'text': content,
+                        'time': 'Just now',
+                        'is_mine': True
+                    },
+                    {
+                        'sender': recipient['name'],
+                        'text': 'Thank you for your message. I will review and respond shortly.',
+                        'time': 'Just now',
+                        'is_mine': False
+                    }
+                ])
+                
+                # Mark session as modified
+                session.modified = True
+                
                 # Flash a success message
                 flash('Message sent successfully!', 'success')
                 
@@ -469,38 +502,55 @@ def messages():
                 conv['unread'] = False
                 break
     
+    # Get conversation messages from session storage if they exist, otherwise initialize
+    if 'conversation_messages' not in session:
+        session['conversation_messages'] = {}
+    
     # Generate message data for the selected conversation
     messages = []
     if selected_conversation:
-        messages = [
-            {
-                'sender': selected_conversation['name'], 
-                'text': 'Hi there!', 
-                'time': '10:15 AM', 
-                'is_mine': False
-            },
-            {
-                'sender': 'You', 
-                'text': 'Hello! How can I help you today?', 
-                'time': '10:18 AM', 
-                'is_mine': True
-            },
-            {
-                'sender': selected_conversation['name'], 
-                'text': selected_conversation['last_message'], 
-                'time': '10:30 AM', 
-                'is_mine': False
-            }
-        ]
+        # Use session to store messages for each conversation
+        conversation_id_str = str(selected_conversation['id'])
+        
+        # Initialize conversation messages if not exist
+        if conversation_id_str not in session['conversation_messages']:
+            session['conversation_messages'][conversation_id_str] = [
+                {
+                    'sender': selected_conversation['name'], 
+                    'text': 'Hi there!', 
+                    'time': '10:15 AM', 
+                    'is_mine': False
+                },
+                {
+                    'sender': 'You', 
+                    'text': 'Hello! How can I help you today?', 
+                    'time': '10:18 AM', 
+                    'is_mine': True
+                },
+                {
+                    'sender': selected_conversation['name'], 
+                    'text': selected_conversation['last_message'], 
+                    'time': '10:30 AM', 
+                    'is_mine': False
+                }
+            ]
         
         # If this was a reply to an existing conversation, add the user's message
         if request.method == 'POST' and 'message' in request.form:
-            messages.append({
-                'sender': 'You',
-                'text': request.form.get('message'),
-                'time': 'Just now',
-                'is_mine': True
-            })
+            message_text = request.form.get('message')
+            if message_text.strip():  # Check message is not empty
+                session['conversation_messages'][conversation_id_str].append({
+                    'sender': 'You',
+                    'text': message_text,
+                    'time': 'Just now',
+                    'is_mine': True
+                })
+                
+                # Mark the session as modified
+                session.modified = True
+        
+        # Use messages from session
+        messages = session['conversation_messages'][conversation_id_str]
     
     return render_template('messages_simple.html', 
                           title='Messages',
