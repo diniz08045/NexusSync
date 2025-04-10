@@ -205,42 +205,49 @@
             currentChatName.textContent = conversation.name;
             deleteBtn.classList.remove('d-none');
             
-            // Show conversation immediately
+            // First show loading indicator
             selectPrompt.classList.add('d-none');
-            loadingMessages.classList.add('d-none');
-            messagesList.classList.remove('d-none');
-            inputContainer.classList.remove('d-none');
-                
-            // Generate placeholder messages
-            const messages = [
-                { sender: conversation.name, text: 'Hi there!', time: '10:15 AM', isMine: false },
-                { sender: 'You', text: 'Hello! How can I help you today?', time: '10:18 AM', isMine: true },
-                { sender: conversation.name, text: conversation.lastMessage, time: '10:30 AM', isMine: false }
-            ];
+            messagesList.classList.add('d-none');
+            loadingMessages.classList.remove('d-none');
             
-            // Render messages
-            messagesList.innerHTML = '';
-            messages.forEach(message => {
-                const messageEl = document.createElement('div');
-                messageEl.className = `message ${message.isMine ? 'message-mine' : 'message-other'}`;
+            // Simulate loading delay (this would be an actual API call in production)
+            setTimeout(function() {
+                // Hide loading, show messages
+                loadingMessages.classList.add('d-none');
+                messagesList.classList.remove('d-none');
+                inputContainer.classList.remove('d-none');
                 
-                messageEl.innerHTML = `
-                    <div class="message-content">
-                        <div class="message-header">
-                            <span class="message-sender">${message.sender}</span>
-                            <small class="message-time">${message.time}</small>
-                        </div>
-                        <div class="message-body">
-                            ${message.text}
-                        </div>
-                    </div>
-                `;
+                // Generate placeholder messages
+                const messages = [
+                    { sender: conversation.name, text: 'Hi there!', time: '10:15 AM', isMine: false },
+                    { sender: 'You', text: 'Hello! How can I help you today?', time: '10:18 AM', isMine: true },
+                    { sender: conversation.name, text: conversation.lastMessage, time: '10:30 AM', isMine: false }
+                ];
                 
-                messagesList.appendChild(messageEl);
-            });
-            
-            // Scroll to bottom
-            messagesList.scrollTop = messagesList.scrollHeight;
+                // Render messages
+                messagesList.innerHTML = '';
+                messages.forEach(message => {
+                    const messageEl = document.createElement('div');
+                    messageEl.className = `message ${message.isMine ? 'message-mine' : 'message-other'}`;
+                    
+                    messageEl.innerHTML = `
+                        <div class="message-content">
+                            <div class="message-header">
+                                <span class="message-sender">${message.sender}</span>
+                                <small class="message-time">${message.time}</small>
+                            </div>
+                            <div class="message-body">
+                                ${message.text}
+                            </div>
+                        </div>
+                    `;
+                    
+                    messagesList.appendChild(messageEl);
+                });
+                
+                // Scroll to bottom
+                messagesList.scrollTop = messagesList.scrollHeight;
+            }, 500); // Short delay to simulate loading
         }
         
         // Handle message form submission
@@ -362,12 +369,12 @@
     }
     
     .message-mine .message-content {
-        background-color: rgba(var(--bs-primary-rgb), 0.1);
+        background-color: rgba(var(--bs-primary-rgb), 0.25);
         color: var(--bs-light);
     }
     
     .message-other .message-content {
-        background-color: rgba(var(--bs-secondary-rgb), 0.1);
+        background-color: rgba(var(--bs-secondary-rgb), 0.2);
         color: var(--bs-light);
     }
     
