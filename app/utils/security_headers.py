@@ -16,20 +16,19 @@ from flask import Response, request, current_app, g
 headers_logger = logging.getLogger("app.security_headers")
 headers_logger.setLevel(logging.INFO)
 
-# Default Content Security Policy settings
+# Default Content Security Policy settings - very permissive for development
 DEFAULT_CSP = {
-    'default-src': ["'self'", "https:", "http:"],
-    'script-src': ["'self'", "'unsafe-inline'", "https:", "http:"],
+    'default-src': ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https:", "http:", "data:", "blob:"],
+    'script-src': ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https:", "http:"],
     'style-src': ["'self'", "'unsafe-inline'", "https:", "http:"],
-    'img-src': ["'self'", "data:", "https:", "http:"],
+    'img-src': ["'self'", "data:", "https:", "http:", "blob:"],
     'font-src': ["'self'", "data:", "https:", "http:"],
     'connect-src': ["'self'", "https:", "http:"],
     'frame-src': ["'self'", "https:", "http:"],
-    'object-src': ["'none'"],
+    'object-src': ["'self'", "https:", "http:"],
     'base-uri': ["'self'"],
-    'form-action': ["'self'"],
-    'frame-ancestors': ["'self'"],
-    'upgrade-insecure-requests': [],
+    'form-action': ["'self'", "https:", "http:"],
+    'frame-ancestors': ["'self'", "https:", "http:"],
 }
 
 # Security header defaults
@@ -143,6 +142,11 @@ def add_security_headers(response: Response) -> Response:
     Returns:
         Response: The modified response with security headers
     """
+    # Check if CSP should be disabled
+    if current_app.config.get('DISABLE_CSP', False):
+        headers_logger.debug("Content Security Policy is disabled")
+        return response
+        
     # Get custom CSP from app config or use default
     custom_csp = current_app.config.get('CONTENT_SECURITY_POLICY')
     

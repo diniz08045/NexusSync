@@ -115,19 +115,19 @@ def apply_middlewares(app: Flask) -> None:
                 session.clear()
                 return redirect(url_for('auth.login', next=request.path))
     
-    # Apply origin validation for sensitive requests
-    @app.before_request
-    def validate_origin() -> None:
-        """Validate request origin for cross-site request protection."""
-        # Skip for safe methods
-        if request.method in ('GET', 'HEAD', 'OPTIONS'):
-            return
-            
-        # Check origin for cross-site requests
-        origin = request.headers.get('Origin')
-        if origin:
-            if not is_safe_url(origin):
-                security_logger.warning(f"Invalid origin detected: {origin}")
-                abort(403)
+    # Disable origin validation for now (too restrictive for development)
+    # @app.before_request
+    # def validate_origin() -> None:
+    #     """Validate request origin for cross-site request protection."""
+    #     # Skip for safe methods
+    #     if request.method in ('GET', 'HEAD', 'OPTIONS'):
+    #         return
+    #         
+    #     # Check origin for cross-site requests
+    #     origin = request.headers.get('Origin')
+    #     if origin:
+    #         if not is_safe_url(origin):
+    #             security_logger.warning(f"Invalid origin detected: {origin}")
+    #             abort(403)
                 
     middleware_logger.info("All middlewares applied successfully")

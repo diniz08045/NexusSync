@@ -68,26 +68,24 @@ def create_app(config=None):
     mail.init_app(app)
     limiter.init_app(app)
     
-    # Initialize security extension
+    # Initialize security extension with very permissive settings
     app.config['SECURITY_PLUS'] = {
         'ENABLE_SECURITY_ENDPOINTS': False,  # Set to True to enable security endpoints
-        'ALLOWED_DOMAINS': ['localhost', 'localhost:5000', '0.0.0.0', '0.0.0.0:5000'],
+        'ALLOWED_DOMAINS': ['*'],  # Allow all domains
         'CSP': {
-            'default-src': ["'self'", "https:", "http:"],
-            'script-src': ["'self'", "'unsafe-inline'", "https:", "http:"],
+            'default-src': ["'self'", "'unsafe-inline'", "'unsafe-eval'", "data:", "blob:", "https:", "http:"],
+            'script-src': ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https:", "http:"],
             'style-src': ["'self'", "'unsafe-inline'", "https:", "http:"],
-            'img-src': ["'self'", "data:", "https:", "http:"],
+            'img-src': ["'self'", "data:", "blob:", "https:", "http:"],
             'font-src': ["'self'", "data:", "https:", "http:"],
             'connect-src': ["'self'", "https:", "http:"],
             'frame-src': ["'self'", "https:", "http:"],
-            'form-action': ["'self'"],
-            'base-uri': ["'self'"],
-            'upgrade-insecure-requests': []
+            'form-action': ["'self'", "https:", "http:"]
         },
         'RATE_LIMITS': {
-            'default': '200 per day, 50 per hour',
-            'auth': '10 per minute, 100 per day',
-            'sensitive': '3 per minute, 10 per hour'
+            'default': '1000 per minute',
+            'auth': '1000 per minute',
+            'sensitive': '1000 per minute'
         },
         'TRUSTED_HOSTS': None,  # Disable trusted hosts validation for development
         'UPLOAD_FOLDER': os.path.join(app.instance_path, 'uploads')
@@ -96,7 +94,8 @@ def create_app(config=None):
     # Create upload directory
     os.makedirs(app.config['SECURITY_PLUS']['UPLOAD_FOLDER'], exist_ok=True)
     
-    # Initialize security
+    # Initialize security with disabled CSP
+    app.config['DISABLE_CSP'] = True
     security.init_app(app)
     
     # Configure login manager
