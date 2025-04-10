@@ -17,6 +17,14 @@ class RegistrationForm(FlaskForm):
         'Confirm Password', validators=[DataRequired(), EqualTo('password')])
     first_name = StringField('First Name', validators=[Length(max=64)])
     last_name = StringField('Last Name', validators=[Length(max=64)])
+    department = SelectField('Department', choices=[
+        ('default', 'General/Default'),
+        ('it', 'IT Department'),
+        ('sales', 'Sales Department'),
+        ('hr', 'Human Resources'),
+        ('marketing', 'Marketing'),
+        ('finance', 'Finance/Accounting')
+    ])
     submit = SubmitField('Register')
 
     def validate_username(self, username):
@@ -34,6 +42,14 @@ class EditProfileForm(FlaskForm):
     email = EmailField('Email', validators=[DataRequired(), Email()])
     first_name = StringField('First Name', validators=[Length(max=64)])
     last_name = StringField('Last Name', validators=[Length(max=64)])
+    department = SelectField('Department', choices=[
+        ('default', 'General/Default'),
+        ('it', 'IT Department'),
+        ('sales', 'Sales Department'),
+        ('hr', 'Human Resources'),
+        ('marketing', 'Marketing'),
+        ('finance', 'Finance/Accounting')
+    ])
     submit = SubmitField('Save Changes')
 
     def __init__(self, original_username, original_email, *args, **kwargs):
@@ -75,5 +91,13 @@ class AdminUserForm(FlaskForm):
     is_active = BooleanField('Active Account')
     is_email_confirmed = BooleanField('Email Confirmed')
     roles = SelectField('Role', choices=[('user', 'Regular User'), ('admin', 'Administrator')])
+    department = SelectField('Department', choices=[
+        ('default', 'General/Default'),
+        ('it', 'IT Department'),
+        ('sales', 'Sales Department'),
+        ('hr', 'Human Resources'),
+        ('marketing', 'Marketing'),
+        ('finance', 'Finance/Accounting')
+    ])
     two_factor_enabled = BooleanField('Two-Factor Authentication Enabled')
     submit = SubmitField('Save Changes')
