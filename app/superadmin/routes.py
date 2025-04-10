@@ -39,7 +39,7 @@ SUPER_ADMIN_USERNAME = "superadmin"
 SUPER_ADMIN_PASSWORD_HASH = generate_password_hash("change_this_password_immediately!")
 
 # Define the list of allowed IP addresses
-ALLOWED_IPS = ['127.0.0.1', 'localhost', '::1']  # localhost only
+ALLOWED_IPS = ['127.0.0.1', 'localhost', '::1', '10.82.4.51']  # localhost and Replit specific IPs
 
 # Whether the development mode is enabled
 DEVELOPMENT_MODE = True  # Set to False in production
