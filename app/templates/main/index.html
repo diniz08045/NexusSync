@@ -4,14 +4,61 @@
 
 {% block styles %}
 <style>
-    /* Add custom styles to ensure responsive behavior */
+    /* Container constraints for consistent layout */
+    .landing-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 15px;
+    }
+    
+    /* Feature card styling */
+    .feature-card {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .feature-card .card-body {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        padding: 2rem;
+    }
+    
+    .feature-card .card-text {
+        flex-grow: 1;
+    }
+    
+    /* Force cards to stack on all screen sizes until specifically set to display in rows */
     @media (min-width: 992px) {
-        .container-lg {
-            max-width: 1140px;
+        .features-row {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        
+        .feature-column {
+            width: 33.333%;
+            padding: 0 15px;
+            margin-bottom: 30px;
+        }
+        
+        /* Fixed width for feature cards on larger screens */
+        .feature-card {
+            max-width: 100%;
         }
     }
     
-    /* Fix footer positioning */
+    /* Footer styling with absolute positioning for text alignment */
+    .footer-section {
+        margin-top: 5rem;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .footer-left {
+        text-align: left;
+    }
+    
     .footer-center {
         text-align: center;
     }
@@ -20,26 +67,23 @@
         text-align: right;
     }
     
+    /* Medium screens and below - center everything for footer */
     @media (max-width: 767.98px) {
-        .footer-center, .footer-right {
+        .footer-left,
+        .footer-center,
+        .footer-right {
             text-align: center;
-            margin-top: 1.5rem;
+            margin-bottom: 2rem;
         }
-    }
-    
-    /* Add container width constraints for large screens */
-    .limited-width {
-        max-width: 1400px;
-        margin: 0 auto;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container limited-width mt-5 pt-5">
+<div class="landing-container mt-5 pt-4">
     <!-- Heading Section -->
     <div class="row mb-5">
-        <div class="col-lg-8 mx-auto text-center">
+        <div class="col-lg-8 col-md-10 mx-auto text-center">
             <h1 class="display-4 fw-bold">Welcome to {{ app_name }}</h1>
             <p class="lead fs-4 mt-3">A secure, enterprise-grade platform for comprehensive client relationship management</p>
             <div class="d-grid gap-3 d-sm-flex justify-content-center mt-4">
@@ -54,43 +98,47 @@
     </div>
 
     <!-- Features Section -->
-    <div class="row mb-5">
-        <div class="col-12 text-center mb-4">
-            <h2 class="fw-bold">Key Features</h2>
-        </div>
+    <div class="mb-5 text-center">
+        <h2 class="fw-bold mb-4">Key Features</h2>
         
-        <div class="col-lg-4 col-md-6 mb-4">
-            <div class="card h-100">
-                <div class="card-body text-center p-4">
-                    <div class="mb-4">
-                        <i class="fas fa-tasks text-primary" style="font-size: 3rem;"></i>
+        <!-- Custom feature row that will stack on mobile and display properly on desktop -->
+        <div class="features-row">
+            <!-- Feature 1 -->
+            <div class="feature-column">
+                <div class="card feature-card border-0 shadow">
+                    <div class="card-body text-center">
+                        <div class="mb-4">
+                            <i class="fas fa-tasks text-primary" style="font-size: 3rem;"></i>
+                        </div>
+                        <h3 class="h4 card-title mb-3">Task Management</h3>
+                        <p class="card-text mb-0">Organize and prioritize your tasks with our intuitive interface, ensuring nothing falls through the cracks.</p>
                     </div>
-                    <h3 class="h4 card-title">Task Management</h3>
-                    <p class="card-text">Organize and prioritize your tasks with our intuitive interface, ensuring nothing falls through the cracks.</p>
                 </div>
             </div>
-        </div>
-        
-        <div class="col-lg-4 col-md-6 mb-4">
-            <div class="card h-100">
-                <div class="card-body text-center p-4">
-                    <div class="mb-4">
-                        <i class="fas fa-ticket-alt text-primary" style="font-size: 3rem;"></i>
+            
+            <!-- Feature 2 -->
+            <div class="feature-column">
+                <div class="card feature-card border-0 shadow">
+                    <div class="card-body text-center">
+                        <div class="mb-4">
+                            <i class="fas fa-ticket-alt text-primary" style="font-size: 3rem;"></i>
+                        </div>
+                        <h3 class="h4 card-title mb-3">Ticket System</h3>
+                        <p class="card-text mb-0">Track and resolve client issues efficiently with our comprehensive ticket system and automated workflows.</p>
                     </div>
-                    <h3 class="h4 card-title">Ticket System</h3>
-                    <p class="card-text">Track and resolve client issues efficiently with our comprehensive ticket system and automated workflows.</p>
                 </div>
             </div>
-        </div>
-        
-        <div class="col-lg-4 col-md-6 mb-4 mx-auto">
-            <div class="card h-100">
-                <div class="card-body text-center p-4">
-                    <div class="mb-4">
-                        <i class="fas fa-users text-primary" style="font-size: 3rem;"></i>
+            
+            <!-- Feature 3 -->
+            <div class="feature-column">
+                <div class="card feature-card border-0 shadow">
+                    <div class="card-body text-center">
+                        <div class="mb-4">
+                            <i class="fas fa-users text-primary" style="font-size: 3rem;"></i>
+                        </div>
+                        <h3 class="h4 card-title mb-3">Client Management</h3>
+                        <p class="card-text mb-0">Maintain detailed client profiles and communication history in one centralized, secure platform.</p>
                     </div>
-                    <h3 class="h4 card-title">Client Management</h3>
-                    <p class="card-text">Maintain detailed client profiles and communication history in one centralized, secure platform.</p>
                 </div>
             </div>
         </div>
@@ -98,7 +146,7 @@
     
     <!-- CTA Section -->
     <div class="row mb-5">
-        <div class="col-lg-8 mx-auto">
+        <div class="col-lg-8 col-md-10 mx-auto">
             <div class="p-4 p-lg-5 text-center bg-dark rounded-3">
                 <h2 class="fw-bold">Ready to streamline your workflow?</h2>
                 <p class="lead mt-3 mb-4">Join thousands of businesses that use {{ app_name }} to improve productivity and client satisfaction.</p>
@@ -108,39 +156,45 @@
     </div>
     
     <!-- Footer -->
-    <div class="row mt-5 pt-5 border-top">
-        <div class="col-md-4 mb-4">
-            <h5 class="fw-bold">About {{ app_name }}</h5>
-            <p class="text-muted">
-                {{ app_name }} is a modern platform designed to streamline client relationship management for businesses of all sizes.
-                Our secure and intuitive interface helps teams collaborate effectively.
-            </p>
-        </div>
-        
-        <div class="col-md-4 mb-4">
-            <div class="footer-center">
-                <h5 class="fw-bold">Learn More</h5>
-                <ul class="list-unstyled">
-                    <li class="mb-2"><a href="{{ url_for('main.features') }}" class="text-decoration-none">Features</a></li>
-                    <li class="mb-2"><a href="{{ url_for('main.about') }}" class="text-decoration-none">About Us</a></li>
-                    <li class="mb-2"><a href="{{ url_for('main.contact') }}" class="text-decoration-none">Contact Us</a></li>
-                </ul>
+    <footer class="footer-section">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="footer-left">
+                    <h5 class="fw-bold">About {{ app_name }}</h5>
+                    <p class="text-muted">
+                        {{ app_name }} is a modern platform designed to streamline client relationship management for businesses of all sizes.
+                        Our secure and intuitive interface helps teams collaborate effectively.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="footer-center">
+                    <h5 class="fw-bold">Learn More</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="{{ url_for('main.features') }}" class="text-decoration-none">Features</a></li>
+                        <li class="mb-2"><a href="{{ url_for('main.about') }}" class="text-decoration-none">About Us</a></li>
+                        <li class="mb-2"><a href="{{ url_for('main.contact') }}" class="text-decoration-none">Contact Us</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="footer-right">
+                    <h5 class="fw-bold">Legal</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="{{ url_for('main.terms') }}" class="text-decoration-none">Terms of Service</a></li>
+                        <li class="mb-2"><a href="{{ url_for('main.privacy') }}" class="text-decoration-none">Privacy Policy</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
         
-        <div class="col-md-4 mb-4">
-            <div class="footer-right">
-                <h5 class="fw-bold">Legal</h5>
-                <ul class="list-unstyled">
-                    <li class="mb-2"><a href="{{ url_for('main.terms') }}" class="text-decoration-none">Terms of Service</a></li>
-                    <li class="mb-2"><a href="{{ url_for('main.privacy') }}" class="text-decoration-none">Privacy Policy</a></li>
-                </ul>
+        <div class="row mt-4 pt-3 border-top">
+            <div class="col-12 text-center">
+                <p class="text-muted small mb-0">© {{ now.year }} {{ app_name }} - All rights reserved</p>
             </div>
         </div>
-        
-        <div class="col-12 text-center mt-4">
-            <p class="text-muted small">© {{ now.year }} {{ app_name }} - All rights reserved</p>
-        </div>
-    </div>
+    </footer>
 </div>
 {% endblock %}
