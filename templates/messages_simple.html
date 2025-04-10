@@ -86,7 +86,6 @@
                     
                     <div class="p-3 mt-auto border-top" id="message-input-container">
                         <form id="send-message-form" action="{{ url_for('user.messages', conversation_id=selected_conversation.id) }}" method="POST">
-                            <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                             <div class="input-group">
                                 <input type="text" class="form-control" name="message" id="message-input" placeholder="Type your message...">
                                 <button class="btn btn-primary" type="submit" data-noloading="true">
@@ -111,7 +110,6 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="new-message-form" method="POST" action="{{ url_for('user.messages') }}">
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="recipient" class="form-label">Recipient</label>
