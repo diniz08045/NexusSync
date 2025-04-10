@@ -68,7 +68,6 @@ def sanitize_html(html_content: str, strict: bool = True) -> str:
         html_content,
         tags=tags,
         attributes=ALLOWED_ATTRIBUTES,
-        styles=ALLOWED_STYLES,
         protocols=ALLOWED_PROTOCOLS,
         strip=True,
         strip_comments=True

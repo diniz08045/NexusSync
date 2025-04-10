@@ -357,7 +357,6 @@ def sanitize_html(html_content: str) -> str:
         html_content,
         tags=ALLOWED_TAGS,
         attributes=ALLOWED_ATTRIBUTES,
-        styles=ALLOWED_STYLES,
         strip=True
     )
 
@@ -559,7 +558,10 @@ def init_security(app: Flask, domains: List[str] = None) -> None:
     # Set up allowed domains for URL validation
     global ALLOWED_DOMAINS
     if domains:
-        ALLOWED_DOMAINS.update(domains)
+        # Filter out None values
+        filtered_domains = [d for d in domains if d]
+        if filtered_domains:
+            ALLOWED_DOMAINS.update(filtered_domains)
     
     # Set up secure session configuration
     app.config["SESSION_COOKIE_SECURE"] = True

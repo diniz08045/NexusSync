@@ -57,8 +57,17 @@ def set_allowed_domains(domains: List[str]) -> None:
         domains: List of allowed domain names
     """
     global ALLOWED_DOMAINS
-    ALLOWED_DOMAINS = set(domains)
-    url_logger.info(f"Allowed domains set: {', '.join(domains)}")
+    # Filter out None values and convert to set
+    if domains:
+        filtered_domains = [d for d in domains if d]
+        ALLOWED_DOMAINS = set(filtered_domains)
+        if filtered_domains:
+            url_logger.info(f"Allowed domains set: {', '.join(filtered_domains)}")
+        else:
+            url_logger.info("No allowed domains set (empty list)")
+    else:
+        ALLOWED_DOMAINS = set()
+        url_logger.info("No allowed domains set (None provided)")
 
 def is_ip_private(ip_str: str) -> bool:
     """

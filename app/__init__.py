@@ -23,6 +23,10 @@ login_manager = LoginManager()
 mail = Mail()
 limiter = Limiter(key_func=get_remote_address)
 
+# Initialize security extension (will be configured with app later)
+from app.utils.flask_security_extension import SecurityPlus
+security = SecurityPlus()
+
 def create_app(config=None):
     """Create and configure the Flask application"""
     app = Flask(__name__, instance_relative_config=True)
@@ -60,6 +64,37 @@ def create_app(config=None):
     login_manager.init_app(app)
     mail.init_app(app)
     limiter.init_app(app)
+    
+    # Initialize security extension
+    app.config['SECURITY_PLUS'] = {
+        'ENABLE_SECURITY_ENDPOINTS': False,  # Set to True to enable security endpoints
+        'ALLOWED_DOMAINS': ['localhost', 'localhost:5000', '0.0.0.0', '0.0.0.0:5000'],
+        'CSP': {
+            'default-src': ["'self'"],
+            'script-src': ["'self'", "'unsafe-inline'"],
+            'style-src': ["'self'", "'unsafe-inline'", "https://cdn.replit.com"],
+            'img-src': ["'self'", "data:", "https:"],
+            'font-src': ["'self'", "https:"],
+            'connect-src': ["'self'"],
+            'frame-ancestors': ["'none'"],
+            'form-action': ["'self'"],
+            'base-uri': ["'self'"],
+            'upgrade-insecure-requests': []
+        },
+        'RATE_LIMITS': {
+            'default': '200 per day, 50 per hour',
+            'auth': '10 per minute, 100 per day',
+            'sensitive': '3 per minute, 10 per hour'
+        },
+        'TRUSTED_HOSTS': None,  # Disable trusted hosts validation for development
+        'UPLOAD_FOLDER': os.path.join(app.instance_path, 'uploads')
+    }
+    
+    # Create upload directory
+    os.makedirs(app.config['SECURITY_PLUS']['UPLOAD_FOLDER'], exist_ok=True)
+    
+    # Initialize security
+    security.init_app(app)
     
     # Configure login manager
     login_manager.login_view = 'auth.login'
