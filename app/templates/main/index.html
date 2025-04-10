@@ -7,7 +7,8 @@
     <!-- Header Section -->
     <header class="text-center mb-5">
         <h1 class="mb-3">Welcome to {{ app_name }}</h1>
-        <p class="lead mb-4">A secure platform for client relationship management</p>
+        <p class="lead mb-4">A comprehensive enterprise management system with department-specific dashboards</p>
+        <p class="text-muted mb-4">Streamline your organizational workflow with tailored experiences for each department</p>
         <div class="mb-4">
             <a href="{{ url_for('auth.login') }}" class="btn btn-primary me-2">Sign In</a>
             <a href="{{ url_for('auth.register') }}" class="btn btn-outline-secondary">Register</a>
@@ -48,14 +49,98 @@
                     </div>
                 </div>
             </div>
+            
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-th-large text-primary mb-3" style="font-size: 2.5rem;"></i>
+                        <h3 class="card-title h5">Multi-Dashboard System</h3>
+                        <p class="card-text">Department-specific dashboards that provide tailored experiences based on user roles.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-shield-alt text-primary mb-3" style="font-size: 2.5rem;"></i>
+                        <h3 class="card-title h5">Advanced Security</h3>
+                        <p class="card-text">Suspicious login detection, two-factor authentication, and comprehensive audit logs.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-bell text-primary mb-3" style="font-size: 2.5rem;"></i>
+                        <h3 class="card-title h5">Notification System</h3>
+                        <p class="card-text">Real-time alerts and notifications keep team members informed of important updates.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Multi-Dashboard Demo Section -->
+    <section class="mb-5">
+        <h2 class="text-center mb-4">Department-Specific Dashboards</h2>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">IT Department</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Specialized dashboard with system status monitoring, network metrics, and service request tracking.</p>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check-circle text-success me-2"></i> System status monitoring</li>
+                            <li><i class="fas fa-check-circle text-success me-2"></i> Network performance metrics</li>
+                            <li><i class="fas fa-check-circle text-success me-2"></i> Service request management</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">Sales Department</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Custom dashboard with sales metrics, lead tracking, and performance analytics tools.</p>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check-circle text-success me-2"></i> Sales performance tracking</li>
+                            <li><i class="fas fa-check-circle text-success me-2"></i> Lead management</li>
+                            <li><i class="fas fa-check-circle text-success me-2"></i> Deal pipeline visualization</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">More Departments</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Additional tailored dashboards for HR, Marketing, Accounting, and more departments.</p>
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-check-circle text-success me-2"></i> HR employee management</li>
+                            <li><i class="fas fa-check-circle text-success me-2"></i> Marketing campaign tracking</li>
+                            <li><i class="fas fa-check-circle text-success me-2"></i> Accounting metrics & reports</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
     
     <!-- CTA Section -->
     <section class="py-4 mb-5 bg-dark rounded text-center">
         <div class="py-3">
-            <h2 class="mb-3">Ready to streamline your workflow?</h2>
-            <p class="mb-4">Join thousands of businesses using {{ app_name }}</p>
+            <h2 class="mb-3">Ready to transform your organizational workflow?</h2>
+            <p class="mb-4">Experience department-specific dashboards tailored to your team's needs</p>
             <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Get Started Today</a>
         </div>
     </section>
@@ -67,7 +152,7 @@
             <div class="col-md-4 mb-3">
                 <h5>About {{ app_name }}</h5>
                 <p class="text-muted small">
-                    {{ app_name }} is designed to streamline client relationship management for businesses of all sizes.
+                    {{ app_name }} is a comprehensive enterprise management system that provides tailored dashboard experiences based on user departments and roles.
                 </p>
             </div>
             
