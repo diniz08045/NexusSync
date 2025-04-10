@@ -858,6 +858,92 @@ def search():
         })
 
 # Message API endpoints
+@user_bp.route('/api/conversation/<int:conversation_id>/messages')
+@login_required
+def api_get_conversation_messages(conversation_id):
+    """API endpoint to get messages for a conversation"""
+    # Find the conversation
+    conversations = [
+        {
+            'id': 1,
+            'name': 'Admin User',
+            'avatar': 'A',
+            'last_message': 'Please review the latest documentation.',
+            'time': '2h ago',
+            'unread': True
+        },
+        {
+            'id': 2,
+            'name': 'John Smith',
+            'avatar': 'J',
+            'last_message': 'When can we schedule the meeting?',
+            'time': '1d ago',
+            'unread': False
+        },
+        {
+            'id': 3,
+            'name': 'Sarah Johnson',
+            'avatar': 'S',
+            'last_message': 'The report has been submitted.',
+            'time': '3d ago',
+            'unread': False
+        },
+        {
+            'id': 4,
+            'name': 'Support Team',
+            'avatar': 'S',
+            'last_message': 'Your ticket has been resolved.',
+            'time': '1w ago',
+            'unread': False
+        }
+    ]
+    
+    selected_conversation = None
+    for conv in conversations:
+        if conv['id'] == conversation_id:
+            selected_conversation = conv
+            break
+    
+    if not selected_conversation:
+        return jsonify({'success': False, 'error': 'Conversation not found'}), 404
+    
+    # Get messages from session
+    if 'conversation_messages' not in session:
+        session['conversation_messages'] = {}
+    
+    conversation_id_str = str(conversation_id)
+    if conversation_id_str not in session['conversation_messages']:
+        # Initialize with dummy messages
+        session['conversation_messages'][conversation_id_str] = [
+            {
+                'sender': selected_conversation['name'],
+                'text': 'Hello! How can I help you today?',
+                'time': '2 days ago',
+                'is_mine': False
+            },
+            {
+                'sender': 'You',
+                'text': 'I have a question about the project.',
+                'time': '2 days ago',
+                'is_mine': True
+            },
+            {
+                'sender': selected_conversation['name'],
+                'text': 'Of course, what would you like to know?',
+                'time': '2 days ago',
+                'is_mine': False
+            }
+        ]
+        # Mark session as modified
+        session.modified = True
+    
+    # Return the messages
+    return jsonify({
+        'success': True,
+        'messages': session['conversation_messages'][conversation_id_str],
+        'conversation': selected_conversation
+    })
+
 @user_bp.route('/api/send-message/<int:conversation_id>', methods=['POST'])
 @login_required
 def api_send_message(conversation_id):
