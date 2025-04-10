@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block title %}{{ app_name }} - Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Dashboard</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
+            <i class="fas fa-calendar-alt me-1"></i>
+            This week
+        </button>
+    </div>
+</div>
+
+<!-- Overview Cards -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-4">
+        <div class="card border-0 shadow stats-card h-100">
+            <div class="card-body position-relative">
+                <h5 class="card-title text-primary">Tasks</h5>
+                <h2 class="display-4 fw-bold">{{ tasks_count }}</h2>
+                <p class="card-text text-muted">Tasks assigned to you</p>
+                <div class="position-absolute top-50 end-0 translate-middle-y pe-4">
+                    <i class="fas fa-tasks stats-icon text-primary"></i>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-0">
+                <a href="{{ url_for('planner.index') }}" class="text-decoration-none">View details <i class="fas fa-arrow-right ms-1"></i></a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card border-0 shadow stats-card h-100">
+            <div class="card-body position-relative">
+                <h5 class="card-title text-success">Open Tickets</h5>
+                <h2 class="display-4 fw-bold">{{ tickets_count }}</h2>
+                <p class="card-text text-muted">Active tickets</p>
+                <div class="position-absolute top-50 end-0 translate-middle-y pe-4">
+                    <i class="fas fa-ticket-alt stats-icon text-success"></i>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-0">
+                <a href="{{ url_for('tickets.index') }}" class="text-decoration-none">View details <i class="fas fa-arrow-right ms-1"></i></a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card border-0 shadow stats-card h-100">
+            <div class="card-body position-relative">
+                <h5 class="card-title text-warning">Clients</h5>
+                <h2 class="display-4 fw-bold">{{ clients_count }}</h2>
+                <p class="card-text text-muted">Active clients</p>
+                <div class="position-absolute top-50 end-0 translate-middle-y pe-4">
+                    <i class="fas fa-users stats-icon text-warning"></i>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-0">
+                <a href="{{ url_for('clients.index') }}" class="text-decoration-none">View details <i class="fas fa-arrow-right ms-1"></i></a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card border-0 shadow stats-card h-100">
+            <div class="card-body position-relative">
+                <h5 class="card-title text-danger">Messages</h5>
+                <h2 class="display-4 fw-bold">{{ messages_count }}</h2>
+                <p class="card-text text-muted">Unread messages</p>
+                <div class="position-absolute top-50 end-0 translate-middle-y pe-4">
+                    <i class="fas fa-envelope stats-icon text-danger"></i>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-0">
+                <a href="{{ url_for('user.messages') }}" class="text-decoration-none">View details <i class="fas fa-arrow-right ms-1"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Recent Tasks -->
+    <div class="col-md-6 mb-4">
+        <div class="card border-0 shadow h-100">
+            <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Recent Tasks</h5>
+                <a href="{{ url_for('planner.index') }}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {% if recent_tasks %}
+                        {% for task in recent_tasks %}
+                        <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3 px-4">
+                            <div class="form-check">
+                                <input class="form-check-input task-checkbox" type="checkbox" value="" id="task-{{ task.id }}" data-task-id="{{ task.id }}" {{ 'checked' if task.completed }}>
+                                <label class="form-check-label {{ 'text-decoration-line-through' if task.completed }}" for="task-{{ task.id }}">
+                                    {{ task.title }}
+                                </label>
+                            </div>
+                            <span class="badge bg-{{ task.priority_color }} rounded-pill">{{ task.priority }}</span>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="list-group-item py-4 text-center">
+                            <p class="text-muted mb-0">No tasks found</p>
+                            <a href="{{ url_for('planner.create_task') }}" class="btn btn-sm btn-primary mt-2">
+                                <i class="fas fa-plus me-1"></i> Add Task
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Tickets -->
+    <div class="col-md-6 mb-4">
+        <div class="card border-0 shadow h-100">
+            <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Recent Tickets</h5>
+                <a href="{{ url_for('tickets.index') }}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {% if recent_tickets %}
+                        {% for ticket in recent_tickets %}
+                        <a href="{{ url_for('tickets.view', ticket_id=ticket.id) }}" class="list-group-item list-group-item-action py-3 px-4">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">#{{ ticket.id }} {{ ticket.title }}</h6>
+                                <small class="text-muted">{{ ticket.created_at|timeago }}</small>
+                            </div>
+                            <p class="mb-1 small text-truncate">{{ ticket.description }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge status-{{ ticket.status.lower() }}">{{ ticket.status }}</span>
+                                <small>
+                                    Assigned to: {{ ticket.assigned_to_name or 'Unassigned' }}
+                                </small>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    {% else %}
+                        <div class="list-group-item py-4 text-center">
+                            <p class="text-muted mb-0">No tickets found</p>
+                            <a href="{{ url_for('tickets.create') }}" class="btn btn-sm btn-primary mt-2">
+                                <i class="fas fa-plus me-1"></i> Create Ticket
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Activity Timeline -->
+    <div class="col-md-8 mb-4">
+        <div class="card border-0 shadow">
+            <div class="card-header bg-transparent border-0">
+                <h5 class="mb-0">Activity Timeline</h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="timeline">
+                    {% if activities %}
+                        {% for activity in activities %}
+                        <div class="timeline-item mb-4">
+                            <div class="timeline-icon bg-{{ activity.color }}">
+                                <i class="fas fa-{{ activity.icon }} text-white"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <h6 class="mb-1">{{ activity.title }}</h6>
+                                <p class="mb-1 text-muted small">{{ activity.description }}</p>
+                                <p class="text-muted small mb-0">{{ activity.time|timeago }}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <p class="text-muted mb-0">No recent activity</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notifications -->
+    <div class="col-md-4 mb-4">
+        <div class="card border-0 shadow">
+            <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Notifications</h5>
+                <a href="{{ url_for('user.notifications') }}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {% if recent_notifications %}
+                        {% for notification in recent_notifications %}
+                        <a href="{{ url_for('user.mark_notification_read', notification_id=notification.id) }}" class="list-group-item list-group-item-action py-3 px-4">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ notification.title }}</h6>
+                                <small class="text-muted">{{ notification.created_at|timeago }}</small>
+                            </div>
+                            <p class="mb-1 small">{{ notification.message|truncate(100) }}</p>
+                            {% if not notification.is_read %}
+                                <span class="badge bg-primary">New</span>
+                            {% endif %}
+                        </a>
+                        {% endfor %}
+                    {% else %}
+                        <div class="list-group-item py-4 text-center">
+                            <p class="text-muted mb-0">No notifications</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
