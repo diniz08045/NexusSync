@@ -350,8 +350,8 @@ def dismiss_notification(notification_id):
 @login_required
 def messages():
     """View messages and conversations."""
-    # Redirect to the test page temporarily to debug
-    return redirect(url_for('user.test_page'))
+    # Use an extremely minimal version of the messages page
+    return render_template('minimal_messages.html', title='Messages')
     
 @user_bp.route('/test')
 @login_required
