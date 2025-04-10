@@ -235,6 +235,7 @@ def edit_profile():
         current_user.email = form.email.data
         current_user.first_name = form.first_name.data
         current_user.last_name = form.last_name.data
+        current_user.department = form.department.data
         
         db.session.commit()
         
