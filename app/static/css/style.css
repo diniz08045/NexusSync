@@ -1,0 +1,170 @@
+/* Custom CSS for NexusSync */
+
+/* Sidebar styling */
+.sidebar {
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    padding-top: 70px;
+    overflow-y: auto;
+}
+
+.sidebar .nav-link {
+    color: #adb5bd;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    margin-bottom: 0.2rem;
+}
+
+.sidebar .nav-link.active {
+    color: #fff;
+    background-color: rgba(13, 110, 253, 0.25);
+}
+
+.sidebar .nav-link:hover {
+    color: #fff;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar .sidebar-heading {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+}
+
+/* Custom navbar styles */
+.navbar-brand {
+    font-weight: 600;
+}
+
+/* Custom card styles */
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Dashboard widgets */
+.stats-card {
+    border-left: 4px solid #0d6efd;
+    transition: all 0.3s ease;
+}
+
+.stats-card:hover {
+    background-color: rgba(13, 110, 253, 0.1);
+}
+
+.stats-card .stats-icon {
+    font-size: 3rem;
+    opacity: 0.25;
+}
+
+/* Table enhancements */
+.table-hover tbody tr:hover {
+    background-color: rgba(13, 110, 253, 0.1);
+}
+
+/* Form stylings */
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Notification badge styles */
+.badge-notify {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+}
+
+/* Animations */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Ticket status styles */
+.status-open {
+    background-color: rgba(25, 135, 84, 0.1);
+    color: #198754;
+}
+
+.status-pending {
+    background-color: rgba(255, 193, 7, 0.1);
+    color: #ffc107;
+}
+
+.status-closed {
+    background-color: rgba(108, 117, 125, 0.1);
+    color: #6c757d;
+}
+
+.status-urgent {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+}
+
+/* Task priority styles */
+.priority-low {
+    border-left: 3px solid #198754;
+}
+
+.priority-medium {
+    border-left: 3px solid #ffc107;
+}
+
+.priority-high {
+    border-left: 3px solid #dc3545;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+    .sidebar {
+        position: static;
+        height: auto;
+        padding-top: 20px;
+    }
+    
+    .stats-card {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Fix sticky footer */
+html, body {
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1 0 auto;
+}

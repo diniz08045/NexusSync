@@ -1,83 +1,105 @@
-<div class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse" id="sidebarMenu">
+<nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse">
     <div class="position-sticky pt-3">
+        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase">
+            <span>Main</span>
+        </h6>
         <ul class="nav flex-column">
             <li class="nav-item">
-                <a class="nav-link {% if request.endpoint == 'user.index' %}active{% endif %}" href="{{ url_for('user.index') }}">
+                <a class="nav-link {{ 'active' if request.endpoint == 'user.dashboard' }}" href="{{ url_for('user.dashboard') }}">
                     <i class="fas fa-tachometer-alt me-2"></i>
                     Dashboard
                 </a>
             </li>
-            
             <li class="nav-item">
-                <a class="nav-link {% if request.endpoint.startswith('planner.') %}active{% endif %}" href="{{ url_for('planner.index') }}">
-                    <i class="fas fa-tasks me-2"></i>
+                <a class="nav-link {{ 'active' if request.endpoint == 'planner.index' }}" href="{{ url_for('planner.index') }}">
+                    <i class="fas fa-calendar-alt me-2"></i>
                     Planner
                 </a>
             </li>
-            
             <li class="nav-item">
-                <a class="nav-link {% if request.endpoint.startswith('tickets.') %}active{% endif %}" href="{{ url_for('tickets.index') }}">
+                <a class="nav-link {{ 'active' if request.endpoint.startswith('tickets.') }}" href="{{ url_for('tickets.index') }}">
                     <i class="fas fa-ticket-alt me-2"></i>
                     Tickets
                 </a>
             </li>
-            
             <li class="nav-item">
-                <a class="nav-link {% if request.endpoint.startswith('clients.') %}active{% endif %}" href="{{ url_for('clients.index') }}">
+                <a class="nav-link {{ 'active' if request.endpoint.startswith('clients.') }}" href="{{ url_for('clients.index') }}">
                     <i class="fas fa-users me-2"></i>
                     Clients
                 </a>
             </li>
-            
             <li class="nav-item">
-                <a class="nav-link {% if request.endpoint == 'user.notifications' %}active{% endif %}" href="{{ url_for('user.notifications') }}">
-                    <i class="fas fa-bell me-2"></i>
-                    Notifications
-                    {% if current_user.unread_notifications_count() > 0 %}
-                    <span class="badge bg-danger rounded-pill">{{ current_user.unread_notifications_count() }}</span>
-                    {% endif %}
+                <a class="nav-link {{ 'active' if request.endpoint == 'user.messages' }}" href="{{ url_for('user.messages') }}">
+                    <i class="fas fa-envelope me-2"></i>
+                    Messages
+                    <span class="badge rounded-pill bg-danger ms-2">5</span>
                 </a>
             </li>
         </ul>
-        
+
         <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase">
-            <span>User</span>
+            <span>Account</span>
         </h6>
         <ul class="nav flex-column mb-2">
             <li class="nav-item">
-                <a class="nav-link {% if request.endpoint == 'user.profile' %}active{% endif %}" href="{{ url_for('user.profile') }}">
+                <a class="nav-link {{ 'active' if request.endpoint == 'user.profile' }}" href="{{ url_for('user.profile') }}">
                     <i class="fas fa-user me-2"></i>
-                    My Profile
+                    Profile
                 </a>
             </li>
-            
             <li class="nav-item">
-                <a class="nav-link {% if request.endpoint == 'user.settings' %}active{% endif %}" href="{{ url_for('user.settings') }}">
+                <a class="nav-link {{ 'active' if request.endpoint == 'user.notifications' }}" href="{{ url_for('user.notifications') }}">
+                    <i class="fas fa-bell me-2"></i>
+                    Notifications
+                    {% if current_user.unread_notifications_count() > 0 %}
+                    <span class="badge rounded-pill bg-danger ms-2">{{ current_user.unread_notifications_count() }}</span>
+                    {% endif %}
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ 'active' if request.endpoint == 'user.settings' }}" href="{{ url_for('user.settings') }}">
                     <i class="fas fa-cog me-2"></i>
                     Settings
                 </a>
             </li>
         </ul>
-        
+
         {% if current_user.is_admin() %}
         <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase">
-            <span>Admin</span>
+            <span>Administration</span>
         </h6>
         <ul class="nav flex-column mb-2">
             <li class="nav-item">
-                <a class="nav-link {% if request.endpoint == 'admin.index' %}active{% endif %}" href="{{ url_for('admin.index') }}">
-                    <i class="fas fa-cogs me-2"></i>
+                <a class="nav-link {{ 'active' if request.endpoint == 'admin.index' }}" href="{{ url_for('admin.index') }}">
+                    <i class="fas fa-shield-alt me-2"></i>
                     Admin Dashboard
                 </a>
             </li>
-            
             <li class="nav-item">
-                <a class="nav-link {% if request.endpoint == 'admin.list_users' %}active{% endif %}" href="{{ url_for('admin.list_users') }}">
+                <a class="nav-link {{ 'active' if request.endpoint == 'admin.list_users' }}" href="{{ url_for('admin.list_users') }}">
                     <i class="fas fa-users-cog me-2"></i>
-                    Manage Users
+                    User Management
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ 'active' if request.endpoint == 'admin.active_sessions' }}" href="{{ url_for('admin.active_sessions') }}">
+                    <i class="fas fa-chart-line me-2"></i>
+                    Active Sessions
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{ 'active' if request.endpoint == 'admin.create_notification' }}" href="{{ url_for('admin.create_notification') }}">
+                    <i class="fas fa-bullhorn me-2"></i>
+                    Send Notifications
                 </a>
             </li>
         </ul>
         {% endif %}
+
+        <div class="px-3 mt-5 mb-3 d-none d-md-block">
+            <a href="{{ url_for('auth.logout') }}" class="btn btn-danger btn-sm d-block w-100">
+                <i class="fas fa-sign-out-alt me-2"></i> Sign Out
+            </a>
+        </div>
     </div>
-</div>
+</nav>
