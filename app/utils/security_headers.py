@@ -18,13 +18,13 @@ headers_logger.setLevel(logging.INFO)
 
 # Default Content Security Policy settings
 DEFAULT_CSP = {
-    'default-src': ["'self'"],
-    'script-src': ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://code.jquery.com"],
-    'style-src': ["'self'", "'unsafe-inline'", "https://cdn.replit.com", "https://cdnjs.cloudflare.com"],
-    'img-src': ["'self'", "data:", "https:"],
-    'font-src': ["'self'", "https:", "data:"],
-    'connect-src': ["'self'"],
-    'frame-src': ["'none'"],
+    'default-src': ["'self'", "https:", "http:"],
+    'script-src': ["'self'", "'unsafe-inline'", "https:", "http:"],
+    'style-src': ["'self'", "'unsafe-inline'", "https:", "http:"],
+    'img-src': ["'self'", "data:", "https:", "http:"],
+    'font-src': ["'self'", "data:", "https:", "http:"],
+    'connect-src': ["'self'", "https:", "http:"],
+    'frame-src': ["'self'", "https:", "http:"],
     'object-src': ["'none'"],
     'base-uri': ["'self'"],
     'form-action': ["'self'"],
