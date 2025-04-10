@@ -1,0 +1,300 @@
+{% extends 'user/layout.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.css">
+<style>
+    .task-card {
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .task-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+    .fc-toolbar-title {
+        font-size: 1.25rem !important;
+    }
+    .stat-card {
+        border: none;
+        border-radius: 10px;
+        transition: transform 0.3s;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="h3">Planner Dashboard</h1>
+                <a href="{{ url_for('planner.create_task') }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Create Task
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Row -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card stat-card bg-primary text-white h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="stat-icon bg-white text-primary me-3">
+                        <i class="fas fa-tasks fa-2x"></i>
+                    </div>
+                    <div>
+                        <h6 class="card-title mb-0">Total Tasks</h6>
+                        <h2 class="card-text mb-0">{{ total_tasks }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card bg-success text-white h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="stat-icon bg-white text-success me-3">
+                        <i class="fas fa-check-circle fa-2x"></i>
+                    </div>
+                    <div>
+                        <h6 class="card-title mb-0">Completed</h6>
+                        <h2 class="card-text mb-0">{{ completed_count }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card bg-warning text-white h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="stat-icon bg-white text-warning me-3">
+                        <i class="fas fa-hourglass-half fa-2x"></i>
+                    </div>
+                    <div>
+                        <h6 class="card-title mb-0">Pending</h6>
+                        <h2 class="card-text mb-0">{{ pending_tasks }}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card bg-info text-white h-100">
+                <div class="card-body d-flex align-items-center">
+                    <div class="stat-icon bg-white text-info me-3">
+                        <i class="fas fa-chart-line fa-2x"></i>
+                    </div>
+                    <div>
+                        <h6 class="card-title mb-0">Completion Rate</h6>
+                        <h2 class="card-text mb-0">{{ completion_rate | round }}%</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Tasks Section -->
+        <div class="col-md-7">
+            <!-- Today's Tasks -->
+            <div class="card mb-4">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Today's Tasks</h5>
+                    <span class="badge bg-primary">{{ today_tasks | length }} tasks</span>
+                </div>
+                <div class="card-body p-0">
+                    {% if today_tasks %}
+                        <div class="list-group list-group-flush">
+                            {% for task in today_tasks %}
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="form-check">
+                                            <input class="form-check-input task-checkbox" type="checkbox" 
+                                                   id="task-{{ task.id }}" data-task-id="{{ task.id }}"
+                                                   {% if task.is_completed %}checked{% endif %}>
+                                            <label class="form-check-label {% if task.is_completed %}text-decoration-line-through text-muted{% endif %}" 
+                                                   for="task-{{ task.id }}">
+                                                {{ task.title }}
+                                            </label>
+                                        </div>
+                                        <div>
+                                            <span class="badge {% if task.priority == 'urgent' %}bg-danger{% elif task.priority == 'high' %}bg-warning{% elif task.priority == 'medium' %}bg-info{% else %}bg-secondary{% endif %}">
+                                                {{ task.priority | capitalize }}
+                                            </span>
+                                            <a href="{{ url_for('planner.edit_task', task_id=task.id) }}" class="btn btn-sm btn-outline-primary ms-2">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-check fa-2x text-success mb-3"></i>
+                            <p class="text-muted">No tasks scheduled for today!</p>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="{{ url_for('planner.tasks', completed='no') }}" class="btn btn-sm btn-outline-primary">View All Pending Tasks</a>
+                </div>
+            </div>
+
+            <!-- Overdue Tasks -->
+            <div class="card mb-4">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Overdue Tasks</h5>
+                    <span class="badge bg-danger">{{ overdue_tasks | length }} tasks</span>
+                </div>
+                <div class="card-body p-0">
+                    {% if overdue_tasks %}
+                        <div class="list-group list-group-flush">
+                            {% for task in overdue_tasks %}
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <div class="form-check">
+                                                <input class="form-check-input task-checkbox" type="checkbox" 
+                                                    id="overdue-task-{{ task.id }}" data-task-id="{{ task.id }}"
+                                                    {% if task.is_completed %}checked{% endif %}>
+                                                <label class="form-check-label {% if task.is_completed %}text-decoration-line-through text-muted{% endif %}" 
+                                                    for="overdue-task-{{ task.id }}">
+                                                    {{ task.title }}
+                                                </label>
+                                            </div>
+                                            <small class="text-danger">Due: {{ task.due_date.strftime('%Y-%m-%d') }}</small>
+                                        </div>
+                                        <div>
+                                            <span class="badge {% if task.priority == 'urgent' %}bg-danger{% elif task.priority == 'high' %}bg-warning{% elif task.priority == 'medium' %}bg-info{% else %}bg-secondary{% endif %}">
+                                                {{ task.priority | capitalize }}
+                                            </span>
+                                            <a href="{{ url_for('planner.edit_task', task_id=task.id) }}" class="btn btn-sm btn-outline-primary ms-2">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-check-circle fa-2x text-success mb-3"></i>
+                            <p class="text-muted">No overdue tasks!</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Upcoming Tasks -->
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Upcoming Tasks</h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if upcoming_tasks %}
+                        <div class="list-group list-group-flush">
+                            {% for task in upcoming_tasks %}
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-0">{{ task.title }}</h6>
+                                            <small class="text-muted">Due: {{ task.due_date.strftime('%Y-%m-%d') }}</small>
+                                        </div>
+                                        <div>
+                                            <span class="badge {% if task.priority == 'urgent' %}bg-danger{% elif task.priority == 'high' %}bg-warning{% elif task.priority == 'medium' %}bg-info{% else %}bg-secondary{% endif %}">
+                                                {{ task.priority | capitalize }}
+                                            </span>
+                                            <a href="{{ url_for('planner.edit_task', task_id=task.id) }}" class="btn btn-sm btn-outline-primary ms-2">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <p class="text-muted">No upcoming tasks scheduled</p>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="{{ url_for('planner.tasks') }}" class="btn btn-sm btn-outline-primary">View All Tasks</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Calendar Section -->
+        <div class="col-md-5">
+            <div class="card h-100">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Calendar</h5>
+                </div>
+                <div class="card-body">
+                    <div id="calendar"></div>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="{{ url_for('planner.calendar') }}" class="btn btn-sm btn-outline-primary">Full Calendar View</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toggle Task Form -->
+<form id="toggleTaskForm" method="post" action="" style="display: none;">
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Calendar
+        const calendarEl = document.getElementById('calendar');
+        if (calendarEl) {
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek'
+                },
+                height: 450,
+                events: {{ calendar_tasks | tojson }},
+                navLinks: true,
+                eventClick: function(info) {
+                    if (info.event.url) {
+                        window.location.href = info.event.url;
+                        return false;
+                    }
+                }
+            });
+            calendar.render();
+        }
+        
+        // Task checkbox toggle
+        const toggleTaskForm = document.getElementById('toggleTaskForm');
+        const checkboxes = document.querySelectorAll('.task-checkbox');
+        
+        checkboxes.forEach(function(checkbox) {
+            checkbox.addEventListener('change', function() {
+                const taskId = this.dataset.taskId;
+                toggleTaskForm.action = "{{ url_for('planner.toggle_task_completion', task_id=0) }}".replace('0', taskId);
+                toggleTaskForm.submit();
+            });
+        });
+    });
+</script>
+{% endblock %}
