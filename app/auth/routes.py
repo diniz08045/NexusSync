@@ -104,6 +104,10 @@ def login():
         is_new_location = check_new_location(user, ip_address)
         is_new_device = check_new_device(user, user_agent)
         
+        # Check for suspicious login patterns
+        from app.utils.security import detect_suspicious_patterns, log_security_event
+        suspicious_patterns = detect_suspicious_patterns(user.id, ip_address, user_agent)
+        
         # If no 2FA, login directly
         login_user(user, remember=form.remember_me.data)
         
@@ -111,11 +115,24 @@ def login():
         user.record_login(ip_address, user_agent, successful=True)
         
         # Log security event for successful login
-        from app.utils.security import log_security_event
         log_security_event('login_successful', user_id=user.id,
                           details={'ip': ip_address, 
                                   'new_location': is_new_location,
-                                  'new_device': is_new_device})
+                                  'new_device': is_new_device,
+                                  'suspicious_patterns': suspicious_patterns})
+                                  
+        # Create security notifications for suspicious patterns
+        if suspicious_patterns:
+            from app.models.notification import Notification
+            
+            notification = Notification(
+                user_id=user.id,
+                title="Suspicious Login Activity Detected",
+                message=f"We detected potentially suspicious login patterns on your account. Please review your recent login activity and contact support if you don't recognize any logins."
+            )
+            db.session.add(notification)
+            db.session.commit()
+            logger.warning(f"Suspicious patterns detected for user {user.id}: {suspicious_patterns}")
         
         # Create session activity record
         try:
@@ -192,6 +209,10 @@ def two_factor_auth():
         is_new_location = check_new_location(user, ip_address)
         is_new_device = check_new_device(user, user_agent)
         
+        # Check for suspicious login patterns
+        from app.utils.security import detect_suspicious_patterns, log_security_event
+        suspicious_patterns = detect_suspicious_patterns(user.id, ip_address, user_agent)
+        
         # Login the user
         login_user(user)
         
@@ -199,11 +220,24 @@ def two_factor_auth():
         user.record_login(ip_address, user_agent, successful=True)
         
         # Log security event for successful 2FA login
-        from app.utils.security import log_security_event
         log_security_event('2fa_login_successful', user_id=user.id,
                           details={'ip': ip_address, 
                                   'new_location': is_new_location,
-                                  'new_device': is_new_device})
+                                  'new_device': is_new_device,
+                                  'suspicious_patterns': suspicious_patterns})
+                                  
+        # Create security notifications for suspicious patterns
+        if suspicious_patterns:
+            from app.models.notification import Notification
+            
+            notification = Notification(
+                user_id=user.id,
+                title="Suspicious Login Activity Detected",
+                message=f"We detected potentially suspicious login patterns on your account. Please review your recent login activity and contact support if you don't recognize any logins."
+            )
+            db.session.add(notification)
+            db.session.commit()
+            logger.warning(f"Suspicious patterns detected for user {user.id}: {suspicious_patterns}")
         
         # Create session activity record
         try:

@@ -144,3 +144,92 @@ def log_security_event(event_type, user_id=None, details=None):
             db.session.rollback()
     
     # TODO: In the future, implement a SecurityLog model to store these events
+    
+def detect_suspicious_patterns(user_id, ip_address=None, user_agent=None):
+    """
+    Detect suspicious patterns in login behavior.
+    
+    This function analyzes recent login patterns for a user and returns a list of
+    suspicious activities detected.
+    
+    Args:
+        user_id (int): The user ID to analyze
+        ip_address (str, optional): The current IP address
+        user_agent (str, optional): The current user agent string
+        
+    Returns:
+        list: List of suspicious patterns detected
+        
+    Suspicious patterns include:
+    - Multiple failed login attempts followed by a successful one
+    - Successful logins from multiple locations in a short time window
+    - Login attempts outside normal hours for the user
+    - Abnormal frequency of login attempts
+    """
+    suspicious_patterns = []
+    time_window = datetime.utcnow() - timedelta(days=3)  # Look at last 3 days
+    
+    # Get user data
+    user = User.query.get(user_id)
+    if not user:
+        return suspicious_patterns
+    
+    # Get recent login attempts for this user
+    recent_attempts = LoginAttempt.query.filter(
+        LoginAttempt.user_id == user_id,
+        LoginAttempt.timestamp > time_window
+    ).order_by(LoginAttempt.timestamp.desc()).all()
+    
+    if not recent_attempts:
+        return suspicious_patterns
+    
+    # Analyze failed attempts followed by success
+    failed_before_success = 0
+    for i, attempt in enumerate(recent_attempts):
+        if attempt.successful:
+            # Found a successful login, look back at previous attempts
+            for j in range(i+1, min(i+6, len(recent_attempts))):
+                if not recent_attempts[j].successful:
+                    failed_before_success += 1
+                else:
+                    break  # Stop at another successful login
+            break  # Only check most recent successful login
+    
+    if failed_before_success >= 3:
+        suspicious_patterns.append({
+            'type': 'failed_before_success',
+            'details': f'Multiple failed attempts ({failed_before_success}) before successful login'
+        })
+    
+    # Check for multiple locations in short time window (24 hours)
+    location_window = datetime.utcnow() - timedelta(hours=24)
+    recent_locations = set()
+    
+    for attempt in recent_attempts:
+        if attempt.timestamp > location_window and attempt.successful:
+            if attempt.ip_address:
+                recent_locations.add(attempt.ip_address)
+    
+    if len(recent_locations) > 2:  # More than 2 distinct locations in 24 hours
+        suspicious_patterns.append({
+            'type': 'multiple_locations',
+            'details': f'Logins from {len(recent_locations)} different locations in 24 hours'
+        })
+    
+    # Check for abnormal login frequency
+    hourly_attempts = {}
+    for attempt in recent_attempts:
+        hour = attempt.timestamp.hour
+        hourly_attempts[hour] = hourly_attempts.get(hour, 0) + 1
+    
+    # Find hour with most attempts
+    max_hour = max(hourly_attempts.items(), key=lambda x: x[1]) if hourly_attempts else (None, 0)
+    
+    # If there's a significantly higher number of attempts during a certain hour
+    if max_hour[1] > 10 and max_hour[1] > sum(hourly_attempts.values()) / len(hourly_attempts) * 2:
+        suspicious_patterns.append({
+            'type': 'abnormal_frequency',
+            'details': f'Unusual login frequency during hour {max_hour[0]}'
+        })
+    
+    return suspicious_patterns
