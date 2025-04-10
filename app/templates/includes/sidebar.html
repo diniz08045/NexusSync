@@ -35,12 +35,9 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {{ 'active' if request.endpoint == 'user.messages' }}" href="{{ url_for('user.messages') }}">
+                <a class="nav-link" href="#">
                     <i class="fas fa-envelope me-2"></i>
                     Messages
-                    {% if unread_messages_count and unread_messages_count > 0 %}
-                    <span class="badge bg-danger rounded-pill ms-2">{{ unread_messages_count }}</span>
-                    {% endif %}
                 </a>
             </li>
         </ul>
@@ -55,29 +52,26 @@
         </h6>
         <ul class="nav flex-column mb-2">
             <li class="nav-item">
-                <a class="nav-link {{ 'active' if request.endpoint == 'user.profile' }}" href="{{ url_for('user.profile') }}">
+                <a class="nav-link" href="#">
                     <i class="fas fa-user me-2"></i>
                     My Profile
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {{ 'active' if request.endpoint == 'user.notifications' }}" href="{{ url_for('user.notifications') }}">
+                <a class="nav-link" href="#">
                     <i class="fas fa-bell me-2"></i>
                     Notifications
-                    {% if current_user.unread_notifications_count() > 0 %}
-                    <span class="badge bg-danger rounded-pill ms-2">{{ current_user.unread_notifications_count() }}</span>
-                    {% endif %}
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {{ 'active' if request.endpoint == 'user.settings' }}" href="{{ url_for('user.settings') }}">
+                <a class="nav-link" href="#">
                     <i class="fas fa-cog me-2"></i>
                     Settings
                 </a>
             </li>
         </ul>
         
-        {% if current_user.is_admin() %}
+        {% if current_user.is_authenticated and current_user.is_admin %}
         <hr class="border-gray my-3">
         
         <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-2 mb-1 text-muted text-uppercase">
@@ -88,25 +82,25 @@
         </h6>
         <ul class="nav flex-column mb-2">
             <li class="nav-item">
-                <a class="nav-link {{ 'active' if request.endpoint == 'admin.index' }}" href="{{ url_for('admin.index') }}">
+                <a class="nav-link" href="#">
                     <i class="fas fa-tachometer-alt me-2"></i>
                     Admin Dashboard
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {{ 'active' if request.endpoint == 'admin.list_users' }}" href="{{ url_for('admin.list_users') }}">
+                <a class="nav-link" href="#">
                     <i class="fas fa-users-cog me-2"></i>
                     Manage Users
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {{ 'active' if request.endpoint == 'admin.active_sessions' }}" href="{{ url_for('admin.active_sessions') }}">
+                <a class="nav-link" href="#">
                     <i class="fas fa-desktop me-2"></i>
                     Active Sessions
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {{ 'active' if request.endpoint == 'admin.create_notification' }}" href="{{ url_for('admin.create_notification') }}">
+                <a class="nav-link" href="#">
                     <i class="fas fa-bullhorn me-2"></i>
                     Send Notifications
                 </a>
