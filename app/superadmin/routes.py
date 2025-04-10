@@ -381,7 +381,10 @@ def system_time():
         now = datetime.datetime.now()
         form.timezone.data = 'UTC'  # Default timezone
     
-    return render_template('superadmin/system_time.html', form=form)
+    return render_template('superadmin/system_time.html', 
+                          form=form, 
+                          now=now, 
+                          datetime=datetime)
 
 
 @superadmin_bp.route('/data-retention', methods=['GET', 'POST'])
@@ -406,7 +409,13 @@ def data_retention():
         form.backup_retention_days.data = 180  # Default backup retention
         form.user_data_retention_days.data = 365  # Default user data retention
     
-    return render_template('superadmin/data_retention.html', form=form)
+    # Get the current time for template calculations
+    now = datetime.datetime.now()
+    
+    return render_template('superadmin/data_retention.html', 
+                          form=form, 
+                          now=now, 
+                          datetime=datetime)
 
 
 @superadmin_bp.route('/security-config', methods=['GET', 'POST'])
@@ -444,7 +453,13 @@ def security_config():
         form.cors_enabled.data = True  # Default setting
         form.cors_allowed_origins.data = "*"  # Default setting
     
-    return render_template('superadmin/security_config.html', form=form)
+    # Get the current time for template calculations
+    now = datetime.datetime.now()
+    
+    return render_template('superadmin/security_config.html', 
+                          form=form, 
+                          now=now, 
+                          datetime=datetime)
 
 
 @superadmin_bp.route('/startup-config', methods=['GET', 'POST'])
@@ -468,7 +483,13 @@ def startup_config():
         form.auto_start_services.data = True  # Default setting
         form.startup_timeout.data = 60  # Default timeout in seconds
     
-    return render_template('superadmin/startup_config.html', form=form)
+    # Get the current time and pass datetime module for template calculations
+    now = datetime.datetime.now()
+    
+    return render_template('superadmin/startup_config.html', 
+                          form=form, 
+                          now=now, 
+                          datetime=datetime)
 
 
 @superadmin_bp.route('/audit-logs')
@@ -485,7 +506,13 @@ def audit_logs():
     # Sort logs by timestamp, newest first
     logs.sort(key=lambda x: x.get('timestamp', ''), reverse=True)
     
-    return render_template('superadmin/audit_logs.html', logs=logs)
+    # Get the current time for template calculations
+    now = datetime.datetime.now()
+    
+    return render_template('superadmin/audit_logs.html', 
+                          logs=logs, 
+                          now=now, 
+                          datetime=datetime)
 
 
 @superadmin_bp.route('/change-password', methods=['GET', 'POST'])
@@ -505,7 +532,13 @@ def change_password():
         else:
             flash('Current password is incorrect.', 'danger')
     
-    return render_template('superadmin/change_password.html', form=form)
+    # Get the current time for template calculations
+    now = datetime.datetime.now()
+    
+    return render_template('superadmin/change_password.html', 
+                          form=form,
+                          now=now,
+                          datetime=datetime)
 
 
 # Development-only routes (should be removed in production)
