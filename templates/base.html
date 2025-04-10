@@ -17,6 +17,27 @@
     {% block head %}{% endblock %}
 </head>
 <body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen active">
+        <div class="d-flex flex-column align-items-center">
+            <div class="loading-spinner"></div>
+            <div class="loading-text mt-3">Loading...</div>
+        </div>
+    </div>
+    
+    <!-- Initial script to handle loading screen before DOM is fully loaded -->
+    <script>
+        // Hide loading screen after page load
+        window.addEventListener('load', function() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            if (loadingScreen) {
+                setTimeout(function() {
+                    loadingScreen.classList.remove('active');
+                }, 300);
+            }
+        });
+    </script>
+    
     {% block content_override %}
         {% if current_user.is_authenticated %}
         <div class="d-flex wrapper">
