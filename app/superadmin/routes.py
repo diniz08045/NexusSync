@@ -39,11 +39,23 @@ SUPER_ADMIN_USERNAME = "superadmin"
 SUPER_ADMIN_PASSWORD_HASH = generate_password_hash("change_this_password_immediately!")
 
 # Define the list of allowed IP addresses
-ALLOWED_IPS = ['127.0.0.1', 'localhost', '::1', '10.82.4.51']  # localhost and Replit specific IPs
+ALLOWED_IPS = ['127.0.0.1', 'localhost', '::1', '10.82.4.51', '10.82.5.39', '10.82.']  # localhost and Replit specific IPs
 
 # Whether the development mode is enabled
 DEVELOPMENT_MODE = True  # Set to False in production
 
+
+def is_ip_allowed(ip_address):
+    """Check if the IP address is in the allowed list.
+    Supports exact matches and partial prefix matches."""
+    for allowed_ip in ALLOWED_IPS:
+        # Check for exact match
+        if ip_address == allowed_ip:
+            return True
+        # Check for prefix match (e.g. "10.82." will match "10.82.4.51")
+        if allowed_ip.endswith('.') and ip_address.startswith(allowed_ip):
+            return True
+    return False
 
 def superadmin_required(f):
     """
@@ -56,7 +68,7 @@ def superadmin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         # Check if the request is coming from an allowed IP
-        if request.remote_addr not in ALLOWED_IPS:
+        if not is_ip_allowed(request.remote_addr):
             logger.warning(f"Unauthorized superadmin access attempt from IP: {request.remote_addr}")
             abort(403)  # Forbidden
             
@@ -103,7 +115,7 @@ def login():
     session['is_superadmin'] = False
     
     # Check if the request is coming from an allowed IP
-    if request.remote_addr not in ALLOWED_IPS:
+    if not is_ip_allowed(request.remote_addr):
         logger.warning(f"Superadmin login attempt from unauthorized IP: {request.remote_addr}")
         abort(403)  # Forbidden
     
@@ -410,8 +422,9 @@ if DEVELOPMENT_MODE:
     @superadmin_bp.route('/dev-login')
     def dev_login():
         """Auto-login for development purposes only."""
-        # Only allowed from localhost
-        if request.remote_addr not in ALLOWED_IPS:
+        # Only allowed from allowed IPs
+        if not is_ip_allowed(request.remote_addr):
+            logger.warning(f"Unauthorized dev-login attempt from IP: {request.remote_addr}")
             abort(403)  # Forbidden
             
         # Set superadmin status in session
