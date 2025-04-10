@@ -345,54 +345,68 @@
     <!-- Initialize Feather Icons -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Replace all feather icons
             feather.replace();
             
-            // Sidebar toggle functionality
-            const sidebarToggle = document.getElementById('sidebarToggle');
-            const sidebarCollapseBtn = document.getElementById('sidebarCollapseBtn');
+            // Only run authenticated page functionality if the elements exist
+            const isAuthenticatedPage = document.body.classList.contains('authenticated-page');
+            
+            if (isAuthenticatedPage) {
+                initializeAuthenticatedPageFeatures();
+            }
+        });
+        
+        // Function to initialize features only for authenticated pages
+        function initializeAuthenticatedPageFeatures() {
+            // Sidebar functionality
             const sidebar = document.getElementById('sidebar');
             const content = document.getElementById('content');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebarCollapseBtn = document.getElementById('sidebarCollapseBtn');
             
-            if (sidebarToggle) {
-                sidebarToggle.addEventListener('click', function() {
-                    sidebar.classList.toggle('collapsed');
-                    content.classList.toggle('expanded');
+            if (sidebar && content) {
+                // Collapse sidebar on small screens by default
+                function checkWidth() {
+                    if (window.innerWidth < 768) {
+                        sidebar.classList.add('collapsed');
+                        content.classList.add('expanded');
+                    } else {
+                        sidebar.classList.remove('collapsed');
+                        content.classList.remove('expanded');
+                    }
+                }
+                
+                // Initial check
+                checkWidth();
+                
+                // Check on resize
+                window.addEventListener('resize', checkWidth);
+                
+                // Toggle sidebar functionality
+                if (sidebarToggle) {
+                    sidebarToggle.addEventListener('click', function() {
+                        sidebar.classList.toggle('collapsed');
+                        content.classList.toggle('expanded');
+                    });
+                }
+                
+                if (sidebarCollapseBtn) {
+                    sidebarCollapseBtn.addEventListener('click', function() {
+                        sidebar.classList.toggle('collapsed');
+                        content.classList.toggle('expanded');
+                    });
+                }
+                
+                // Auto-expand active dropdown menus
+                const activeLinks = document.querySelectorAll('.sidebar-dropdown-link.active');
+                activeLinks.forEach(function(link) {
+                    const parentCollapse = link.closest('.collapse');
+                    if (parentCollapse) {
+                        new bootstrap.Collapse(parentCollapse).show();
+                    }
                 });
             }
-            
-            if (sidebarCollapseBtn) {
-                sidebarCollapseBtn.addEventListener('click', function() {
-                    sidebar.classList.toggle('collapsed');
-                    content.classList.toggle('expanded');
-                });
-            }
-            
-            // Collapse sidebar on small screens by default
-            function checkWidth() {
-                if (window.innerWidth < 768) {
-                    sidebar.classList.add('collapsed');
-                    content.classList.add('expanded');
-                } else {
-                    sidebar.classList.remove('collapsed');
-                    content.classList.remove('expanded');
-                }
-            }
-            
-            // Initial check
-            checkWidth();
-            
-            // Check on resize
-            window.addEventListener('resize', checkWidth);
-            
-            // Auto-expand active dropdown menus
-            const activeLinks = document.querySelectorAll('.sidebar-dropdown-link.active');
-            activeLinks.forEach(function(link) {
-                const parentCollapse = link.closest('.collapse');
-                if (parentCollapse) {
-                    new bootstrap.Collapse(parentCollapse).show();
-                }
-            });
-        });
+        }
     </script>
     <!-- Custom JavaScript -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
