@@ -352,11 +352,241 @@ def messages():
     """View messages and conversations."""
     return render_template('messages.html', title='Messages')
 
+@user_bp.route('/settings', methods=['GET', 'POST'])
+@login_required
+def settings():
+    """User settings page with profile, security, and notification settings"""
+    form = EditProfileForm(current_user.username, current_user.email)
+    if form.validate_on_submit():
+        current_user.username = form.username.data
+        current_user.email = form.email.data
+        current_user.first_name = form.first_name.data
+        current_user.last_name = form.last_name.data
+        db.session.commit()
+        flash('Your profile has been updated.', 'success')
+        return redirect(url_for('user.settings', _anchor='profile'))
+    elif request.method == 'GET':
+        form.username.data = current_user.username
+        form.email.data = current_user.email
+        form.first_name.data = current_user.first_name
+        form.last_name.data = current_user.last_name
+    
+    return render_template('settings.html', title='Account Settings', form=form)
+
+@user_bp.route('/settings/resend-confirmation', methods=['POST'])
+@login_required
+def resend_confirmation():
+    """Resend email confirmation link"""
+    if current_user.is_email_confirmed:
+        flash('Your email is already confirmed.', 'info')
+        return redirect(url_for('user.settings', _anchor='security'))
+    
+    # Send confirmation email
+    send_confirmation_email(current_user)
+    
+    flash('A new confirmation email has been sent. Please check your inbox.', 'success')
+    return redirect(url_for('user.settings', _anchor='security'))
+
+@user_bp.route('/settings/setup-two-factor', methods=['GET', 'POST'])
+@login_required
+def setup_two_factor():
+    """Set up two-factor authentication"""
+    if current_user.two_factor_enabled:
+        flash('Two-factor authentication is already enabled.', 'info')
+        return redirect(url_for('user.settings', _anchor='security'))
+    
+    # Generate and send a token for verification
+    token = TwoFactorToken.generate_token()
+    two_factor_token = TwoFactorToken(
+        user_id=current_user.id,
+        token=token,
+        expires_at=datetime.utcnow() + timedelta(minutes=10)
+    )
+    db.session.add(two_factor_token)
+    db.session.commit()
+    
+    # Send the token via email
+    send_two_factor_token(current_user.email, token)
+    
+    form = TwoFactorForm()
+    if form.validate_on_submit():
+        # Verify the token
+        valid_token = TwoFactorToken.query.filter_by(
+            user_id=current_user.id,
+            token=form.token.data,
+            is_used=False
+        ).first()
+        
+        if not valid_token or valid_token.expires_at < datetime.utcnow():
+            flash('Invalid or expired verification code. Please try again.', 'danger')
+            return redirect(url_for('user.setup_two_factor'))
+        
+        # Enable 2FA for the user
+        current_user.two_factor_enabled = True
+        
+        # Mark token as used
+        valid_token.is_used = True
+        db.session.commit()
+        
+        flash('Two-factor authentication has been enabled for your account.', 'success')
+        return redirect(url_for('user.settings', _anchor='security'))
+    
+    return render_template('setup_two_factor.html', title='Enable Two-Factor Authentication', form=form)
+
+@user_bp.route('/settings/disable-two-factor', methods=['POST'])
+@login_required
+def disable_two_factor():
+    """Disable two-factor authentication"""
+    if not current_user.two_factor_enabled:
+        flash('Two-factor authentication is not enabled.', 'info')
+        return redirect(url_for('user.settings', _anchor='security'))
+    
+    current_user.two_factor_enabled = False
+    db.session.commit()
+    
+    # Add notification for the user
+    notification = Notification(
+        user_id=current_user.id,
+        title='Two-Factor Authentication Disabled',
+        message='Two-factor authentication has been disabled for your account. If you did not make this change, please contact support immediately.'
+    )
+    db.session.add(notification)
+    db.session.commit()
+    
+    flash('Two-factor authentication has been disabled for your account.', 'success')
+    return redirect(url_for('user.settings', _anchor='security'))
+
+@user_bp.route('/settings/change-password', methods=['GET', 'POST'])
+@login_required
+def change_password():
+    """Change user password"""
+    form = PasswordResetForm()
+    if form.validate_on_submit():
+        current_user.set_password(form.password.data)
+        db.session.commit()
+        
+        # Add notification for the user
+        notification = Notification(
+            user_id=current_user.id,
+            title='Password Changed',
+            message='Your password has been successfully changed. If you did not make this change, please contact support immediately.'
+        )
+        db.session.add(notification)
+        db.session.commit()
+        
+        flash('Your password has been changed.', 'success')
+        return redirect(url_for('user.settings', _anchor='security'))
+    
+    return render_template('change_password.html', title='Change Password', form=form)
+
 @user_bp.route('/security/two-factor')
 @login_required
 def two_factor_settings():
-    """Configure two-factor authentication."""
-    return render_template('two_factor_settings.html', title='Two-Factor Authentication')
+    """Configure two-factor authentication - redirects to settings page."""
+    return redirect(url_for('user.settings', _anchor='security'))
+
+# Global search API endpoint
+@user_bp.route('/api/global-search', methods=['GET'])
+@login_required
+def global_search():
+    """API endpoint for global search across users, pages, and settings"""
+    query = request.args.get('q', '').strip().lower()
+    if not query or len(query) < 2:
+        return jsonify({'results': []})
+    
+    results = []
+    
+    # 1. Search navigation items
+    nav_items = [
+        {'title': 'Dashboard', 'url': url_for('user.index'), 'icon': 'home', 'category': 'Page', 
+         'description': 'Main dashboard with overview and statistics', 'keywords': 'dashboard home main overview'},
+        {'title': 'Profile', 'url': url_for('user.profile'), 'icon': 'user', 'category': 'Page', 
+         'description': 'View and manage your profile information', 'keywords': 'profile account user information personal'},
+        {'title': 'Edit Profile', 'url': url_for('user.edit_profile'), 'icon': 'edit', 'category': 'Page', 
+         'description': 'Edit your profile information', 'keywords': 'edit profile account settings user information update'},
+        {'title': 'Messages', 'url': url_for('user.messages'), 'icon': 'message-square', 'category': 'Page', 
+         'description': 'View your messages and conversations', 'keywords': 'messages inbox chat communication'},
+        {'title': 'Notifications', 'url': url_for('user.notifications'), 'icon': 'bell', 'category': 'Page', 
+         'description': 'View your notifications', 'keywords': 'notifications alerts updates messages'},
+        {'title': 'Security Settings', 'url': url_for('user.two_factor_settings'), 'icon': 'shield', 'category': 'Settings', 
+         'description': 'Manage two-factor authentication', 'keywords': 'security 2fa two factor authentication settings'},
+        {'title': 'Password Reset', 'url': url_for('user.reset_password_request'), 'icon': 'key', 'category': 'Settings', 
+         'description': 'Request a password reset', 'keywords': 'password reset security forgot change'}
+    ]
+    
+    # If user is admin, add admin pages
+    if current_user.is_admin():
+        admin_items = [
+            {'title': 'Admin Dashboard', 'url': url_for('admin.index'), 'icon': 'sliders', 'category': 'Admin', 
+             'description': 'Administrative dashboard and overview', 'keywords': 'admin dashboard control panel'},
+            {'title': 'User Management', 'url': url_for('admin.list_users'), 'icon': 'users', 'category': 'Admin', 
+             'description': 'Manage users and permissions', 'keywords': 'admin users management permissions roles'},
+            {'title': 'Active Sessions', 'url': url_for('admin.active_sessions'), 'icon': 'activity', 'category': 'Admin', 
+             'description': 'View and manage active user sessions', 'keywords': 'admin sessions active users online'},
+            {'title': 'Create Notification', 'url': url_for('admin.create_notification'), 'icon': 'send', 'category': 'Admin', 
+             'description': 'Create and send notifications to users', 'keywords': 'admin notifications send message alert'}
+        ]
+        nav_items.extend(admin_items)
+    
+    # Filter navigation items based on query
+    for item in nav_items:
+        if (query in item['title'].lower() or 
+            query in item['description'].lower() or 
+            query in item.get('keywords', '').lower()):
+            results.append(item)
+    
+    # 2. Search users (if admin or searching for self)
+    try:
+        if current_user.is_admin():
+            # Admins can search all users
+            user_query = User.query.filter(
+                db.or_(
+                    db.func.lower(User.username).contains(query),
+                    db.func.lower(User.email).contains(query),
+                    db.func.lower(User.first_name).contains(query),
+                    db.func.lower(User.last_name).contains(query)
+                )
+            ).limit(5).all()
+            
+            for user in user_query:
+                user_result = {
+                    'title': user.username,
+                    'description': f"{user.first_name} {user.last_name}" if user.first_name and user.last_name else user.email,
+                    'url': url_for('admin.edit_user', user_id=user.id),
+                    'icon': 'user',
+                    'category': 'User'
+                }
+                results.append(user_result)
+        else:
+            # Regular users can only find themselves in search
+            if (query in current_user.username.lower() or 
+                (current_user.email and query in current_user.email.lower()) or
+                (current_user.first_name and query in current_user.first_name.lower()) or
+                (current_user.last_name and query in current_user.last_name.lower())):
+                user_result = {
+                    'title': current_user.username,
+                    'description': 'Your profile',
+                    'url': url_for('user.profile'),
+                    'icon': 'user',
+                    'category': 'User'
+                }
+                results.append(user_result)
+    except Exception as e:
+        logger.error(f"Error searching users: {e}")
+    
+    # Sort results by relevance: title match first, then category
+    def sort_key(item):
+        title_match = 1 if query in item['title'].lower() else 0
+        # Order by category: Page, Settings, User, Admin
+        category_order = {'Page': 0, 'Settings': 1, 'User': 2, 'Admin': 3}
+        return (-title_match, category_order.get(item.get('category', ''), 99))
+    
+    results.sort(key=sort_key)
+    
+    # Limit to 10 results
+    results = results[:10]
+    
+    return jsonify({'results': results})
 
 @user_bp.route('/search')
 @login_required

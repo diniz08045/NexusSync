@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="widget">
+            <h4 class="widget-title">
+                <i data-feather="shield" class="widget-icon"></i>
+                Enable Two-Factor Authentication
+            </h4>
+            
+            <div class="alert alert-info">
+                <i data-feather="info" class="feather-sm me-2"></i>
+                A verification code has been sent to your email address. Please enter it below to enable two-factor authentication.
+            </div>
+            
+            <p class="mb-3">Two-factor authentication adds an extra layer of security to your account by requiring a verification code in addition to your password when you log in.</p>
+            
+            <form method="POST" action="{{ url_for('user.setup_two_factor') }}" class="needs-validation" novalidate>
+                {{ form.hidden_tag() }}
+                <div class="mb-3">
+                    <label for="token" class="form-label">Verification Code</label>
+                    {{ form.token(class="form-control", placeholder="Enter 6-digit code", autocomplete="off") }}
+                    {% for error in form.token.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="d-grid gap-2">
+                    {{ form.submit(class="btn btn-primary") }}
+                    <a href="{{ url_for('user.settings', _anchor='security') }}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+            
+            <div class="mt-4">
+                <h5>What is Two-Factor Authentication?</h5>
+                <p>Two-factor authentication (2FA) is a security process in which you provide two different authentication factors to verify your identity. With 2FA enabled:</p>
+                <ul>
+                    <li>You'll need to enter a verification code sent to your email in addition to your password when logging in</li>
+                    <li>This helps prevent unauthorized access even if your password is compromised</li>
+                    <li>You'll receive a notification whenever a login attempt is made to your account</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
