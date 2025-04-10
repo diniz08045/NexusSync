@@ -1,0 +1,253 @@
+{% extends 'user_base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1>Sales Department Dashboard</h1>
+                <span class="badge bg-primary p-2">{{ current_user.department|capitalize }}</span>
+            </div>
+            
+            <!-- Summary Cards Row -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card bg-primary text-white h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Tasks</h5>
+                            <h2 class="display-4">{{ pending_tasks }}</h2>
+                            <p class="card-text">Pending tasks</p>
+                        </div>
+                        <div class="card-footer bg-transparent border-0">
+                            <a href="{{ url_for('planner.tasks') }}" class="text-white">View all tasks <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="card bg-success text-white h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Completion</h5>
+                            <h2 class="display-4">{{ completion_rate }}%</h2>
+                            <p class="card-text">Task completion rate</p>
+                        </div>
+                        <div class="card-footer bg-transparent border-0">
+                            <a href="{{ url_for('planner.completed_tasks') }}" class="text-white">View completed <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="card bg-info text-white h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Tickets</h5>
+                            <h2 class="display-4">{{ open_assigned_tickets }}</h2>
+                            <p class="card-text">Open tickets assigned to you</p>
+                        </div>
+                        <div class="card-footer bg-transparent border-0">
+                            <a href="{{ url_for('tickets.my_tickets') }}" class="text-white">View all tickets <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="card bg-secondary text-white h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Notifications</h5>
+                            <h2 class="display-4">{{ unread_count }}</h2>
+                            <p class="card-text">Unread notifications</p>
+                        </div>
+                        <div class="card-footer bg-transparent border-0">
+                            <a href="{{ url_for('user.notifications') }}" class="text-white">View all <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sales-Specific Metrics -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Sales Performance</h5>
+                            <span class="badge bg-success">On Target</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label">Monthly Target</label>
+                                <div class="progress">
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: 85%;" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100">85%</div>
+                                </div>
+                                <small class="text-muted">$85,000 of $100,000 target</small>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Quarterly Target</label>
+                                <div class="progress">
+                                    <div class="progress-bar bg-info" role="progressbar" style="width: 68%;" aria-valuenow="68" aria-valuemin="0" aria-valuemax="100">68%</div>
+                                </div>
+                                <small class="text-muted">$204,000 of $300,000 target</small>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Annual Target</label>
+                                <div class="progress">
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width: 45%;" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100">45%</div>
+                                </div>
+                                <small class="text-muted">$540,000 of $1,200,000 target</small>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Your Performance</label>
+                                <div class="progress">
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: 92%;" aria-valuenow="92" aria-valuemin="0" aria-valuemax="100">92%</div>
+                                </div>
+                                <small class="text-muted">You're in the top 10% of salespeople</small>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <a href="#" class="btn btn-sm btn-outline-primary">Detailed Performance</a>
+                            <a href="#" class="btn btn-sm btn-primary float-end">Set Goals</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Active Deals</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group">
+                                <div class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">Acme Corporation</h6>
+                                        <span class="badge bg-success">$75,000</span>
+                                    </div>
+                                    <p class="mb-1">Enterprise software license renewal</p>
+                                    <div class="d-flex justify-content-between">
+                                        <span class="badge bg-info">Negotiation</span>
+                                        <small>Closing: 7 days</small>
+                                    </div>
+                                </div>
+                                <div class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">TechStart Inc.</h6>
+                                        <span class="badge bg-warning">$25,000</span>
+                                    </div>
+                                    <p class="mb-1">New client implementation package</p>
+                                    <div class="d-flex justify-content-between">
+                                        <span class="badge bg-warning">Proposal</span>
+                                        <small>Closing: 14 days</small>
+                                    </div>
+                                </div>
+                                <div class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">Global Enterprises</h6>
+                                        <span class="badge bg-danger">$120,000</span>
+                                    </div>
+                                    <p class="mb-1">Full platform migration and training</p>
+                                    <div class="d-flex justify-content-between">
+                                        <span class="badge bg-primary">Discovery</span>
+                                        <small>Closing: 30 days</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <a href="#" class="btn btn-sm btn-outline-primary">View All Deals</a>
+                            <a href="#" class="btn btn-sm btn-primary float-end">Add Deal</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Leads and Recent Activity -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Recent Leads</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group">
+                                <div class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">Sarah Johnson</h6>
+                                        <small>1 day ago</small>
+                                    </div>
+                                    <p class="mb-1">Director of Operations at Innovate LLC</p>
+                                    <div>
+                                        <span class="badge bg-danger">Hot Lead</span>
+                                        <span class="badge bg-secondary">Website Inquiry</span>
+                                    </div>
+                                </div>
+                                <div class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">Michael Chen</h6>
+                                        <small>2 days ago</small>
+                                    </div>
+                                    <p class="mb-1">CTO at NextGen Solutions</p>
+                                    <div>
+                                        <span class="badge bg-warning">Warm Lead</span>
+                                        <span class="badge bg-secondary">Referral</span>
+                                    </div>
+                                </div>
+                                <div class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">Jessica Miller</h6>
+                                        <small>3 days ago</small>
+                                    </div>
+                                    <p class="mb-1">VP of Marketing at Growth Partners</p>
+                                    <div>
+                                        <span class="badge bg-info">New Lead</span>
+                                        <span class="badge bg-secondary">Trade Show</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <a href="#" class="btn btn-sm btn-outline-primary">View All Leads</a>
+                            <a href="#" class="btn btn-sm btn-primary float-end">Add Lead</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Recent Tasks</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if recent_tasks %}
+                                <div class="list-group">
+                                    {% for task in recent_tasks %}
+                                        <a href="{{ url_for('planner.edit_task', task_id=task.id) }}" class="list-group-item list-group-item-action">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <h6 class="mb-1">{{ task.title }}</h6>
+                                                <small>{{ task.updated_at | timeago }}</small>
+                                            </div>
+                                            <p class="mb-1">{{ task.description | truncate(100) }}</p>
+                                            <div>
+                                                <span class="badge {% if task.priority == 'high' %}bg-danger{% elif task.priority == 'medium' %}bg-warning{% else %}bg-info{% endif %}">
+                                                    {{ task.priority | capitalize }}
+                                                </span>
+                                                <span class="badge {% if task.status == 'completed' %}bg-success{% elif task.status == 'in_progress' %}bg-primary{% else %}bg-secondary{% endif %}">
+                                                    {{ task.status | replace('_', ' ') | capitalize }}
+                                                </span>
+                                            </div>
+                                        </a>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <p class="text-muted">No recent tasks found.</p>
+                            {% endif %}
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <a href="{{ url_for('planner.tasks') }}" class="btn btn-sm btn-outline-primary">View All Tasks</a>
+                            <a href="{{ url_for('planner.create_task') }}" class="btn btn-sm btn-primary float-end">Create Task</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

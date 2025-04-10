@@ -32,6 +32,7 @@ def index():
     # Get stats for dashboard widgets
     from app.models.task import Task
     from app.models.ticket import Ticket
+    from app.utils.dashboard import get_department_dashboard, get_department_widgets
     
     # Tasks stats
     total_tasks = Task.query.filter_by(user_id=current_user.id).count()
@@ -57,8 +58,17 @@ def index():
         (Ticket.assignee_id == current_user.id)
     ).order_by(Ticket.updated_at.desc()).limit(5).all()
     
-    return render_template('user/index.html', 
-                          title='Dashboard',
+    # Get department-specific dashboard template
+    dashboard_template = get_department_dashboard()
+    
+    # Get department-specific widgets
+    widgets = get_department_widgets()
+    
+    # Get department name for display purposes
+    department_display = current_user.department.replace('_', ' ').title() if current_user.department else 'Default'
+    
+    return render_template(dashboard_template, 
+                          title=f'{department_display} Dashboard',
                           unread_count=unread_count,
                           total_tasks=total_tasks,
                           completed_tasks=completed_tasks,
@@ -69,6 +79,8 @@ def index():
                           open_assigned_tickets=open_assigned_tickets,
                           recent_tasks=recent_tasks,
                           recent_tickets=recent_tickets,
+                          widgets=widgets,
+                          department=current_user.department,
                           app_name="NexusSync")
 
 @user_bp.route('/profile')
