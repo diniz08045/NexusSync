@@ -27,7 +27,7 @@
                     </div>
                     <div class="flex-grow-1 ms-3">
                         <h5 class="fw-bold mb-1">Total Active Sessions</h5>
-                        <h3 class="mb-0">{{ sessions|length }}</h3>
+                        <h3 class="mb-0">{{ sessions.items|length }}</h3>
                     </div>
                 </div>
             </div>
@@ -98,7 +98,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for session in sessions %}
+                            {% for session in sessions.items %}
                             <tr>
                                 <td>
                                     <div class="d-flex align-items-center">
@@ -166,6 +166,34 @@
                         </tbody>
                     </table>
                 </div>
+                <!-- Pagination -->
+                {% if sessions.pages > 1 %}
+                <div class="card-footer">
+                    <nav aria-label="Session pagination">
+                        <ul class="pagination justify-content-center mb-0">
+                            <li class="page-item {% if not sessions.has_prev %}disabled{% endif %}">
+                                <a class="page-link" href="{{ url_for('admin.active_sessions', page=sessions.prev_num) if sessions.has_prev else '#' }}">Previous</a>
+                            </li>
+                            
+                            {% for page_num in sessions.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                                {% if page_num %}
+                                    <li class="page-item {% if page_num == sessions.page %}active{% endif %}">
+                                        <a class="page-link" href="{{ url_for('admin.active_sessions', page=page_num) }}">{{ page_num }}</a>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link">...</span>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            <li class="page-item {% if not sessions.has_next %}disabled{% endif %}">
+                                <a class="page-link" href="{{ url_for('admin.active_sessions', page=sessions.next_num) if sessions.has_next else '#' }}">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
