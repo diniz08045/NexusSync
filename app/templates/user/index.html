@@ -147,7 +147,7 @@
                     {% else %}
                         <div class="list-group-item py-4 text-center">
                             <p class="text-muted mb-0">No tickets found</p>
-                            <a href="#" class="btn btn-sm btn-primary mt-2">
+                            <a href="{{ url_for('tickets.create_ticket') }}" class="btn btn-sm btn-primary mt-2">
                                 <i class="fas fa-plus me-1"></i> Create Ticket
                             </a>
                         </div>
