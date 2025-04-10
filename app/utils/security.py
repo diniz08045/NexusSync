@@ -79,19 +79,68 @@ def check_login_attempts(user_id, ip_address=None, max_attempts=5, window_minute
 def log_security_event(event_type, user_id=None, details=None):
     """
     Log a security-related event to both the application log and database.
+    Optionally creates notifications for suspicious activities.
     
     Args:
         event_type (str): Type of security event (e.g., 'login_failed', 'password_reset')
         user_id (int, optional): User ID associated with the event
         details (dict, optional): Additional details about the event
     """
+    if details is None:
+        details = {}
+        
     ip_address = get_client_ip()
     user_agent = request.user_agent.string if request and request.user_agent else "Unknown"
+    
+    # Add IP and user agent to details if not already present
+    if 'ip' not in details:
+        details['ip'] = ip_address
+    if 'user_agent' not in details:
+        details['user_agent'] = user_agent
     
     # Log to application logs
     log_message = f"Security event: {event_type}, User: {user_id}, IP: {ip_address}"
     if details:
         log_message += f", Details: {details}"
     logger.info(log_message)
+    
+    # Check if this is a suspicious event that should trigger a notification
+    suspicious_events = {
+        'login_blocked': {
+            'title': 'Account Temporarily Locked',
+            'message': 'Your account has been temporarily locked due to too many failed login attempts. For security purposes, please wait a few minutes before trying again.'
+        },
+        'password_reset_requested': {
+            'title': 'Password Reset Requested',
+            'message': f'A password reset was requested for your account from IP {ip_address}. If you did not request this, please contact support immediately.'
+        },
+        'login_failed': {
+            'title': 'Failed Login Attempt',
+            'message': f'There was a failed login attempt on your account from IP {ip_address}. If this wasn\'t you, please review your account security.'
+        },
+        'new_location_login': {
+            'title': 'Login from New Location',
+            'message': f'Your account was accessed from a new location ({ip_address}). If this wasn\'t you, please change your password immediately.'
+        }
+    }
+    
+    # If this is a suspicious event and we have a user_id, create a notification
+    if user_id and event_type in suspicious_events:
+        try:
+            from app.models.notification import Notification
+            from app import db
+            
+            notification = Notification(
+                user_id=user_id,
+                title=suspicious_events[event_type]['title'],
+                message=suspicious_events[event_type]['message']
+            )
+            db.session.add(notification)
+            db.session.commit()
+            logger.info(f"Created security notification for user_id {user_id}: {event_type}")
+            
+        except Exception as e:
+            logger.error(f"Failed to create security notification: {str(e)}")
+            db.session.rollback()
     
     # TODO: In the future, implement a SecurityLog model to store these events

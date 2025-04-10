@@ -99,13 +99,23 @@ def login():
             flash('A verification code has been sent to your email.', 'info')
             return redirect(url_for('auth.two_factor_auth'))
         
+        # Check for login from new location or device
+        from app.utils.location import check_new_location, check_new_device
+        is_new_location = check_new_location(user, ip_address)
+        is_new_device = check_new_device(user, user_agent)
+        
         # If no 2FA, login directly
         login_user(user, remember=form.remember_me.data)
         
-        # Log successful login
-        user.last_login = datetime.utcnow()
-        user.last_ip = request.remote_addr
-        user.last_user_agent = request.user_agent.string
+        # Record successful login attempt
+        user.record_login(ip_address, user_agent, successful=True)
+        
+        # Log security event for successful login
+        from app.utils.security import log_security_event
+        log_security_event('login_successful', user_id=user.id,
+                          details={'ip': ip_address, 
+                                  'new_location': is_new_location,
+                                  'new_device': is_new_device})
         
         # Create session activity record
         try:
@@ -173,13 +183,27 @@ def two_factor_auth():
         # Mark token as used
         token.is_used = True
         
+        # Get client info for security tracking
+        ip_address = request.remote_addr
+        user_agent = request.user_agent.string if request.user_agent else "Unknown"
+        
+        # Check for login from new location or device
+        from app.utils.location import check_new_location, check_new_device
+        is_new_location = check_new_location(user, ip_address)
+        is_new_device = check_new_device(user, user_agent)
+        
         # Login the user
         login_user(user)
         
-        # Log successful login
-        user.last_login = datetime.utcnow()
-        user.last_ip = request.remote_addr
-        user.last_user_agent = request.user_agent.string
+        # Record successful login attempt
+        user.record_login(ip_address, user_agent, successful=True)
+        
+        # Log security event for successful 2FA login
+        from app.utils.security import log_security_event
+        log_security_event('2fa_login_successful', user_id=user.id,
+                          details={'ip': ip_address, 
+                                  'new_location': is_new_location,
+                                  'new_device': is_new_device})
         
         # Create session activity record
         try:
