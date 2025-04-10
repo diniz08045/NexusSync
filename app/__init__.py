@@ -131,4 +131,32 @@ def create_app(config=None):
         from datetime import datetime
         return {'now': datetime.utcnow()}
     
+    # Add security headers to all responses
+    @app.after_request
+    def add_security_headers(response):
+        # Content Security Policy
+        response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; style-src 'self' https://cdn.jsdelivr.net https://cdn.replit.com 'unsafe-inline'; img-src 'self' data:; font-src 'self' https://cdn.jsdelivr.net data:; connect-src 'self'"
+        
+        # Prevent MIME type sniffing
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+        
+        # Enable browser XSS protection
+        response.headers['X-XSS-Protection'] = '1; mode=block'
+        
+        # Prevent clickjacking
+        response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+        
+        # HSTS (HTTP Strict Transport Security)
+        # Only enable if SSL is properly configured
+        if app.config.get('SESSION_COOKIE_SECURE', False):
+            response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+        
+        # Referrer Policy
+        response.headers['Referrer-Policy'] = 'same-origin'
+        
+        # Feature Policy (now Permissions Policy)
+        response.headers['Permissions-Policy'] = 'geolocation=(), microphone=(), camera=()'
+        
+        return response
+    
     return app
