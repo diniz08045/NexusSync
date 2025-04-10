@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Verification Code</title>
+    <title>{{ notification.title }}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -23,16 +23,25 @@
             text-align: center;
             margin-bottom: 20px;
         }
-        .verification-code {
-            text-align: center;
-            font-size: 32px;
-            letter-spacing: 4px;
-            margin: 30px 0;
+        .notification-content {
             padding: 15px;
-            background-color: #eee;
+            background-color: #e8f0fe;
+            border-left: 4px solid #0d6efd;
+            margin: 20px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        .button-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #0d6efd;
+            color: white;
+            text-decoration: none;
             border-radius: 5px;
             font-weight: bold;
-            color: #222;
         }
         .footer {
             margin-top: 30px;
@@ -48,15 +57,21 @@
             <h2>NexusSync</h2>
         </div>
         
-        <p>Hello,</p>
+        <p>Hello {{ user.username }},</p>
         
-        <p>Your verification code for logging into NexusSync is:</p>
+        <h3>{{ notification.title }}</h3>
         
-        <div class="verification-code">{{ token }}</div>
+        <div class="notification-content">
+            <p>{{ notification.message }}</p>
+        </div>
         
-        <p>This code will expire in 15 minutes.</p>
+        <p>You can view all your notifications in your account dashboard.</p>
         
-        <p>If you did not attempt to log in, please contact support immediately.</p>
+        <div class="button-container">
+            <a href="#" class="button">Go to Dashboard</a>
+        </div>
+        
+        <p>Thank you for using NexusSync!</p>
         
         <p>Best regards,<br>The NexusSync Team</p>
         

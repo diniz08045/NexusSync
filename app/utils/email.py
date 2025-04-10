@@ -24,6 +24,15 @@ def send_email(subject, recipients, text_body, html_body, sender=None, attachmen
         
         if not sender:
             sender = app.config['MAIL_DEFAULT_SENDER']
+            
+        # Check if we have the required email configs
+        if not app.config.get('MAIL_SERVER') or not app.config.get('MAIL_PASSWORD'):
+            logger.warning("Email not configured. Would have sent email to: " + ", ".join(recipients))
+            # Log email content for debugging
+            logger.info(f"Email subject: {subject}")
+            logger.info(f"Email body: {text_body}")
+            # Don't prevent app from working if email isn't configured
+            return True
         
         msg = Message(subject, sender=sender, recipients=recipients)
         msg.body = text_body
