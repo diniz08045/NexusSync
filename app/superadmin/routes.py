@@ -364,32 +364,111 @@ def system_monitoring():
 @superadmin_required
 def system_time():
     """Manage system time/date settings."""
-    # This would be expanded to show and edit system time settings
-    return render_template('superadmin/system_time.html')
+    form = SystemTimeForm()
+    
+    if form.validate_on_submit():
+        try:
+            # Process the form data - in a real app, this would update system time settings
+            log_action("TIME_CONFIG_CHANGE", "System time settings updated")
+            flash('System time settings updated successfully.', 'success')
+            return redirect(url_for('superadmin.system_time'))
+        except Exception as e:
+            flash(f'Error updating system time settings: {str(e)}', 'danger')
+            logger.error(f"Error in system time update: {str(e)}")
+    
+    # Populate the form with current values
+    if request.method == 'GET':
+        now = datetime.datetime.now()
+        form.timezone.data = 'UTC'  # Default timezone
+    
+    return render_template('superadmin/system_time.html', form=form)
 
 
 @superadmin_bp.route('/data-retention', methods=['GET', 'POST'])
 @superadmin_required
 def data_retention():
     """Manage data retention rules."""
-    # This would be expanded to show and edit data retention settings
-    return render_template('superadmin/data_retention.html')
+    form = DataRetentionForm()
+    
+    if form.validate_on_submit():
+        try:
+            # Process form data - in a real app, this would update data retention settings
+            log_action("RETENTION_CONFIG_CHANGE", "Data retention settings updated")
+            flash('Data retention settings updated successfully.', 'success')
+            return redirect(url_for('superadmin.data_retention'))
+        except Exception as e:
+            flash(f'Error updating data retention settings: {str(e)}', 'danger')
+            logger.error(f"Error in data retention update: {str(e)}")
+    
+    # Populate the form with current values
+    if request.method == 'GET':
+        form.log_retention_days.data = 90  # Default retention period
+        form.backup_retention_days.data = 180  # Default backup retention
+        form.user_data_retention_days.data = 365  # Default user data retention
+    
+    return render_template('superadmin/data_retention.html', form=form)
 
 
 @superadmin_bp.route('/security-config', methods=['GET', 'POST'])
 @superadmin_required
 def security_config():
     """Manage SSL/TLS, proxy, DNS, and WAF configurations."""
-    # This would be expanded to show and edit security settings
-    return render_template('superadmin/security_config.html')
+    form = SecurityConfigForm()
+    
+    if form.validate_on_submit():
+        try:
+            # Process form data - in a real app, this would update security settings
+            config_changes = {
+                "ssl_enabled": form.ssl_enabled.data,
+                "proxy_enabled": form.proxy_enabled.data,
+                "proxy_server": form.proxy_server.data,
+                "proxy_port": form.proxy_port.data,
+                "waf_enabled": form.waf_enabled.data,
+                "cors_enabled": form.cors_enabled.data,
+                "cors_allowed_origins": form.cors_allowed_origins.data
+            }
+            
+            log_action("SECURITY_CONFIG_CHANGE", f"Security configuration changed: {json.dumps(config_changes)}")
+            
+            flash('Security configuration updated successfully.', 'success')
+            return redirect(url_for('superadmin.security_config'))
+        except Exception as e:
+            flash(f'Error updating security configuration: {str(e)}', 'danger')
+            logger.error(f"Error in security config update: {str(e)}")
+    
+    # Populate the form with current values
+    if request.method == 'GET':
+        form.ssl_enabled.data = True  # Default setting
+        form.proxy_enabled.data = False  # Default setting
+        form.waf_enabled.data = True  # Default setting
+        form.cors_enabled.data = True  # Default setting
+        form.cors_allowed_origins.data = "*"  # Default setting
+    
+    return render_template('superadmin/security_config.html', form=form)
 
 
 @superadmin_bp.route('/startup-config', methods=['GET', 'POST'])
 @superadmin_required
 def startup_config():
     """Manage startup flow and rules."""
-    # This would be expanded to show and edit startup configuration
-    return render_template('superadmin/startup_config.html')
+    form = StartupConfigForm()
+    
+    if form.validate_on_submit():
+        try:
+            # Process form data - in a real app, this would update startup settings
+            log_action("STARTUP_CONFIG_CHANGE", "Startup configuration updated")
+            flash('Startup configuration updated successfully.', 'success')
+            return redirect(url_for('superadmin.startup_config'))
+        except Exception as e:
+            flash(f'Error updating startup configuration: {str(e)}', 'danger')
+            logger.error(f"Error in startup config update: {str(e)}")
+    
+    # Populate the form with current values
+    if request.method == 'GET':
+        form.auto_start_services.data = True  # Default setting
+        form.startup_timeout.data = 60  # Default timeout in seconds
+    
+    return render_template('superadmin/startup_config.html', form=form)
 
 
 @superadmin_bp.route('/audit-logs')
@@ -413,8 +492,20 @@ def audit_logs():
 @superadmin_required
 def change_password():
     """Change the superadmin password."""
-    # This would be expanded to allow changing the superadmin password
-    return render_template('superadmin/change_password.html')
+    form = ChangePasswordForm()
+    
+    if form.validate_on_submit():
+        if check_password_hash(SUPER_ADMIN_PASSWORD_HASH, form.current_password.data):
+            # In a real app, we would update the password in a secure way
+            # For this demo, we just log the action
+            log_action("PASSWORD_CHANGE", "Superadmin password changed")
+            
+            flash('Password changed successfully.', 'success')
+            return redirect(url_for('superadmin.dashboard'))
+        else:
+            flash('Current password is incorrect.', 'danger')
+    
+    return render_template('superadmin/change_password.html', form=form)
 
 
 # Development-only routes (should be removed in production)

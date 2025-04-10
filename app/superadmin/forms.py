@@ -102,6 +102,8 @@ class StartupConfigForm(FlaskForm):
     auto_migrate = BooleanField('Auto-migrate Database on Startup')
     auto_create_admin = BooleanField('Auto-create Admin User if None Exists')
     auto_backup = BooleanField('Auto-backup Database on Startup')
+    auto_start_services = BooleanField('Auto-start Services on Boot')
+    startup_timeout = IntegerField('Startup Timeout (seconds)', validators=[DataRequired()])
     submit = SubmitField('Save Startup Configuration')
 
 
