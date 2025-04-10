@@ -74,6 +74,7 @@ def create_app(config=None):
     from app.planner.routes import planner_bp
     from app.tickets.routes import tickets_bp
     from app.clients.routes import clients_bp
+    from app.utils.filters import filters_bp
     
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
@@ -82,6 +83,7 @@ def create_app(config=None):
     app.register_blueprint(planner_bp)
     app.register_blueprint(tickets_bp)
     app.register_blueprint(clients_bp)
+    app.register_blueprint(filters_bp)
     
     # Create tables and initialize database
     with app.app_context():
