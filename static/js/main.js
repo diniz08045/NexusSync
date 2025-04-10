@@ -39,25 +39,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Sidebar functionality
-    const sidebar = document.getElementById('sidebar');
-    const sidebarToggle = document.getElementById('sidebarToggle');
-    const sidebarCollapseBtn = document.getElementById('sidebarCollapseBtn');
+    // Only run authenticated page functionality if the elements exist
+    // This prevents errors on the login/register pages
+    const isAuthenticatedPage = document.body.classList.contains('authenticated-page');
     
-    // Check if elements exist to avoid null errors
-    if (sidebar) {
-        if (sidebarToggle) {
-            sidebarToggle.addEventListener('click', function() {
-                sidebar.classList.toggle('collapsed');
-            });
-        }
-        
-        if (sidebarCollapseBtn) {
-            sidebarCollapseBtn.addEventListener('click', function() {
-                sidebar.classList.toggle('collapsed');
-            });
-        }
+    if (isAuthenticatedPage) {
+        initializeAuthenticatedPageFeatures();
     }
+    
+    // Handle common functionality for all pages
     
     // Handle click-to-copy elements
     document.querySelectorAll('.click-to-copy').forEach(element => {
@@ -126,3 +116,55 @@ document.addEventListener('DOMContentLoaded', function() {
         }, false);
     });
 });
+
+// Function to initialize features only for authenticated pages
+function initializeAuthenticatedPageFeatures() {
+    // Sidebar functionality
+    const sidebar = document.getElementById('sidebar');
+    const content = document.getElementById('content');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebarCollapseBtn = document.getElementById('sidebarCollapseBtn');
+    
+    if (sidebar && content) {
+        // Collapse sidebar on small screens by default
+        function checkWidth() {
+            if (window.innerWidth < 768) {
+                sidebar.classList.add('collapsed');
+                content.classList.add('expanded');
+            } else {
+                sidebar.classList.remove('collapsed');
+                content.classList.remove('expanded');
+            }
+        }
+        
+        // Initial check
+        checkWidth();
+        
+        // Check on resize
+        window.addEventListener('resize', checkWidth);
+        
+        // Toggle sidebar functionality
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('collapsed');
+                content.classList.toggle('expanded');
+            });
+        }
+        
+        if (sidebarCollapseBtn) {
+            sidebarCollapseBtn.addEventListener('click', function() {
+                sidebar.classList.toggle('collapsed');
+                content.classList.toggle('expanded');
+            });
+        }
+        
+        // Auto-expand active dropdown menus
+        const activeLinks = document.querySelectorAll('.sidebar-dropdown-link.active');
+        activeLinks.forEach(function(link) {
+            const parentCollapse = link.closest('.collapse');
+            if (parentCollapse) {
+                new bootstrap.Collapse(parentCollapse).show();
+            }
+        });
+    }
+}

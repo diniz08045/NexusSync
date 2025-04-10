@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
     {% block head %}{% endblock %}
 </head>
-<body>
+<body {% if current_user.is_authenticated %}class="authenticated-page"{% endif %}>
     <!-- Loading Screen -->
     <div id="loadingScreen" class="loading-screen active">
         <div class="d-flex flex-column align-items-center">
@@ -144,15 +144,21 @@
                         </a>
                         <ul class="collapse sidebar-dropdown list-unstyled" id="securitySubmenu">
                             <li>
-                                <a href="{{ url_for('user.reset_password_request') }}" class="sidebar-dropdown-link">
+                                <a href="{{ url_for('user.settings', _anchor='security') }}" class="sidebar-dropdown-link">
+                                    <i data-feather="settings" class="feather-sm me-2"></i>
+                                    Security Settings
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ url_for('user.change_password') }}" class="sidebar-dropdown-link">
                                     <i data-feather="key" class="feather-sm me-2"></i>
                                     Change Password
                                 </a>
                             </li>
                             <li>
-                                <a href="#" class="sidebar-dropdown-link">
-                                    <i data-feather="smartphone" class="feather-sm me-2"></i>
-                                    Two-Factor Auth
+                                <a href="{{ url_for('user.settings', _anchor='security') }}" class="sidebar-dropdown-link">
+                                    <i data-feather="check-circle" class="feather-sm me-2"></i>
+                                    Account Verification
                                 </a>
                             </li>
                         </ul>
@@ -288,6 +294,12 @@
                                         <a class="dropdown-item d-flex align-items-center" href="{{ url_for('user.profile') }}">
                                             <i data-feather="user" class="feather-sm me-2"></i>
                                             Profile
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item d-flex align-items-center" href="{{ url_for('user.settings') }}">
+                                            <i data-feather="settings" class="feather-sm me-2"></i>
+                                            Settings
                                         </a>
                                     </li>
                                     <li>
