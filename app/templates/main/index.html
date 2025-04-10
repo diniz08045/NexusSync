@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+
+{% block title %}{{ app_name }} - Secure Enterprise Management Solution{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row align-items-center">
+        <div class="col-lg-6">
+            <h1 class="display-4 fw-bold mb-4">Streamline Your Enterprise Management</h1>
+            <p class="lead mb-4">
+                NexusSync is a comprehensive solution for enterprise access management, task tracking, and client communication - all in one secure platform.
+            </p>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-start mb-4">
+                <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg px-4 me-md-2">
+                    <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                </a>
+                <a href="{{ url_for('auth.register') }}" class="btn btn-outline-secondary btn-lg px-4">
+                    <i class="fas fa-user-plus me-2"></i>Create Account
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card bg-dark border-0 shadow-lg rounded-3 p-3">
+                <div class="card-body text-center">
+                    <i class="fas fa-sync-alt fa-10x text-primary mb-4"></i>
+                    <h3 class="card-title">NexusSync Dashboard</h3>
+                    <p class="card-text">
+                        Experience our intuitive dashboard with real-time updates,
+                        advanced reporting, and seamless team collaboration.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-5 pt-5">
+        <div class="col-12 text-center mb-5">
+            <h2 class="display-5 fw-bold">Key Features</h2>
+            <p class="lead">Designed to enhance productivity and streamline operations</p>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 bg-dark border-0 shadow-sm">
+                <div class="card-body text-center p-4">
+                    <i class="fas fa-tasks fa-3x text-primary mb-3"></i>
+                    <h3 class="card-title h5">Task Management</h3>
+                    <p class="card-text">
+                        Create, assign, and track tasks with deadlines, priorities, and automated reminders.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 bg-dark border-0 shadow-sm">
+                <div class="card-body text-center p-4">
+                    <i class="fas fa-ticket-alt fa-3x text-primary mb-3"></i>
+                    <h3 class="card-title h5">Ticket System</h3>
+                    <p class="card-text">
+                        Efficiently manage customer support with our advanced ticketing system.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 bg-dark border-0 shadow-sm">
+                <div class="card-body text-center p-4">
+                    <i class="fas fa-users fa-3x text-primary mb-3"></i>
+                    <h3 class="card-title h5">Client Management</h3>
+                    <p class="card-text">
+                        Keep track of all client interactions, contacts, and project statuses.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-5 py-5">
+        <div class="col-12 text-center mb-5">
+            <h2 class="display-5 fw-bold">Built For Security</h2>
+            <p class="lead">Your data is protected with enterprise-grade security measures</p>
+        </div>
+        
+        <div class="col-md-6 mb-4">
+            <div class="d-flex">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-shield-alt fa-3x text-primary"></i>
+                </div>
+                <div class="flex-grow-1 ms-4">
+                    <h3 class="h5">Advanced Authentication</h3>
+                    <p>Two-factor authentication, role-based access control, and secure password policies.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 mb-4">
+            <div class="d-flex">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-lock fa-3x text-primary"></i>
+                </div>
+                <div class="flex-grow-1 ms-4">
+                    <h3 class="h5">Data Encryption</h3>
+                    <p>All sensitive data is encrypted both at rest and in transit using industry-standard protocols.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 mb-4">
+            <div class="d-flex">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-history fa-3x text-primary"></i>
+                </div>
+                <div class="flex-grow-1 ms-4">
+                    <h3 class="h5">Audit Logs</h3>
+                    <p>Comprehensive audit trails for all user actions and system changes.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 mb-4">
+            <div class="d-flex">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-server fa-3x text-primary"></i>
+                </div>
+                <div class="flex-grow-1 ms-4">
+                    <h3 class="h5">Secure Infrastructure</h3>
+                    <p>Hosted on secure, compliant cloud infrastructure with regular security updates.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-5 py-5 bg-dark rounded-3 shadow-lg">
+        <div class="col-12 text-center p-5">
+            <h2 class="display-5 fw-bold mb-4">Ready to get started?</h2>
+            <p class="lead mb-5">Join thousands of businesses that trust NexusSync for their enterprise management needs.</p>
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg px-4 gap-3">
+                    <i class="fas fa-rocket me-2"></i>Get Started
+                </a>
+                <a href="{{ url_for('main.contact') }}" class="btn btn-outline-light btn-lg px-4">
+                    <i class="fas fa-paper-plane me-2"></i>Contact Sales
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="bg-dark text-light py-4 mt-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <h5>NexusSync</h5>
+                <p class="small">
+                    A comprehensive enterprise management solution for modern businesses.
+                </p>
+            </div>
+            <div class="col-md-2 mb-3">
+                <h5>Company</h5>
+                <ul class="nav flex-column small">
+                    <li class="nav-item mb-2"><a href="{{ url_for('main.about') }}" class="nav-link p-0 text-muted">About</a></li>
+                    <li class="nav-item mb-2"><a href="{{ url_for('main.features') }}" class="nav-link p-0 text-muted">Features</a></li>
+                    <li class="nav-item mb-2"><a href="{{ url_for('main.contact') }}" class="nav-link p-0 text-muted">Contact</a></li>
+                </ul>
+            </div>
+            <div class="col-md-2 mb-3">
+                <h5>Legal</h5>
+                <ul class="nav flex-column small">
+                    <li class="nav-item mb-2"><a href="{{ url_for('main.terms') }}" class="nav-link p-0 text-muted">Terms</a></li>
+                    <li class="nav-item mb-2"><a href="{{ url_for('main.privacy') }}" class="nav-link p-0 text-muted">Privacy</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4 mb-3">
+                <form>
+                    <h5>Subscribe to our newsletter</h5>
+                    <p class="small">Monthly digest of what's new and exciting from us.</p>
+                    <div class="d-flex flex-column flex-sm-row w-100 gap-2">
+                        <label for="newsletter1" class="visually-hidden">Email address</label>
+                        <input id="newsletter1" type="text" class="form-control" placeholder="Email address">
+                        <button class="btn btn-primary" type="button">Subscribe</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="d-flex flex-column flex-sm-row justify-content-between py-4 mt-4 border-top">
+            <p class="small">&copy; {{ now.year }} NexusSync. All rights reserved.</p>
+            <ul class="list-unstyled d-flex">
+                <li class="ms-3"><a class="text-muted" href="#"><i class="fab fa-twitter fa-lg"></i></a></li>
+                <li class="ms-3"><a class="text-muted" href="#"><i class="fab fa-instagram fa-lg"></i></a></li>
+                <li class="ms-3"><a class="text-muted" href="#"><i class="fab fa-facebook fa-lg"></i></a></li>
+                <li class="ms-3"><a class="text-muted" href="#"><i class="fab fa-linkedin fa-lg"></i></a></li>
+            </ul>
+        </div>
+    </div>
+</footer>
+{% endblock %}

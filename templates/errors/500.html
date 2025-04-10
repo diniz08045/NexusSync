@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}{{ app_name }} - Server Error{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-0 shadow">
+                <div class="card-body p-5 text-center">
+                    <h1 class="display-1 fw-bold text-danger">500</h1>
+                    <h2 class="mt-3">Server Error</h2>
+                    <p class="text-muted mt-3">
+                        We're sorry, but something went wrong on our end. Our team has been notified and is working to fix the issue.
+                    </p>
+                    {% if error %}
+                    <div class="alert alert-danger mt-4">
+                        {{ error }}
+                    </div>
+                    {% endif %}
+                    <div class="mt-4">
+                        <a href="{{ url_for('main.index') }}" class="btn btn-primary">
+                            <i class="fas fa-home me-2"></i> Go to Homepage
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
