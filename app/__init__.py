@@ -23,16 +23,9 @@ login_manager = LoginManager()
 mail = Mail()
 limiter = Limiter(key_func=get_remote_address)
 
-# Initialize security extension (will be configured with app later)
-from app.utils.flask_security_extension import SecurityPlus
-security = SecurityPlus()
-
 def create_app(config=None):
     """Create and configure the Flask application"""
-    app = Flask(__name__, 
-                instance_relative_config=True,
-                static_folder='static',
-                static_url_path='/static')
+    app = Flask(__name__, instance_relative_config=True)
     
     # Default configuration
     app.config.update(
@@ -67,36 +60,6 @@ def create_app(config=None):
     login_manager.init_app(app)
     mail.init_app(app)
     limiter.init_app(app)
-    
-    # Initialize security extension with very permissive settings
-    app.config['SECURITY_PLUS'] = {
-        'ENABLE_SECURITY_ENDPOINTS': False,  # Set to True to enable security endpoints
-        'ALLOWED_DOMAINS': ['*'],  # Allow all domains
-        'CSP': {
-            'default-src': ["'self'", "'unsafe-inline'", "'unsafe-eval'", "data:", "blob:", "https:", "http:"],
-            'script-src': ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https:", "http:"],
-            'style-src': ["'self'", "'unsafe-inline'", "https:", "http:"],
-            'img-src': ["'self'", "data:", "blob:", "https:", "http:"],
-            'font-src': ["'self'", "data:", "https:", "http:"],
-            'connect-src': ["'self'", "https:", "http:"],
-            'frame-src': ["'self'", "https:", "http:"],
-            'form-action': ["'self'", "https:", "http:"]
-        },
-        'RATE_LIMITS': {
-            'default': '1000 per minute',
-            'auth': '1000 per minute',
-            'sensitive': '1000 per minute'
-        },
-        'TRUSTED_HOSTS': None,  # Disable trusted hosts validation for development
-        'UPLOAD_FOLDER': os.path.join(app.instance_path, 'uploads')
-    }
-    
-    # Create upload directory
-    os.makedirs(app.config['SECURITY_PLUS']['UPLOAD_FOLDER'], exist_ok=True)
-    
-    # Initialize security with disabled CSP
-    app.config['DISABLE_CSP'] = True
-    security.init_app(app)
     
     # Configure login manager
     login_manager.login_view = 'auth.login'

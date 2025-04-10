@@ -20,7 +20,4 @@ dependencies = [
     "flask-limiter>=3.12",
     "twilio>=9.5.2",
     "sendgrid>=6.11.0",
-    "bleach>=6.2.0",
-    "python-magic>=0.4.27",
-    "itsdangerous>=2.2.0",
 ]

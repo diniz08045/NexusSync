@@ -1,151 +1,181 @@
-/* Main application styles */
+/* Custom CSS for NexusSync */
 
-/* Global styles */
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    line-height: 1.6;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-}
-
-/* Navbar styles */
-.navbar {
-    padding: 0.75rem 1rem;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.navbar-brand {
-    font-weight: 600;
-    font-size: 1.4rem;
-}
-
-/* Sidebar styles */
+/* Sidebar styling */
 .sidebar {
-    min-height: calc(100vh - 56px);
-    box-shadow: 1px 0 5px rgba(0, 0, 0, 0.1);
-    padding-top: 1rem;
-}
-
-.sidebar-heading {
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    padding: 0.75rem 1rem;
-    margin-bottom: 0;
-    font-weight: 600;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    padding-top: 70px;
+    overflow-y: auto;
 }
 
 .sidebar .nav-link {
+    color: #adb5bd;
     font-weight: 500;
-    padding: 0.75rem 1rem;
+    padding: 0.5rem 1rem;
     border-radius: 0.25rem;
-    margin: 0.2rem 0;
-}
-
-.sidebar .nav-link:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    margin-bottom: 0.2rem;
 }
 
 .sidebar .nav-link.active {
-    background-color: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    background-color: rgba(13, 110, 253, 0.25);
 }
 
-.sidebar .nav-link i {
-    margin-right: 0.5rem;
+.sidebar .nav-link:hover {
+    color: #fff;
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
-/* Card styles */
+.sidebar .sidebar-heading {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+}
+
+/* Custom navbar styles */
+.navbar-brand {
+    font-weight: 600;
+}
+
+/* Custom card styles */
 .card {
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-    margin-bottom: 1.5rem;
-    transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card:hover {
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
-}
-
-.card-header {
-    font-weight: 600;
-}
-
-/* Form styles */
-.form-control:focus {
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-}
-
-/* Button styles */
-.btn {
-    font-weight: 500;
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2) !important;
 }
 
 /* Dashboard widgets */
-.widget {
-    padding: 1.5rem;
-    border-radius: 0.3rem;
-    margin-bottom: 1.5rem;
+.stats-card {
+    border-left: 4px solid #0d6efd;
+    transition: all 0.3s ease;
 }
 
-.widget-icon {
-    font-size: 2rem;
-    margin-bottom: 1rem;
+.stats-card:hover {
+    background-color: rgba(13, 110, 253, 0.1);
 }
 
-.widget-title {
-    font-weight: 600;
-    margin-bottom: 0.5rem;
+.stats-card .stats-icon {
+    font-size: 3rem;
+    opacity: 0.25;
 }
 
-.widget-value {
-    font-size: 1.8rem;
-    font-weight: 700;
+/* Table enhancements */
+.table-hover tbody tr:hover {
+    background-color: rgba(13, 110, 253, 0.1);
 }
 
-/* Ticket status colors */
+/* Form stylings */
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Notification badge styles */
+.badge-notify {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+}
+
+/* Animations */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Ticket status styles */
 .status-open {
-    color: #28a745;
+    background-color: rgba(25, 135, 84, 0.1);
+    color: #198754;
 }
 
 .status-pending {
+    background-color: rgba(255, 193, 7, 0.1);
     color: #ffc107;
 }
 
 .status-closed {
+    background-color: rgba(108, 117, 125, 0.1);
+    color: #6c757d;
+}
+
+.status-urgent {
+    background-color: rgba(220, 53, 69, 0.1);
     color: #dc3545;
 }
 
-/* Auth pages */
-.auth-container {
-    max-width: 450px;
-    margin: 2rem auto;
+/* Task priority styles */
+.priority-low {
+    border-left: 3px solid #198754;
 }
 
-.auth-card {
-    padding: 2rem;
+.priority-medium {
+    border-left: 3px solid #ffc107;
 }
 
-.auth-title {
-    text-align: center;
-    margin-bottom: 2rem;
+.priority-high {
+    border-left: 3px solid #dc3545;
 }
 
-/* Profile page */
-.profile-header {
-    padding: 2rem 0;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-    margin-bottom: 2rem;
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
 }
 
-.profile-img {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    object-fit: cover;
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
 }
 
-/* Footer */
-footer {
-    margin-top: auto;
-    padding: 1.5rem 0;
-    text-align: center;
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        top: 56px;
+        left: 0;
+        width: 100%;
+        z-index: 1030;
+        padding-top: 1rem;
+        max-height: calc(100vh - 56px);
+        overflow-y: auto;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+    
+    .sidebar.show {
+        transform: translateX(0);
+    }
+    
+    .stats-card {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Fix sticky footer */
+html, body {
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1 0 auto;
 }
