@@ -8,6 +8,23 @@ class EditProfileForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     first_name = StringField('First Name', validators=[Length(max=64)])
     last_name = StringField('Last Name', validators=[Length(max=64)])
+    department = SelectField('Department', choices=[
+        ('', 'Select Department'),
+        ('it', 'IT'),
+        ('marketing', 'Marketing'),
+        ('sales', 'Sales'),
+        ('hr', 'Human Resources'),
+        ('accounting', 'Accounting'),
+        ('support', 'Customer Support'),
+        ('product', 'Product / Engineering'),
+        ('legal', 'Legal / Compliance'),
+        ('procurement', 'Procurement / Purchasing'),
+        ('logistics', 'Logistics / Operations'),
+        ('rnd', 'R&D'),
+        ('training', 'Training / L&D'),
+        ('executive', 'Executive / Leadership'),
+        ('communications', 'Internal Communications / PR')
+    ])
     submit = SubmitField('Save Changes')
     
     def __init__(self, original_username, original_email, *args, **kwargs):

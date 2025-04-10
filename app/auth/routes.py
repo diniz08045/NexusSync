@@ -331,6 +331,7 @@ def register():
             email=form.email.data,
             first_name=form.first_name.data,
             last_name=form.last_name.data,
+            department=form.department.data,
             is_active=True,
             is_email_confirmed=False,
             last_ip=ip_address,

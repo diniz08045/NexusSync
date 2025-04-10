@@ -91,6 +91,7 @@ def edit_profile():
         current_user.email = form.email.data
         current_user.first_name = form.first_name.data
         current_user.last_name = form.last_name.data
+        current_user.department = form.department.data
         
         db.session.commit()
         
@@ -103,6 +104,7 @@ def edit_profile():
         form.email.data = current_user.email
         form.first_name.data = current_user.first_name
         form.last_name.data = current_user.last_name
+        form.department.data = current_user.department
     
     return render_template('user/edit_profile.html', 
                           title='Edit Profile',
