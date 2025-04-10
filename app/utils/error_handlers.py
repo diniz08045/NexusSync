@@ -1,7 +1,10 @@
 import logging
 import traceback
-from flask import render_template
+from datetime import datetime
+from flask import render_template, request, current_app
 from werkzeug.exceptions import BadRequest, Unauthorized, Forbidden, NotFound, TooManyRequests
+
+from app.utils.security import get_client_ip, log_security_event
 
 logger = logging.getLogger(__name__)
 
@@ -17,13 +20,39 @@ def register_error_handlers(app):
     @app.errorhandler(401)
     def unauthorized_error(error):
         """Handle 401 Unauthorized errors."""
-        logger.warning(f"401 Unauthorized: {error}")
+        ip_address = get_client_ip()
+        user_agent = request.user_agent.string if request and request.user_agent else "Unknown"
+        path = request.path if request else "Unknown"
+        
+        # Log more detailed info for security analysis
+        logger.warning(f"401 Unauthorized: {error} - IP: {ip_address}, Path: {path}, UA: {user_agent}")
+        
+        # Track as security event
+        details = {
+            'path': path,
+            'error': str(error)
+        }
+        log_security_event('unauthorized_access', details=details)
+        
         return render_template('errors/401.html', error=error), 401
     
     @app.errorhandler(403)
     def forbidden_error(error):
         """Handle 403 Forbidden errors."""
-        logger.warning(f"403 Forbidden: {error}")
+        ip_address = get_client_ip()
+        user_agent = request.user_agent.string if request and request.user_agent else "Unknown"
+        path = request.path if request else "Unknown"
+        
+        # Log more detailed info for security analysis
+        logger.warning(f"403 Forbidden: {error} - IP: {ip_address}, Path: {path}, UA: {user_agent}")
+        
+        # Track as security event
+        details = {
+            'path': path,
+            'error': str(error)
+        }
+        log_security_event('forbidden_access', details=details)
+        
         return render_template('errors/403.html', error=error), 403
     
     @app.errorhandler(404)
@@ -35,8 +64,25 @@ def register_error_handlers(app):
     @app.errorhandler(429)
     def too_many_requests_error(error):
         """Handle 429 Too Many Requests errors."""
-        logger.warning(f"429 Too Many Requests: {error}")
-        return render_template('errors/429.html', error=error), 429
+        ip_address = get_client_ip()
+        user_agent = request.user_agent.string if request and request.user_agent else "Unknown"
+        path = request.path if request else "Unknown"
+        
+        # Log more detailed info for security analysis
+        logger.warning(f"429 Too Many Requests: {error} - IP: {ip_address}, Path: {path}, UA: {user_agent}")
+        
+        # Track as security event which might indicate a brute force attack
+        details = {
+            'path': path,
+            'error': str(error),
+            'endpoint': request.endpoint if request else "Unknown"
+        }
+        log_security_event('rate_limit_exceeded', details=details)
+        
+        # Return with Retry-After header to indicate when client can retry
+        response = render_template('errors/429.html', error=error), 429
+        response[0].headers['Retry-After'] = '60'  # Suggest client wait 60 seconds
+        return response
     
     @app.errorhandler(500)
     def internal_server_error(error):

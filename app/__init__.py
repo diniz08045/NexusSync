@@ -61,6 +61,10 @@ def create_app(config=None):
     mail.init_app(app)
     limiter.init_app(app)
     
+    # Configure rate limits
+    from app.utils.rate_limits import configure_rate_limits
+    app.rate_limits = configure_rate_limits(limiter)
+    
     # Configure login manager
     login_manager.login_view = 'auth.login'
     login_manager.login_message = 'Please log in to access this page.'
@@ -97,6 +101,7 @@ def create_app(config=None):
         from app.models.task import Task
         from app.models.ticket import Ticket, TicketComment
         from app.models.client import Client
+        from app.models.login_attempt import LoginAttempt
         
         db.create_all()
         
