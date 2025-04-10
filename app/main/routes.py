@@ -10,7 +10,9 @@ main_bp = Blueprint('main', __name__)
 @main_bp.route('/')
 def index():
     """Landing page for non-authenticated users."""
-    return render_template('main/index.html', title='Welcome', app_name="NexusSync")
+    from datetime import datetime
+    now = datetime.utcnow()
+    return render_template('main/index.html', title='Welcome', app_name="NexusSync", now=now)
 
 @main_bp.route('/about')
 def about():
