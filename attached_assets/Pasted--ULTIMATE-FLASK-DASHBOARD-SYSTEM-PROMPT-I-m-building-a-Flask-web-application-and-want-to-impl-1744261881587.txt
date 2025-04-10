@@ -1,0 +1,229 @@
+💡 ULTIMATE FLASK DASHBOARD SYSTEM PROMPT
+
+    I'm building a Flask web application and want to implement a comprehensive multi-dashboard routing system based on user role and department. The system must route users appropriately and present them with dashboards that reflect their responsibilities, with built-in access control.
+    🧭 ROUTING & ACCESS RULES:
+
+        Every user should always have access to a general user_dashboard.html.
+
+        Admin users must also be granted access to an admin_dashboard.html.
+
+        In addition to that, every user (admin or not) should be routed to their department-specific dashboard, based on user.department.
+
+        No one should be able to access a dashboard they are not authorized for. Use role-based decorators, middleware, or Flask-Login for enforcement.
+
+        All dashboards should inherit from base_dashboard.html for a consistent UI layout.
+
+        Department views should be modular, organized via Flask Blueprints.
+
+    📊 DASHBOARDS AND FEATURES PER DEPARTMENT:
+    🔧 IT Department (it_dashboard.html)
+
+        Server uptime and infrastructure health monitors
+
+        Ticket tracking (open, resolved)
+
+        Asset inventory (laptops, software licenses)
+
+        Security alerts and login anomaly logs
+
+        Access request approvals and user permissions
+
+    📢 Marketing Department (marketing_dashboard.html)
+
+        Campaign performance: click rates, conversions
+
+        Lead generation charts
+
+        Ad spend vs ROI breakdowns
+
+        Social media engagement metrics
+
+        A/B testing results
+
+        Marketing calendar with upcoming campaigns
+
+    💼 Sales Department (sales_dashboard.html)
+
+        Sales funnel and pipeline visualization
+
+        Revenue goals vs actuals
+
+        Recent deal activity and status
+
+        Customer value ranking
+
+        Sales rep performance KPIs
+
+        Lead scoring and contact history
+
+    👥 HR Department (hr_dashboard.html)
+
+        Headcount, demographics, attrition rate
+
+        Leave and attendance tracking
+
+        Job applications by status
+
+        New hire onboarding checklists
+
+        Employee satisfaction survey results
+
+        Training participation tracking
+
+    💳 Accounting Department (account_dashboard.html)
+
+        Income and expense summaries
+
+        Unpaid and overdue invoices
+
+        Budget usage by department
+
+        Payroll status and dates
+
+        Monthly financial KPIs (cash flow, net profit)
+
+    🎧 Customer Support (support_dashboard.html)
+
+        Ticket queue status (open, pending, resolved)
+
+        Response and resolution time analytics
+
+        Customer Satisfaction Score (CSAT) graphs
+
+        Live agent activity status
+
+        Top ticket categories
+
+        Escalation monitoring
+
+    🧪 Product / Engineering (product_dashboard.html)
+
+        Feature roadmap and release status
+
+        Bug and issue tracker
+
+        Version deployment history
+
+        Sprint task progress
+
+        Feedback loops from users
+
+        Developer activity and commits
+
+    ⚖️ Legal / Compliance (legal_dashboard.html)
+
+        Contract expiration warnings
+
+        Document management system
+
+        Compliance status (GDPR, ISO, etc.)
+
+        Risk assessment tracking
+
+        Case/incident logs
+
+        Legal resource library
+
+    🛒 Procurement / Purchasing (procurement_dashboard.html)
+
+        Purchase orders and status
+
+        Vendor performance metrics
+
+        Budget allocation for purchases
+
+        Pending approvals and requests
+
+        Inventory request queue
+
+        Delivery timelines
+
+    🚚 Logistics / Operations (logistics_dashboard.html)
+
+        Shipment tracking and delivery status
+
+        Inventory levels and alerts
+
+        Warehouse activity logs
+
+        Transport fleet management stats
+
+        Cost-per-shipment insights
+
+        Delivery performance KPIs
+
+    🔬 R&D (Research & Development) (rnd_dashboard.html)
+
+        Innovation project tracker
+
+        Experiment outcomes
+
+        Budget spend per research initiative
+
+        Team assignments and milestones
+
+        Intellectual property filing status
+
+        ROI of past R&D efforts
+
+    🧑‍🏫 Training / Learning & Development (training_dashboard.html)
+
+        Training course library
+
+        User certification status
+
+        Training completion rates
+
+        Upcoming workshop schedules
+
+        Performance improvement analytics
+
+        Skill gap identification
+
+    🏛 Executive / Leadership (executive_dashboard.html)
+
+        Company-wide KPIs and trend graphs
+
+        Cross-department performance overview
+
+        Profit/loss statements
+
+        Strategic initiative status
+
+        Market expansion insights
+
+        Risk exposure summaries
+
+    🗞 Internal Communications / PR (communications_dashboard.html)
+
+        Internal announcements and newsletters
+
+        Company events and team-building calendar
+
+        Feedback submission stats
+
+        Employee recognition wall
+
+        Engagement stats from internal platforms
+
+    📌 WHAT I WANT YOU TO DO:
+
+        Create a routing system that checks a logged-in user’s role and department and provides access to:
+
+            /user_dashboard
+
+            /admin_dashboard (if admin)
+
+            /<department>_dashboard
+
+        Secure routes using decorators or access control middleware.
+
+        Use Flask Blueprints to separate views by department.
+
+        Use Jinja2 templates with a shared base_dashboard.html layout.
+
+        Populate each dashboard with mock data widgets or sample metrics using Chart.js, Plotly, or similar.
+
+        Follow best practices for modularity, security, and scalability.
+
+    Make the output production-ready, clean, and easy to maintain or expand.

@@ -18,6 +18,7 @@ class User(UserMixin, db.Model):
     last_ip = db.Column(db.String(45))  # IPv6 can be up to 45 chars
     last_user_agent = db.Column(db.String(256))
     two_factor_enabled = db.Column(db.Boolean, default=False)
+    department = db.Column(db.String(64), index=True)  # Department for dashboard routing
     
     # Relationships
     roles = db.relationship('Role', secondary=user_roles, backref=db.backref('users', lazy='dynamic'))
@@ -127,6 +128,7 @@ class User(UserMixin, db.Model):
             'created_at': self.created_at.isoformat(),
             'last_login': self.last_login.isoformat() if self.last_login else None,
             'two_factor_enabled': self.two_factor_enabled,
+            'department': self.department,
             'roles': [role.name for role in self.roles]
         }
     
