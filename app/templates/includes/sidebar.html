@@ -1,4 +1,4 @@
-<nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse">
+<nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse collapse">
     <div class="position-sticky pt-5 mt-2 sidebar-sticky">
         <div class="px-3 py-2 d-none d-md-block">
             <a href="{{ url_for('user.index') }}" class="d-flex align-items-center text-decoration-none">
@@ -17,13 +17,13 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {{ 'active' if request.endpoint.startswith('planner.') }}" href="{{ url_for('planner.index') }}">
+                <a class="nav-link" href="#">
                     <i class="fas fa-tasks me-2"></i>
                     Planner
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {{ 'active' if request.endpoint.startswith('tickets.') }}" href="{{ url_for('tickets.index') }}">
+                <a class="nav-link" href="#">
                     <i class="fas fa-ticket-alt me-2"></i>
                     Tickets
                 </a>
