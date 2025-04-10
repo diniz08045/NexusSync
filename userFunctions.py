@@ -346,7 +346,7 @@ def dismiss_notification(notification_id):
     
     return jsonify({'success': True})
 
-@user_bp.route('/messages')
+@user_bp.route('/messages', methods=['GET', 'POST'])
 @login_required
 def messages():
     """View messages and conversations."""
@@ -394,9 +394,119 @@ def messages():
         {'id': 4, 'name': 'Support Team'}
     ]
     
-    return render_template('messages.html', 
+    # Handle new message submission
+    if request.method == 'POST':
+        if 'recipient' in request.form:
+            # This is a new message
+            recipient_id = int(request.form.get('recipient'))
+            subject = request.form.get('subject')
+            content = request.form.get('content')
+            
+            # Find the recipient in our users list
+            recipient = None
+            for user in users:
+                if user['id'] == recipient_id:
+                    recipient = user
+                    break
+            
+            if recipient:
+                # Create a new conversation or update existing
+                new_conversation = True
+                for conv in conversations:
+                    if conv['id'] == recipient_id:
+                        # Update existing conversation
+                        conv['last_message'] = subject
+                        conv['time'] = 'Just now'
+                        new_conversation = False
+                        break
+                
+                # If it's a new conversation, add it to the list
+                if new_conversation:
+                    new_conv = {
+                        'id': recipient_id,
+                        'name': recipient['name'],
+                        'avatar': recipient['name'][0],
+                        'last_message': subject,
+                        'time': 'Just now',
+                        'unread': False
+                    }
+                    conversations.insert(0, new_conv)
+                
+                # Flash a success message
+                flash('Message sent successfully!', 'success')
+                
+                # Redirect to the new conversation
+                return redirect(url_for('user.messages', conversation_id=recipient_id))
+                
+        elif 'message' in request.form and request.args.get('conversation_id'):
+            # This is a reply to an existing conversation
+            conversation_id = int(request.args.get('conversation_id'))
+            message_text = request.form.get('message')
+            
+            # Find the conversation and update it
+            for conv in conversations:
+                if conv['id'] == conversation_id:
+                    conv['last_message'] = message_text
+                    conv['time'] = 'Just now'
+                    break
+            
+            # Flash a success message
+            flash('Reply sent successfully!', 'success')
+            
+            # Redirect back to the conversation
+            return redirect(url_for('user.messages', conversation_id=conversation_id))
+    
+    # Get the selected conversation ID from query parameter
+    selected_conversation_id = request.args.get('conversation_id', type=int)
+    
+    # Find the selected conversation
+    selected_conversation = None
+    if selected_conversation_id:
+        for conv in conversations:
+            if conv['id'] == selected_conversation_id:
+                selected_conversation = conv
+                # Remove unread status when viewing
+                conv['unread'] = False
+                break
+    
+    # Generate message data for the selected conversation
+    messages = []
+    if selected_conversation:
+        messages = [
+            {
+                'sender': selected_conversation['name'], 
+                'text': 'Hi there!', 
+                'time': '10:15 AM', 
+                'is_mine': False
+            },
+            {
+                'sender': 'You', 
+                'text': 'Hello! How can I help you today?', 
+                'time': '10:18 AM', 
+                'is_mine': True
+            },
+            {
+                'sender': selected_conversation['name'], 
+                'text': selected_conversation['last_message'], 
+                'time': '10:30 AM', 
+                'is_mine': False
+            }
+        ]
+        
+        # If this was a reply to an existing conversation, add the user's message
+        if request.method == 'POST' and 'message' in request.form:
+            messages.append({
+                'sender': 'You',
+                'text': request.form.get('message'),
+                'time': 'Just now',
+                'is_mine': True
+            })
+    
+    return render_template('messages_simple.html', 
                           title='Messages',
                           conversations=conversations,
+                          selected_conversation=selected_conversation,
+                          messages=messages,
                           users=users)
     
 @user_bp.route('/test')
