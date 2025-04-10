@@ -15,11 +15,19 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Handle sidebar toggle for mobile
-    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebarToggle = document.querySelector('.navbar-toggler');
     if (sidebarToggle) {
         sidebarToggle.addEventListener('click', function() {
-            document.querySelector('.sidebar').classList.toggle('show');
-            document.querySelector('main').classList.toggle('sidebar-open');
+            const sidebar = document.getElementById('sidebarMenu');
+            if (sidebar) {
+                if (window.innerWidth < 768) { // Only for mobile
+                    if (sidebar.classList.contains('show')) {
+                        sidebar.classList.remove('show');
+                    } else {
+                        sidebar.classList.add('show');
+                    }
+                }
+            }
         });
     }
     

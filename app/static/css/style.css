@@ -145,9 +145,20 @@
 /* Mobile responsive adjustments */
 @media (max-width: 768px) {
     .sidebar {
-        position: static;
-        height: auto;
-        padding-top: 20px;
+        position: fixed;
+        top: 56px;
+        left: 0;
+        width: 100%;
+        z-index: 1030;
+        padding-top: 1rem;
+        max-height: calc(100vh - 56px);
+        overflow-y: auto;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+    
+    .sidebar.show {
+        transform: translateX(0);
     }
     
     .stats-card {
