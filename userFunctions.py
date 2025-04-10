@@ -196,6 +196,7 @@ def register():
             email=form.email.data,
             first_name=form.first_name.data,
             last_name=form.last_name.data,
+            department=form.department.data,
             is_active=True,
             is_email_confirmed=False
         )
@@ -584,6 +585,7 @@ def settings():
         current_user.email = form.email.data
         current_user.first_name = form.first_name.data
         current_user.last_name = form.last_name.data
+        current_user.department = form.department.data
         db.session.commit()
         flash('Your profile has been updated.', 'success')
         return redirect(url_for('user.settings', _anchor='profile'))
