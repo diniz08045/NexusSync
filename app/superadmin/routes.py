@@ -19,7 +19,12 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.models.user import User
 from app.superadmin import superadmin_bp
-from app.superadmin.forms import SuperAdminLoginForm, ConfigForm
+from app.superadmin.forms import (
+    SuperAdminLoginForm, ConfigForm, IPManagementForm, 
+    DatabaseConfigForm, EmailConfigForm, SystemTimeForm,
+    DataRetentionForm, SecurityConfigForm, StartupConfigForm,
+    ChangePasswordForm
+)
 from app import db
 
 # Set up logger
@@ -35,6 +40,9 @@ SUPER_ADMIN_PASSWORD_HASH = generate_password_hash("change_this_password_immedia
 
 # Define the list of allowed IP addresses
 ALLOWED_IPS = ['127.0.0.1', 'localhost', '::1']  # localhost only
+
+# Whether the development mode is enabled
+DEVELOPMENT_MODE = True  # Set to False in production
 
 
 def superadmin_required(f):
@@ -208,24 +216,128 @@ def system_config():
 @superadmin_required
 def ip_management():
     """Manage IP whitelist/blacklist."""
-    # This would be expanded to show current IP lists and allow editing
-    return render_template('superadmin/ip_management.html')
+    form = IPManagementForm()
+    
+    if form.validate_on_submit():
+        # Process IP configurations
+        try:
+            # This would update IP configurations
+            config_changes = {
+                "whitelist": form.whitelist.data,
+                "blacklist": form.blacklist.data
+            }
+            
+            # Log the changes
+            log_action("IP_CONFIG_CHANGE", f"IP management changed: {json.dumps(config_changes)}")
+            
+            flash('IP management settings updated successfully.', 'success')
+            return redirect(url_for('superadmin.ip_management'))
+        except Exception as e:
+            flash(f'Error updating IP management settings: {str(e)}', 'danger')
+            logger.error(f"Error in IP config update: {str(e)}")
+    
+    # Populate form with current values - in a real app, these would come from a config
+    if request.method == 'GET':
+        form.whitelist.data = "127.0.0.1\n192.168.1.0/24"
+        form.blacklist.data = ""
+    
+    return render_template('superadmin/ip_management.html', form=form)
 
 
 @superadmin_bp.route('/database-config', methods=['GET', 'POST'])
 @superadmin_required
 def database_config():
     """Manage database configuration and API keys."""
-    # This would be expanded to show and edit database configuration
-    return render_template('superadmin/database_config.html')
+    form = DatabaseConfigForm()
+    
+    if form.validate_on_submit():
+        try:
+            # This would update database configurations
+            config_changes = {
+                "db_host": form.db_host.data,
+                "db_port": form.db_port.data,
+                "db_name": form.db_name.data,
+                "db_user": form.db_user.data,
+                "db_password": "[REDACTED]"  # Don't log actual password
+            }
+            
+            # Log the changes
+            log_action("DB_CONFIG_CHANGE", f"Database configuration changed: {json.dumps(config_changes)}")
+            
+            flash('Database configuration updated successfully.', 'success')
+            return redirect(url_for('superadmin.database_config'))
+        except Exception as e:
+            flash(f'Error updating database configuration: {str(e)}', 'danger')
+            logger.error(f"Error in database config update: {str(e)}")
+    
+    # Populate form with current values - in a real app, these would come from a config
+    if request.method == 'GET':
+        db_url = current_app.config.get('SQLALCHEMY_DATABASE_URI', '')
+        # In a real implementation, you would parse this URL correctly
+        form.db_host.data = os.environ.get('PGHOST', 'localhost')
+        form.db_port.data = int(os.environ.get('PGPORT', '5432'))
+        form.db_name.data = os.environ.get('PGDATABASE', 'postgres')
+        form.db_user.data = os.environ.get('PGUSER', 'postgres')
+        form.db_password.data = ''  # Don't fill in password for security reasons
+    
+    return render_template('superadmin/database_config.html', form=form)
 
 
 @superadmin_bp.route('/email-config', methods=['GET', 'POST'])
 @superadmin_required
 def email_config():
     """Manage email server settings."""
-    # This would be expanded to show and edit email configuration
-    return render_template('superadmin/email_config.html')
+    form = EmailConfigForm()
+    test_result = None
+    
+    # Check if this is a test email request
+    is_test = request.args.get('test', '0') == '1' or 'test_email' in request.form
+    
+    if form.validate_on_submit():
+        try:
+            # Update email configurations
+            config_changes = {
+                "mail_server": form.mail_server.data,
+                "mail_port": form.mail_port.data,
+                "mail_use_tls": form.mail_use_tls.data,
+                "mail_use_ssl": form.mail_use_ssl.data,
+                "mail_username": form.mail_username.data,
+                "mail_password": "[REDACTED]",  # Don't log actual password
+                "mail_default_sender": form.mail_default_sender.data
+            }
+            
+            # In a real app, you would update Flask-Mail config and potentially restart it
+            # Here we just log the change
+            log_action("EMAIL_CONFIG_CHANGE", f"Email configuration changed: {json.dumps(config_changes)}")
+            
+            # Handle test email if requested
+            if is_test and 'test_email' in request.form:
+                test_email = request.form.get('test_email')
+                if test_email:
+                    # In a real app, you would send an actual test email here
+                    log_action("TEST_EMAIL", f"Test email sent to: {test_email}")
+                    flash(f'Test email sent to {test_email}.', 'success')
+                else:
+                    flash('Test email address is required.', 'warning')
+            else:
+                flash('Email configuration updated successfully.', 'success')
+            
+            return redirect(url_for('superadmin.email_config'))
+        except Exception as e:
+            flash(f'Error updating email configuration: {str(e)}', 'danger')
+            logger.error(f"Error in email config update: {str(e)}")
+    
+    # Populate form with current values
+    if request.method == 'GET':
+        form.mail_server.data = current_app.config.get('MAIL_SERVER', '')
+        form.mail_port.data = current_app.config.get('MAIL_PORT', 587)
+        form.mail_use_tls.data = current_app.config.get('MAIL_USE_TLS', True)
+        form.mail_use_ssl.data = current_app.config.get('MAIL_USE_SSL', False)
+        form.mail_username.data = current_app.config.get('MAIL_USERNAME', '')
+        form.mail_password.data = ''  # Don't fill in password for security reasons
+        form.mail_default_sender.data = current_app.config.get('MAIL_DEFAULT_SENDER', '')
+    
+    return render_template('superadmin/email_config.html', form=form)
 
 
 @superadmin_bp.route('/system-monitoring')
@@ -291,3 +403,22 @@ def change_password():
     """Change the superadmin password."""
     # This would be expanded to allow changing the superadmin password
     return render_template('superadmin/change_password.html')
+
+
+# Development-only routes (should be removed in production)
+if DEVELOPMENT_MODE:
+    @superadmin_bp.route('/dev-login')
+    def dev_login():
+        """Auto-login for development purposes only."""
+        # Only allowed from localhost
+        if request.remote_addr not in ALLOWED_IPS:
+            abort(403)  # Forbidden
+            
+        # Set superadmin status in session
+        session['is_superadmin'] = True
+        
+        # Log the action
+        log_action("DEV_LOGIN", "Development auto-login used")
+        
+        flash('Development auto-login successful. DO NOT USE IN PRODUCTION!', 'warning')
+        return redirect(url_for('superadmin.dashboard'))

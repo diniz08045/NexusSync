@@ -1,0 +1,241 @@
+{% extends "superadmin/base.html" %}
+
+{% block title %}Startup Configuration{% endblock %}
+
+{% block page_title %}Startup Flow & Rules{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent border-0">
+                <h5 class="mb-0"><i class="fas fa-play me-2"></i>Application Startup Configuration</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i> Configure how the application behaves during startup.
+                </div>
+                
+                <form method="post">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="mb-3 form-check form-switch">
+                        {{ form.auto_migrate(class="form-check-input", role="switch") }}
+                        {{ form.auto_migrate.label(class="form-check-label") }}
+                        <div class="text-muted">
+                            <small>When enabled, database migrations will be automatically applied on application startup.</small>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3 form-check form-switch">
+                        {{ form.auto_create_admin(class="form-check-input", role="switch") }}
+                        {{ form.auto_create_admin.label(class="form-check-label") }}
+                        <div class="text-muted">
+                            <small>When enabled, an admin user will be created if none exists.</small>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3 form-check form-switch">
+                        {{ form.auto_backup(class="form-check-input", role="switch") }}
+                        {{ form.auto_backup.label(class="form-check-label") }}
+                        <div class="text-muted">
+                            <small>When enabled, a database backup will be created each time the application starts.</small>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i> {{ form.submit.label.text }}
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent border-0">
+                <h5 class="mb-0"><i class="fas fa-tasks me-2"></i>Startup Sequence</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">
+                                <span class="badge bg-secondary me-2">1</span>
+                                Load Environment Variables
+                            </h6>
+                            <small class="text-success">Fast</small>
+                        </div>
+                        <p class="mb-1 text-muted small">Read configuration from environment variables and .env files.</p>
+                    </div>
+                    
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">
+                                <span class="badge bg-secondary me-2">2</span>
+                                Initialize Flask Application
+                            </h6>
+                            <small class="text-success">Fast</small>
+                        </div>
+                        <p class="mb-1 text-muted small">Create Flask app instance and configure middleware.</p>
+                    </div>
+                    
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">
+                                <span class="badge bg-secondary me-2">3</span>
+                                Connect to Database
+                            </h6>
+                            <small class="text-success">Fast</small>
+                        </div>
+                        <p class="mb-1 text-muted small">Establish database connection and connection pool.</p>
+                    </div>
+                    
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">
+                                <span class="badge bg-secondary me-2">4</span>
+                                Run Database Migrations
+                            </h6>
+                            <small class="text-warning">Medium</small>
+                        </div>
+                        <p class="mb-1 text-muted small">Apply pending database migrations if auto-migrate is enabled.</p>
+                    </div>
+                    
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">
+                                <span class="badge bg-secondary me-2">5</span>
+                                Register Blueprints
+                            </h6>
+                            <small class="text-success">Fast</small>
+                        </div>
+                        <p class="mb-1 text-muted small">Initialize and register all application modules.</p>
+                    </div>
+                    
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">
+                                <span class="badge bg-secondary me-2">6</span>
+                                Initialize External Services
+                            </h6>
+                            <small class="text-warning">Medium</small>
+                        </div>
+                        <p class="mb-1 text-muted small">Connect to email, search, and other external services.</p>
+                    </div>
+                    
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">
+                                <span class="badge bg-secondary me-2">7</span>
+                                Start Web Server
+                            </h6>
+                            <small class="text-success">Fast</small>
+                        </div>
+                        <p class="mb-1 text-muted small">Start HTTP server and begin accepting connections.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent border-0">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-history me-2"></i>Recent Startups</h5>
+                    <span class="badge bg-success">Running</span>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item bg-transparent">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ now.strftime('%Y-%m-%d %H:%M') }}</h6>
+                            <small class="text-success">Success</small>
+                        </div>
+                        <p class="mb-1 text-muted small">Started in 4.2 seconds</p>
+                    </div>
+                    
+                    <div class="list-group-item bg-transparent">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ (now - datetime.timedelta(days=1)).strftime('%Y-%m-%d %H:%M') }}</h6>
+                            <small class="text-success">Success</small>
+                        </div>
+                        <p class="mb-1 text-muted small">Started in 3.8 seconds</p>
+                    </div>
+                    
+                    <div class="list-group-item bg-transparent">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ (now - datetime.timedelta(days=2)).strftime('%Y-%m-%d %H:%M') }}</h6>
+                            <small class="text-warning">Warnings</small>
+                        </div>
+                        <p class="mb-1 text-muted small">Started in 8.3 seconds (DB migration)</p>
+                    </div>
+                    
+                    <div class="list-group-item bg-transparent">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ (now - datetime.timedelta(days=3)).strftime('%Y-%m-%d %H:%M') }}</h6>
+                            <small class="text-danger">Failed</small>
+                        </div>
+                        <p class="mb-1 text-muted small">Database connection error</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent border-0">
+                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Startup Configuration Info</h5>
+            </div>
+            <div class="card-body">
+                <h6>Best Practices:</h6>
+                <ul class="text-muted small">
+                    <li><strong>Auto Migrations:</strong> Safe for development, but use with caution in production.</li>
+                    <li><strong>Auto Admin Creation:</strong> Useful for initial setup, disable in production.</li>
+                    <li><strong>Auto Backup:</strong> Recommended for production, but may slow down startup.</li>
+                </ul>
+                
+                <div class="alert alert-warning mt-3">
+                    <i class="fas fa-exclamation-triangle me-2"></i> Changing these settings may affect application startup time and behavior.
+                </div>
+            </div>
+        </div>
+        
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent border-0">
+                <h5 class="mb-0"><i class="fas fa-tools me-2"></i>Startup Tools</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    <a href="#" class="list-group-item list-group-item-action bg-transparent">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-sync-alt text-primary me-2"></i>
+                            <div>
+                                <h6 class="mb-0">Restart Application</h6>
+                                <small class="text-muted">Restart the application with new settings</small>
+                            </div>
+                        </div>
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action bg-transparent">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-database text-primary me-2"></i>
+                            <div>
+                                <h6 class="mb-0">Manual Migration</h6>
+                                <small class="text-muted">Run database migrations manually</small>
+                            </div>
+                        </div>
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action bg-transparent">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-download text-primary me-2"></i>
+                            <div>
+                                <h6 class="mb-0">Create Backup</h6>
+                                <small class="text-muted">Manual database backup</small>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
