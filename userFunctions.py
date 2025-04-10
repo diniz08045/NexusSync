@@ -350,7 +350,54 @@ def dismiss_notification(notification_id):
 @login_required
 def messages():
     """View messages and conversations."""
-    return render_template('messages.html', title='Messages')
+    # Create sample conversations for demo purposes
+    sample_conversations = [
+        {
+            "id": 1, 
+            "name": "Admin User", 
+            "avatar": "A", 
+            "last_message": "Welcome to the CRM Suite!", 
+            "time": "10:30 AM", 
+            "unread": True
+        },
+        {
+            "id": 2, 
+            "name": "John Smith", 
+            "avatar": "J", 
+            "last_message": "Let me know when you have time to discuss the new project.", 
+            "time": "Yesterday", 
+            "unread": False
+        },
+        {
+            "id": 3, 
+            "name": "Sarah Johnson", 
+            "avatar": "S", 
+            "last_message": "The meeting is scheduled for tomorrow at 2 PM.", 
+            "time": "Yesterday", 
+            "unread": False
+        },
+        {
+            "id": 4, 
+            "name": "Support Team", 
+            "avatar": "S", 
+            "last_message": "Your ticket has been resolved.", 
+            "time": "Mar 15", 
+            "unread": False
+        }
+    ]
+    
+    # Create sample users for new message modal
+    sample_users = [
+        {"id": 1, "name": "Admin User"},
+        {"id": 2, "name": "John Smith"},
+        {"id": 3, "name": "Sarah Johnson"},
+        {"id": 4, "name": "Support Team"}
+    ]
+    
+    return render_template('messages.html', 
+                          title='Messages',
+                          conversations=sample_conversations,
+                          users=sample_users)
 
 @user_bp.route('/settings', methods=['GET', 'POST'])
 @login_required

@@ -25,60 +25,25 @@
             </div>
             <div class="card-body p-0">
                 <div class="list-group list-group-flush message-list">
-                    <!-- Static sample conversations -->
-                    <a href="#" class="list-group-item list-group-item-action d-flex align-items-center p-3 unread-message" data-id="1">
+                    {% for conversation in conversations %}
+                    <a href="#" class="list-group-item list-group-item-action d-flex align-items-center p-3 {% if conversation.unread %}unread-message{% endif %}" 
+                       data-id="{{ conversation.id }}">
                         <div class="avatar d-inline-flex align-items-center justify-content-center bg-primary rounded-circle me-3" 
                              style="width: 40px; height: 40px; min-width: 40px;">
-                            <span class="text-white fw-bold">A</span>
+                            <span class="text-white fw-bold">{{ conversation.avatar }}</span>
                         </div>
                         <div class="flex-grow-1 text-truncate">
                             <div class="d-flex justify-content-between align-items-center mb-1">
-                                <h6 class="mb-0 text-truncate">Admin User</h6>
-                                <small class="text-muted ms-2">10:30 AM</small>
+                                <h6 class="mb-0 text-truncate">{{ conversation.name }}</h6>
+                                <small class="text-muted ms-2">{{ conversation.time }}</small>
                             </div>
-                            <p class="mb-0 text-truncate text-secondary">Welcome to the CRM Suite!</p>
+                            <p class="mb-0 text-truncate text-secondary">{{ conversation.last_message }}</p>
                         </div>
+                        {% if conversation.unread %}
                         <span class="badge rounded-pill bg-primary ms-2">New</span>
+                        {% endif %}
                     </a>
-                    <a href="#" class="list-group-item list-group-item-action d-flex align-items-center p-3" data-id="2">
-                        <div class="avatar d-inline-flex align-items-center justify-content-center bg-primary rounded-circle me-3" 
-                             style="width: 40px; height: 40px; min-width: 40px;">
-                            <span class="text-white fw-bold">J</span>
-                        </div>
-                        <div class="flex-grow-1 text-truncate">
-                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                <h6 class="mb-0 text-truncate">John Smith</h6>
-                                <small class="text-muted ms-2">Yesterday</small>
-                            </div>
-                            <p class="mb-0 text-truncate text-secondary">Let me know when you have time to discuss the new project.</p>
-                        </div>
-                    </a>
-                    <a href="#" class="list-group-item list-group-item-action d-flex align-items-center p-3" data-id="3">
-                        <div class="avatar d-inline-flex align-items-center justify-content-center bg-primary rounded-circle me-3" 
-                             style="width: 40px; height: 40px; min-width: 40px;">
-                            <span class="text-white fw-bold">S</span>
-                        </div>
-                        <div class="flex-grow-1 text-truncate">
-                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                <h6 class="mb-0 text-truncate">Sarah Johnson</h6>
-                                <small class="text-muted ms-2">Yesterday</small>
-                            </div>
-                            <p class="mb-0 text-truncate text-secondary">The meeting is scheduled for tomorrow at 2 PM.</p>
-                        </div>
-                    </a>
-                    <a href="#" class="list-group-item list-group-item-action d-flex align-items-center p-3" data-id="4">
-                        <div class="avatar d-inline-flex align-items-center justify-content-center bg-primary rounded-circle me-3" 
-                             style="width: 40px; height: 40px; min-width: 40px;">
-                            <span class="text-white fw-bold">S</span>
-                        </div>
-                        <div class="flex-grow-1 text-truncate">
-                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                <h6 class="mb-0 text-truncate">Support Team</h6>
-                                <small class="text-muted ms-2">Mar 15</small>
-                            </div>
-                            <p class="mb-0 text-truncate text-secondary">Your ticket has been resolved.</p>
-                        </div>
-                    </a>
+                    {% endfor %}
                 </div>
             </div>
         </div>
@@ -142,7 +107,9 @@
                         <label for="recipient" class="form-label">To:</label>
                         <select class="form-select" id="recipient" required>
                             <option value="" selected disabled>Select a recipient</option>
-                            <!-- Recipients will be loaded here -->
+                            {% for user in users %}
+                            <option value="{{ user.id }}">{{ user.name }}</option>
+                            {% endfor %}
                         </select>
                     </div>
                     <div class="mb-3">
@@ -170,13 +137,18 @@
         // Work with statically rendered conversations
         const conversationItems = document.querySelectorAll('.message-list .list-group-item');
         
-        // Conversations data from static HTML
-        const conversations = [
-            { id: 1, name: 'Admin User', lastMessage: 'Welcome to the CRM Suite!', time: '10:30 AM' },
-            { id: 2, name: 'John Smith', lastMessage: 'Let me know when you have time to discuss the new project.', time: 'Yesterday' },
-            { id: 3, name: 'Sarah Johnson', lastMessage: 'The meeting is scheduled for tomorrow at 2 PM.', time: 'Yesterday' },
-            { id: 4, name: 'Support Team', lastMessage: 'Your ticket has been resolved.', time: 'Mar 15' }
-        ];
+        // Create conversations data directly from DOM elements
+        const conversations = [];
+        conversationItems.forEach(item => {
+            const id = item.dataset.id;
+            const name = item.querySelector('h6').textContent;
+            const lastMessage = item.querySelector('p').textContent;
+            conversations.push({ 
+                id: id,
+                name: name,
+                lastMessage: lastMessage
+            });
+        });
         
         // Add click event listeners to conversation items
         conversationItems.forEach((item, index) => {
@@ -233,48 +205,42 @@
             currentChatName.textContent = conversation.name;
             deleteBtn.classList.remove('d-none');
             
-            // Show loading
+            // Show conversation immediately
             selectPrompt.classList.add('d-none');
-            messagesList.classList.add('d-none');
-            loadingMessages.classList.remove('d-none');
+            loadingMessages.classList.add('d-none');
+            messagesList.classList.remove('d-none');
+            inputContainer.classList.remove('d-none');
+                
+            // Generate placeholder messages
+            const messages = [
+                { sender: conversation.name, text: 'Hi there!', time: '10:15 AM', isMine: false },
+                { sender: 'You', text: 'Hello! How can I help you today?', time: '10:18 AM', isMine: true },
+                { sender: conversation.name, text: conversation.lastMessage, time: '10:30 AM', isMine: false }
+            ];
             
-            // Simulate loading messages
-            setTimeout(function() {
-                loadingMessages.classList.add('d-none');
-                messagesList.classList.remove('d-none');
-                inputContainer.classList.remove('d-none');
+            // Render messages
+            messagesList.innerHTML = '';
+            messages.forEach(message => {
+                const messageEl = document.createElement('div');
+                messageEl.className = `message ${message.isMine ? 'message-mine' : 'message-other'}`;
                 
-                // Generate placeholder messages
-                const messages = [
-                    { sender: conversation.name, text: 'Hi there!', time: '10:15 AM', isMine: false },
-                    { sender: 'You', text: 'Hello! How can I help you today?', time: '10:18 AM', isMine: true },
-                    { sender: conversation.name, text: conversation.lastMessage, time: '10:30 AM', isMine: false }
-                ];
-                
-                // Render messages
-                messagesList.innerHTML = '';
-                messages.forEach(message => {
-                    const messageEl = document.createElement('div');
-                    messageEl.className = `message ${message.isMine ? 'message-mine' : 'message-other'}`;
-                    
-                    messageEl.innerHTML = `
-                        <div class="message-content">
-                            <div class="message-header">
-                                <span class="message-sender">${message.sender}</span>
-                                <small class="message-time">${message.time}</small>
-                            </div>
-                            <div class="message-body">
-                                ${message.text}
-                            </div>
+                messageEl.innerHTML = `
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-sender">${message.sender}</span>
+                            <small class="message-time">${message.time}</small>
                         </div>
-                    `;
-                    
-                    messagesList.appendChild(messageEl);
-                });
+                        <div class="message-body">
+                            ${message.text}
+                        </div>
+                    </div>
+                `;
                 
-                // Scroll to bottom
-                messagesList.scrollTop = messagesList.scrollHeight;
-            }, 800);
+                messagesList.appendChild(messageEl);
+            });
+            
+            // Scroll to bottom
+            messagesList.scrollTop = messagesList.scrollHeight;
         }
         
         // Handle message form submission
