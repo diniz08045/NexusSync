@@ -78,7 +78,7 @@
                 </div>
             </div>
             <div class="card-footer bg-transparent border-0">
-                <a href="{{ url_for('user.messages') }}" class="text-decoration-none">View details <i class="fas fa-arrow-right ms-1"></i></a>
+                <a href="#" class="text-decoration-none">View details <i class="fas fa-arrow-right ms-1"></i></a>
             </div>
         </div>
     </div>
@@ -90,7 +90,7 @@
         <div class="card border-0 shadow h-100">
             <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Recent Tasks</h5>
-                <a href="{{ url_for('planner.index') }}" class="btn btn-sm btn-outline-primary">View All</a>
+                <a href="#" class="btn btn-sm btn-outline-primary">View All</a>
             </div>
             <div class="card-body p-0">
                 <div class="list-group list-group-flush">
@@ -109,7 +109,7 @@
                     {% else %}
                         <div class="list-group-item py-4 text-center">
                             <p class="text-muted mb-0">No tasks found</p>
-                            <a href="{{ url_for('planner.create_task') }}" class="btn btn-sm btn-primary mt-2">
+                            <a href="#" class="btn btn-sm btn-primary mt-2">
                                 <i class="fas fa-plus me-1"></i> Add Task
                             </a>
                         </div>
@@ -124,13 +124,13 @@
         <div class="card border-0 shadow h-100">
             <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Recent Tickets</h5>
-                <a href="{{ url_for('tickets.index') }}" class="btn btn-sm btn-outline-primary">View All</a>
+                <a href="#" class="btn btn-sm btn-outline-primary">View All</a>
             </div>
             <div class="card-body p-0">
                 <div class="list-group list-group-flush">
                     {% if recent_tickets %}
                         {% for ticket in recent_tickets %}
-                        <a href="{{ url_for('tickets.view', ticket_id=ticket.id) }}" class="list-group-item list-group-item-action py-3 px-4">
+                        <a href="#" class="list-group-item list-group-item-action py-3 px-4">
                             <div class="d-flex w-100 justify-content-between">
                                 <h6 class="mb-1">#{{ ticket.id }} {{ ticket.title }}</h6>
                                 <small class="text-muted">{{ ticket.created_at|timeago }}</small>
@@ -147,7 +147,7 @@
                     {% else %}
                         <div class="list-group-item py-4 text-center">
                             <p class="text-muted mb-0">No tickets found</p>
-                            <a href="{{ url_for('tickets.create') }}" class="btn btn-sm btn-primary mt-2">
+                            <a href="#" class="btn btn-sm btn-primary mt-2">
                                 <i class="fas fa-plus me-1"></i> Create Ticket
                             </a>
                         </div>
@@ -195,13 +195,13 @@
         <div class="card border-0 shadow">
             <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Notifications</h5>
-                <a href="{{ url_for('user.notifications') }}" class="btn btn-sm btn-outline-primary">View All</a>
+                <a href="#" class="btn btn-sm btn-outline-primary">View All</a>
             </div>
             <div class="card-body p-0">
                 <div class="list-group list-group-flush">
                     {% if recent_notifications %}
                         {% for notification in recent_notifications %}
-                        <a href="{{ url_for('user.mark_notification_read', notification_id=notification.id) }}" class="list-group-item list-group-item-action py-3 px-4">
+                        <a href="#" class="list-group-item list-group-item-action py-3 px-4">
                             <div class="d-flex w-100 justify-content-between">
                                 <h6 class="mb-1">{{ notification.title }}</h6>
                                 <small class="text-muted">{{ notification.created_at|timeago }}</small>
