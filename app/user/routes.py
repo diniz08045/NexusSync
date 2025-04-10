@@ -184,6 +184,30 @@ def dismiss_notification(notification_id):
     flash('Notification dismissed.', 'success')
     return redirect(url_for('user.notifications'))
 
+@user_bp.route('/notifications/dismiss-all', methods=['POST'])
+@login_required
+def dismiss_all_notifications():
+    """Dismiss all notifications for the current user."""
+    notifications = Notification.query.filter_by(
+        user_id=current_user.id,
+        is_dismissed=False
+    ).all()
+    
+    for notification in notifications:
+        notification.is_dismissed = True
+    
+    db.session.commit()
+    
+    # Return JSON if it's an AJAX request
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return jsonify({
+            'success': True,
+            'message': 'All notifications dismissed.'
+        })
+    
+    flash('All notifications have been dismissed.', 'success')
+    return redirect(url_for('user.notifications'))
+
 @user_bp.route('/search')
 @login_required
 def search():
