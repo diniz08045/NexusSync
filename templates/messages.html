@@ -324,6 +324,61 @@
             return;
         }
         
+        // Get the selected recipient option
+        const selectedOption = recipientEl.options[recipientEl.selectedIndex];
+        const recipientName = selectedOption.textContent;
+        const recipientId = recipientEl.value;
+        
+        // Create a new conversation entry at the top of the list
+        const messageList = document.querySelector('.message-list');
+        const newConversationItem = document.createElement('a');
+        
+        // Generate first letter of recipient name as avatar
+        const avatarLetter = recipientName.charAt(0);
+        
+        newConversationItem.className = 'list-group-item list-group-item-action d-flex align-items-center p-3';
+        newConversationItem.href = 'javascript:void(0)';
+        newConversationItem.dataset.id = recipientId;
+        
+        newConversationItem.innerHTML = `
+            <div class="avatar d-inline-flex align-items-center justify-content-center bg-primary rounded-circle me-3" 
+                 style="width: 40px; height: 40px; min-width: 40px;">
+                <span class="text-white fw-bold">${avatarLetter}</span>
+            </div>
+            <div class="flex-grow-1 text-truncate">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <h6 class="mb-0 text-truncate">${recipientName}</h6>
+                    <small class="text-muted ms-2">Just now</small>
+                </div>
+                <p class="mb-0 text-truncate text-secondary">${subjectEl.value}</p>
+            </div>
+        `;
+        
+        // Add the new conversation to the data array
+        const newConversation = {
+            id: recipientId,
+            name: recipientName,
+            avatar: avatarLetter,
+            lastMessage: subjectEl.value,
+            time: 'Just now',
+            unread: false
+        };
+        
+        // Add to our data array
+        conversationData.unshift(newConversation);
+        
+        // Prepend to the conversation list
+        if (messageList.firstChild) {
+            messageList.insertBefore(newConversationItem, messageList.firstChild);
+        } else {
+            messageList.appendChild(newConversationItem);
+        }
+        
+        // Add click event to the new conversation
+        newConversationItem.addEventListener('click', function() {
+            selectConversation(0); // Will select the first item in our data array
+        });
+        
         // Show success message
         alert('Message sent successfully!');
         
@@ -334,6 +389,9 @@
         
         // Reset form
         document.getElementById('new-message-form').reset();
+        
+        // Update the screen to show the new conversation
+        selectConversation(0);
     }
     
     // Delete the current conversation
