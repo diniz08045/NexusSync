@@ -857,6 +857,116 @@ def search():
             'error': 'Search functionality encountered an error'
         })
 
+# Message API endpoints
+@user_bp.route('/api/send-message/<int:conversation_id>', methods=['POST'])
+@login_required
+def api_send_message(conversation_id):
+    """API endpoint to send a message in a conversation"""
+    if not request.is_json:
+        return jsonify({'success': False, 'error': 'Invalid request format'}), 400
+    
+    message_text = request.json.get('message', '').strip()
+    if not message_text:
+        return jsonify({'success': False, 'error': 'Message cannot be empty'}), 400
+    
+    # Find the conversation
+    conversations = [
+        {
+            'id': 1,
+            'name': 'Admin User',
+            'avatar': 'A',
+            'last_message': 'Please review the latest documentation.',
+            'time': '2h ago',
+            'unread': True
+        },
+        {
+            'id': 2,
+            'name': 'John Smith',
+            'avatar': 'J',
+            'last_message': 'When can we schedule the meeting?',
+            'time': '1d ago',
+            'unread': False
+        },
+        {
+            'id': 3,
+            'name': 'Sarah Johnson',
+            'avatar': 'S',
+            'last_message': 'The report has been submitted.',
+            'time': '3d ago',
+            'unread': False
+        },
+        {
+            'id': 4,
+            'name': 'Support Team',
+            'avatar': 'S',
+            'last_message': 'Your ticket has been resolved.',
+            'time': '1w ago',
+            'unread': False
+        }
+    ]
+    
+    selected_conversation = None
+    for conv in conversations:
+        if conv['id'] == conversation_id:
+            selected_conversation = conv
+            # Update the last message
+            conv['last_message'] = message_text
+            conv['time'] = 'Just now'
+            break
+    
+    if not selected_conversation:
+        return jsonify({'success': False, 'error': 'Conversation not found'}), 404
+    
+    # Save the message to session
+    if 'conversation_messages' not in session:
+        session['conversation_messages'] = {}
+    
+    conversation_id_str = str(conversation_id)
+    if conversation_id_str not in session['conversation_messages']:
+        session['conversation_messages'][conversation_id_str] = []
+    
+    # Add the user's message to the conversation
+    session['conversation_messages'][conversation_id_str].append({
+        'sender': 'You',
+        'text': message_text,
+        'time': 'Just now',
+        'is_mine': True
+    })
+    
+    # Generate a reply message (simulated)
+    reply_messages = [
+        'That sounds good!',
+        'I\'ll get back to you on that.',
+        'Thanks for the update.',
+        'Let me check and get back to you.',
+        'Could you provide more details?',
+        'I\'ll look into this right away.',
+        'That\'s great news!',
+        'I understand your concern.',
+        'I appreciate your prompt response.',
+        'Let\'s schedule a meeting to discuss this further.'
+    ]
+    import random
+    reply_text = random.choice(reply_messages)
+    
+    # Add the reply to the conversation
+    session['conversation_messages'][conversation_id_str].append({
+        'sender': selected_conversation['name'],
+        'text': reply_text,
+        'time': 'Just now',
+        'is_mine': False
+    })
+    
+    # Mark session as modified
+    session.modified = True
+    
+    # Return success response with the reply
+    return jsonify({
+        'success': True,
+        'reply': reply_text,
+        'sender': selected_conversation['name']
+    })
+
 # Helper functions
 def send_confirmation_email(user):
     """Send account confirmation email."""

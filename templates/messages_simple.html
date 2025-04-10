@@ -85,7 +85,7 @@
                     </div>
                     
                     <div class="p-3 mt-auto border-top" id="message-input-container">
-                        <form id="send-message-form" action="{{ url_for('user.messages', conversation_id=selected_conversation.id) }}" method="POST">
+                        <form id="send-message-form" onsubmit="return sendMessage(event)">
                             <div class="input-group">
                                 <input type="text" class="form-control" name="message" id="message-input" placeholder="Type your message...">
                                 <button class="btn btn-primary" type="submit" data-noloading="true">
@@ -203,7 +203,90 @@
 
 {% block scripts %}
 <script>
-    // Handle the message form submission
+    // Function to send message via AJAX
+    function sendMessage(event) {
+        event.preventDefault();
+        
+        const messageInput = document.getElementById('message-input');
+        const messageText = messageInput.value.trim();
+        
+        if (!messageText) {
+            return false;
+        }
+        
+        // Create the new message element
+        const messagesContainer = document.getElementById('messages-list');
+        const newMessage = document.createElement('div');
+        newMessage.className = 'message message-mine';
+        newMessage.innerHTML = `
+            <div class="message-content">
+                <div class="message-header">
+                    <span class="message-sender">You</span>
+                    <span class="message-time">Just now</span>
+                </div>
+                <div class="message-text">
+                    ${messageText}
+                </div>
+            </div>
+        `;
+        
+        // Add to the messages container
+        messagesContainer.appendChild(newMessage);
+        
+        // Scroll to bottom
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        
+        // Clear the input
+        messageInput.value = '';
+        
+        // Send the message to the server
+        const conversationId = {{ selected_conversation.id if selected_conversation else 'null' }};
+        if (conversationId) {
+            fetch(`/api/send-message/${conversationId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: messageText }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // If we got a reply from the other person, add it
+                    if (data.reply) {
+                        const replyMessage = document.createElement('div');
+                        replyMessage.className = 'message message-other';
+                        replyMessage.innerHTML = `
+                            <div class="message-content">
+                                <div class="message-header">
+                                    <span class="message-sender">${data.sender || '{{ selected_conversation.name if selected_conversation else "Contact" }}'}</span>
+                                    <span class="message-time">Just now</span>
+                                </div>
+                                <div class="message-text">
+                                    ${data.reply}
+                                </div>
+                            </div>
+                        `;
+                        
+                        // Add to the messages container
+                        messagesContainer.appendChild(replyMessage);
+                        
+                        // Scroll to bottom
+                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    }
+                } else {
+                    console.error('Failed to send message');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+        
+        return false;
+    }
+
+    // Handle the new message form submission
     document.addEventListener('DOMContentLoaded', function() {
         const newMessageForm = document.getElementById('new-message-form');
         if (newMessageForm) {
