@@ -45,7 +45,7 @@
                             <p class="card-text">Open tickets assigned to you</p>
                         </div>
                         <div class="card-footer bg-transparent border-0">
-                            <a href="{{ url_for('tickets.my_tickets') }}" class="text-white">View all tickets <i class="fas fa-arrow-right"></i></a>
+                            <a href="{{ url_for('tickets.index') }}" class="text-white">View all tickets <i class="fas fa-arrow-right"></i></a>
                         </div>
                     </div>
                 </div>
@@ -245,8 +245,8 @@
                             {% endif %}
                         </div>
                         <div class="card-footer bg-transparent">
-                            <a href="{{ url_for('tickets.my_tickets') }}" class="btn btn-sm btn-outline-primary">View All Tickets</a>
-                            <a href="{{ url_for('tickets.create_ticket') }}" class="btn btn-sm btn-primary float-end">Create Ticket</a>
+                            <a href="{{ url_for('tickets.index') }}" class="btn btn-sm btn-outline-primary">View All Tickets</a>
+                            <a href="{{ url_for('tickets.create') }}" class="btn btn-sm btn-primary float-end">Create Ticket</a>
                         </div>
                     </div>
                 </div>
