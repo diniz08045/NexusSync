@@ -1,0 +1,42 @@
+{% extends "error_base.html" %}
+
+{% block title %}{{ app_name }} - Two-Factor Authentication{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card border-0 shadow-lg">
+            <div class="card-body p-5">
+                <div class="text-center mb-4">
+                    <i class="fas fa-shield-alt fa-3x text-primary mb-3"></i>
+                    <h2 class="fw-bold">Verification Required</h2>
+                    <p class="text-muted">Please enter the verification code sent to your email</p>
+                </div>
+                
+                <form method="post" action="{{ url_for('auth.two_factor_auth') }}" class="needs-validation" novalidate>
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="mb-4">
+                        <label for="token" class="form-label">{{ form.token.label }}</label>
+                        {{ form.token(class="form-control form-control-lg text-center", id="token", placeholder="6-digit code", autocomplete="off") }}
+                        {% for error in form.token.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                        <div class="form-text">The verification code is valid for 15 minutes.</div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 mb-3">
+                        {{ form.submit(class="btn btn-primary btn-lg") }}
+                    </div>
+                    
+                    <div class="text-center">
+                        <a href="{{ url_for('auth.login') }}" class="text-decoration-none">
+                            <i class="fas fa-arrow-left me-1"></i> Back to login
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
