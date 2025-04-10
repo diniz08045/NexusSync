@@ -1,0 +1,63 @@
+I’m building a Flask web application and I want to implement comprehensive security measures to protect against common vulnerabilities.
+
+Please help me design and implement a security layer that includes:
+
+    Safe URL handling:
+
+        Validate external URLs before redirecting or processing.
+
+        Prevent SSRF (block localhost, private IPs).
+
+        Enforce domain allowlisting and safe schemes (http/https only).
+
+    Token integrity & anti-tampering:
+
+        Generate and verify time-limited, signed tokens (e.g., for password reset or email verification).
+
+        Prevent modification of token values by users.
+
+    SQL Injection prevention:
+
+        Ensure all queries are safely parameterized or handled via ORM.
+
+        No raw user input should reach SQL statements directly.
+
+    Local File Inclusion (LFI) & Path Traversal protection:
+
+        Sanitize all user-supplied file paths.
+
+        Prevent access to files outside designated directories.
+
+    Cross-Site Scripting (XSS) protection:
+
+        Auto-escape all template output.
+
+        Sanitize user-generated content using a library like bleach.
+
+    Cross-Site Request Forgery (CSRF) protection:
+
+        Enable CSRF protection for all forms using Flask-WTF or similar.
+
+    File upload restrictions:
+
+        Limit allowed extensions.
+
+        Rename files to random UUIDs or hashes.
+
+        Store files in isolated, non-executable directories.
+
+    Rate limiting and brute force protection:
+
+        Use Flask-Limiter to rate-limit sensitive routes like login, reset, registration.
+
+    Content Security Policy (CSP) and security headers:
+
+        Apply CSP, X-Content-Type-Options, X-Frame-Options, and Referrer-Policy headers.
+
+    Logging and anomaly detection:
+
+        Log suspicious input, invalid tokens, and unauthorized attempts.
+
+        (Optional) Alert admins or save in audit logs.
+
+Ideally, I’d like a reusable security.py module or middleware system I can plug into my app. The code should be organized, commented, and easy to maintain or expand.
