@@ -36,7 +36,7 @@
             <div class="container mt-5">
                 {% include "includes/alerts.html" %}
                 
-                {% block content %}{% endblock %}
+                {{ self.content() }}
             </div>
         {% endif %}
     {% endblock %}

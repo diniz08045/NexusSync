@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Super Admin Portal{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <style>
+        /* Custom styles for superadmin portal */
+        .superadmin-sidebar {
+            min-height: 100vh;
+            background-color: var(--bs-gray-900);
+        }
+        
+        .superadmin-content {
+            padding: 1.5rem;
+        }
+        
+        .nav-link {
+            color: var(--bs-gray-400);
+            border-radius: 0.25rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            background-color: var(--bs-primary);
+            color: white;
+        }
+        
+        .superadmin-header {
+            background-color: var(--bs-gray-800);
+            border-bottom: 1px solid var(--bs-gray-700);
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            font-size: 0.6rem;
+        }
+        
+        /* Danger area styling */
+        .danger-zone {
+            border: 1px solid var(--bs-danger);
+            border-radius: 0.25rem;
+            padding: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .danger-zone h4 {
+            color: var(--bs-danger);
+        }
+    </style>
+    
+    {% block head_extra %}{% endblock %}
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 d-md-block superadmin-sidebar px-0">
+                <div class="position-sticky pt-3">
+                    <div class="p-3 text-center">
+                        <h5 class="text-primary"><i class="fas fa-shield-alt me-2"></i>Super Admin</h5>
+                        <p class="text-muted small mb-0">Restricted Access</p>
+                    </div>
+                    
+                    <hr class="my-2">
+                    
+                    <ul class="nav flex-column px-3">
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'superadmin.dashboard' %}active{% endif %}" href="{{ url_for('superadmin.dashboard') }}">
+                                <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'superadmin.system_config' %}active{% endif %}" href="{{ url_for('superadmin.system_config') }}">
+                                <i class="fas fa-cogs me-2"></i> System Config
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'superadmin.ip_management' %}active{% endif %}" href="{{ url_for('superadmin.ip_management') }}">
+                                <i class="fas fa-network-wired me-2"></i> IP Management
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'superadmin.database_config' %}active{% endif %}" href="{{ url_for('superadmin.database_config') }}">
+                                <i class="fas fa-database me-2"></i> Database Config
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'superadmin.email_config' %}active{% endif %}" href="{{ url_for('superadmin.email_config') }}">
+                                <i class="fas fa-envelope me-2"></i> Email Config
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'superadmin.system_monitoring' %}active{% endif %}" href="{{ url_for('superadmin.system_monitoring') }}">
+                                <i class="fas fa-chart-line me-2"></i> Monitoring
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'superadmin.system_time' %}active{% endif %}" href="{{ url_for('superadmin.system_time') }}">
+                                <i class="fas fa-clock me-2"></i> System Time
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'superadmin.data_retention' %}active{% endif %}" href="{{ url_for('superadmin.data_retention') }}">
+                                <i class="fas fa-archive me-2"></i> Data Retention
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'superadmin.security_config' %}active{% endif %}" href="{{ url_for('superadmin.security_config') }}">
+                                <i class="fas fa-lock me-2"></i> Security Config
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'superadmin.startup_config' %}active{% endif %}" href="{{ url_for('superadmin.startup_config') }}">
+                                <i class="fas fa-play me-2"></i> Startup Config
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'superadmin.audit_logs' %}active{% endif %}" href="{{ url_for('superadmin.audit_logs') }}">
+                                <i class="fas fa-history me-2"></i> Audit Logs
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'superadmin.change_password' %}active{% endif %}" href="{{ url_for('superadmin.change_password') }}">
+                                <i class="fas fa-key me-2"></i> Change Password
+                            </a>
+                        </li>
+                    </ul>
+                    
+                    <hr class="my-2">
+                    
+                    <div class="px-3">
+                        <a href="{{ url_for('superadmin.logout') }}" class="btn btn-danger btn-sm w-100">
+                            <i class="fas fa-sign-out-alt me-2"></i> Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main content -->
+            <div class="col-md-9 col-lg-10 superadmin-content">
+                <!-- Header -->
+                <div class="row superadmin-header py-2 mb-4">
+                    <div class="col">
+                        <h4 class="mb-0">{% block page_title %}Super Admin Portal{% endblock %}</h4>
+                    </div>
+                    <div class="col-auto">
+                        <span class="badge bg-danger me-2">LOCALHOST ONLY</span>
+                        <span class="text-muted">IP: {{ request.remote_addr }}</span>
+                    </div>
+                </div>
+                
+                <!-- Alerts -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+                <!-- Main content -->
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- Common superadmin scripts -->
+    <script>
+        // Confirmation for dangerous actions
+        document.querySelectorAll('.confirm-action').forEach(button => {
+            button.addEventListener('click', function(e) {
+                if (!confirm('Are you sure you want to perform this action? This cannot be undone.')) {
+                    e.preventDefault();
+                }
+            });
+        });
+        
+        // Display current time in the system
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('current-time').textContent = now.toLocaleString();
+        }
+        
+        // If clock element exists, update it every second
+        if (document.getElementById('current-time')) {
+            updateClock();
+            setInterval(updateClock, 1000);
+        }
+    </script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

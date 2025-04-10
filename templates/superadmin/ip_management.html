@@ -1,0 +1,118 @@
+{% extends "superadmin/base.html" %}
+
+{% block title %}IP Address Management{% endblock %}
+
+{% block page_title %}IP Address Management{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent border-0">
+                <h5 class="mb-0"><i class="fas fa-network-wired me-2"></i>IP Access Control</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="mb-4">
+                        <label class="form-label">IP Whitelist</label>
+                        {{ form.whitelist(class="form-control", rows=6, placeholder="Enter one IP address per line. These IPs will always be allowed access.") }}
+                        <small class="text-muted">IPs or CIDR ranges that should always be allowed access, one per line.</small>
+                        <small class="d-block text-muted">Example: 192.168.1.0/24 or 10.0.0.5</small>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label">IP Blacklist</label>
+                        {{ form.blacklist(class="form-control", rows=6, placeholder="Enter one IP address per line. These IPs will be blocked.") }}
+                        <small class="text-muted">IPs or CIDR ranges that should be blocked, one per line.</small>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i> {{ form.submit.label.text }}
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent border-0">
+                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Access Control Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-lightbulb me-2"></i> IP access control lets you restrict which IP addresses can access your application.
+                </div>
+                
+                <h6 class="mt-3">How it Works:</h6>
+                <ul class="text-muted small">
+                    <li><strong>Whitelist:</strong> Only these IPs can access the application (if not empty)</li>
+                    <li><strong>Blacklist:</strong> These IPs will be denied access</li>
+                    <li>If whitelist is empty but blacklist has entries, all IPs except blacklisted ones can access</li>
+                    <li>If both are empty, all IPs can access</li>
+                </ul>
+                
+                <h6 class="mt-3">CIDR Format:</h6>
+                <p class="text-muted small">
+                    You can use CIDR notation to specify IP ranges:
+                </p>
+                <ul class="text-muted small">
+                    <li>10.0.0.0/8 - All IPs beginning with 10</li>
+                    <li>172.16.0.0/12 - All IPs from 172.16.0.0 to 172.31.255.255</li>
+                    <li>192.168.0.0/16 - All IPs beginning with 192.168</li>
+                </ul>
+                
+                <div class="alert alert-warning mt-3">
+                    <i class="fas fa-exclamation-triangle me-2"></i> Be careful with IP restrictions! Always ensure your own IP is whitelisted to avoid locking yourself out.
+                </div>
+            </div>
+        </div>
+        
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent border-0">
+                <h5 class="mb-0"><i class="fas fa-history me-2"></i>Recent Access Attempts</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item bg-transparent">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">127.0.0.1</h6>
+                                <p class="text-muted small mb-0">Current session</p>
+                            </div>
+                            <span class="badge bg-success">Allowed</span>
+                        </div>
+                    </div>
+                    
+                    <div class="list-group-item bg-transparent">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">192.168.1.5</h6>
+                                <p class="text-muted small mb-0">Admin login attempt</p>
+                            </div>
+                            <span class="badge bg-danger">Blocked</span>
+                        </div>
+                    </div>
+                    
+                    <div class="list-group-item bg-transparent">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">10.0.0.15</h6>
+                                <p class="text-muted small mb-0">API access</p>
+                            </div>
+                            <span class="badge bg-success">Allowed</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent">
+                <a href="{{ url_for('superadmin.audit_logs') }}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-list me-1"></i> View All Access Logs
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

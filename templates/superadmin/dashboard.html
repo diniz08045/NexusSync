@@ -1,0 +1,245 @@
+{% extends "superadmin/base.html" %}
+
+{% block title %}Super Admin Dashboard{% endblock %}
+
+{% block page_title %}System Dashboard{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6 col-lg-3 mb-3">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-1">System Status</h6>
+                        <h5 class="mb-0 text-success">Online</h5>
+                    </div>
+                    <div class="bg-success bg-opacity-10 p-3 rounded">
+                        <i class="fas fa-server fa-2x text-success"></i>
+                    </div>
+                </div>
+                <div class="progress mt-3" style="height: 5px;">
+                    <div class="progress-bar bg-success" role="progressbar" style="width: 100%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-3 mb-3">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-1">Database</h6>
+                        <h5 class="mb-0 text-primary">Connected</h5>
+                    </div>
+                    <div class="bg-primary bg-opacity-10 p-3 rounded">
+                        <i class="fas fa-database fa-2x text-primary"></i>
+                    </div>
+                </div>
+                <div class="progress mt-3" style="height: 5px;">
+                    <div class="progress-bar bg-primary" role="progressbar" style="width: 100%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-3 mb-3">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-1">Email Service</h6>
+                        <h5 class="mb-0 text-warning">Config Needed</h5>
+                    </div>
+                    <div class="bg-warning bg-opacity-10 p-3 rounded">
+                        <i class="fas fa-envelope fa-2x text-warning"></i>
+                    </div>
+                </div>
+                <div class="progress mt-3" style="height: 5px;">
+                    <div class="progress-bar bg-warning" role="progressbar" style="width: 50%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-3 mb-3">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-1">Security</h6>
+                        <h5 class="mb-0 text-info">Protected</h5>
+                    </div>
+                    <div class="bg-info bg-opacity-10 p-3 rounded">
+                        <i class="fas fa-shield-alt fa-2x text-info"></i>
+                    </div>
+                </div>
+                <div class="progress mt-3" style="height: 5px;">
+                    <div class="progress-bar bg-info" role="progressbar" style="width: 80%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent border-0">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">System Information</h5>
+                    <span class="text-muted" id="current-time"></span>
+                </div>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <tbody>
+                        <tr>
+                            <td><i class="fas fa-tag me-2 text-muted"></i> Application Name</td>
+                            <td class="text-end">NexusSync</td>
+                        </tr>
+                        <tr>
+                            <td><i class="fas fa-code-branch me-2 text-muted"></i> Version</td>
+                            <td class="text-end">1.0.0</td>
+                        </tr>
+                        <tr>
+                            <td><i class="fas fa-flask me-2 text-muted"></i> Debug Mode</td>
+                            <td class="text-end">
+                                <span class="badge bg-success">Enabled</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><i class="fas fa-tools me-2 text-muted"></i> Maintenance Mode</td>
+                            <td class="text-end">
+                                <span class="badge bg-secondary">Disabled</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><i class="fas fa-globe me-2 text-muted"></i> Environment</td>
+                            <td class="text-end">Development</td>
+                        </tr>
+                        <tr>
+                            <td><i class="fas fa-clock me-2 text-muted"></i> Timezone</td>
+                            <td class="text-end">UTC</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer bg-transparent border-0">
+                <a href="{{ url_for('superadmin.system_config') }}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-cog me-1"></i> Configure
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent border-0">
+                <h5 class="mb-0">Recent Activities</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item bg-transparent px-0">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">Superadmin Login</h6>
+                                <p class="text-muted small mb-0">Successful login from localhost</p>
+                            </div>
+                            <small class="text-muted">Just now</small>
+                        </div>
+                    </div>
+                    
+                    <div class="list-group-item bg-transparent px-0">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">Database Connected</h6>
+                                <p class="text-muted small mb-0">Connection established to PostgreSQL</p>
+                            </div>
+                            <small class="text-muted">10 min ago</small>
+                        </div>
+                    </div>
+                    
+                    <div class="list-group-item bg-transparent px-0">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">Application Started</h6>
+                                <p class="text-muted small mb-0">Server initialized successfully</p>
+                            </div>
+                            <small class="text-muted">15 min ago</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-0">
+                <a href="{{ url_for('superadmin.audit_logs') }}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-history me-1"></i> View All Logs
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent border-0">
+                <h5 class="mb-0">Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <a href="{{ url_for('superadmin.system_config') }}" class="card h-100 border-0 bg-primary bg-opacity-10 text-primary text-decoration-none">
+                            <div class="card-body text-center py-4">
+                                <i class="fas fa-cogs fa-2x mb-3"></i>
+                                <h6 class="mb-0">System Config</h6>
+                            </div>
+                        </a>
+                    </div>
+                    
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <a href="{{ url_for('superadmin.database_config') }}" class="card h-100 border-0 bg-success bg-opacity-10 text-success text-decoration-none">
+                            <div class="card-body text-center py-4">
+                                <i class="fas fa-database fa-2x mb-3"></i>
+                                <h6 class="mb-0">Database Settings</h6>
+                            </div>
+                        </a>
+                    </div>
+                    
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <a href="{{ url_for('superadmin.email_config') }}" class="card h-100 border-0 bg-warning bg-opacity-10 text-warning text-decoration-none">
+                            <div class="card-body text-center py-4">
+                                <i class="fas fa-envelope fa-2x mb-3"></i>
+                                <h6 class="mb-0">Email Settings</h6>
+                            </div>
+                        </a>
+                    </div>
+                    
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <a href="{{ url_for('superadmin.security_config') }}" class="card h-100 border-0 bg-danger bg-opacity-10 text-danger text-decoration-none">
+                            <div class="card-body text-center py-4">
+                                <i class="fas fa-lock fa-2x mb-3"></i>
+                                <h6 class="mb-0">Security Settings</h6>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Update current time
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('current-time').textContent = now.toLocaleString();
+    }
+    
+    updateClock();
+    setInterval(updateClock, 1000);
+</script>
+{% endblock %}
