@@ -17,25 +17,25 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link {{ 'active' if request.endpoint and request.endpoint.startswith('planner.') }}" href="{{ url_for('planner.index') }}">
                     <i class="fas fa-tasks me-2"></i>
                     Planner
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link {{ 'active' if request.endpoint and request.endpoint.startswith('tickets.') }}" href="{{ url_for('tickets.index') }}">
                     <i class="fas fa-ticket-alt me-2"></i>
                     Tickets
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link {{ 'active' if request.endpoint and request.endpoint.startswith('clients.') }}" href="{{ url_for('clients.index') }}">
                     <i class="fas fa-users me-2"></i>
                     Clients
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link {{ 'active' if request.endpoint == 'user.messages' }}" href="{{ url_for('user.messages') }}">
                     <i class="fas fa-envelope me-2"></i>
                     Messages
                 </a>
@@ -52,19 +52,19 @@
         </h6>
         <ul class="nav flex-column mb-2">
             <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link {{ 'active' if request.endpoint == 'user.profile' }}" href="{{ url_for('user.profile') }}">
                     <i class="fas fa-user me-2"></i>
                     My Profile
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link {{ 'active' if request.endpoint == 'user.notifications' }}" href="{{ url_for('user.notifications') }}">
                     <i class="fas fa-bell me-2"></i>
                     Notifications
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link {{ 'active' if request.endpoint == 'user.settings' }}" href="{{ url_for('user.settings') }}">
                     <i class="fas fa-cog me-2"></i>
                     Settings
                 </a>
@@ -82,7 +82,7 @@
         </h6>
         <ul class="nav flex-column mb-2">
             <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link {{ 'active' if request.endpoint == 'admin.index' }}" href="{{ url_for('admin.index') }}">
                     <i class="fas fa-tachometer-alt me-2"></i>
                     Admin Dashboard
                 </a>
