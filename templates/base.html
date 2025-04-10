@@ -128,7 +128,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="#" class="sidebar-dropdown-link">
+                                <a href="{{ url_for('user.messages') }}" class="sidebar-dropdown-link">
                                     <i data-feather="mail" class="feather-sm me-2"></i>
                                     Messages
                                 </a>
@@ -194,6 +194,12 @@
                                 <a href="{{ url_for('admin.create_notification') }}" class="sidebar-dropdown-link">
                                     <i data-feather="bell" class="feather-sm me-2"></i>
                                     Send Notifications
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ url_for('user.messages') }}" class="sidebar-dropdown-link">
+                                    <i data-feather="mail" class="feather-sm me-2"></i>
+                                    Messages
                                 </a>
                             </li>
                         </ul>

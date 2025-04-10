@@ -350,8 +350,54 @@ def dismiss_notification(notification_id):
 @login_required
 def messages():
     """View messages and conversations."""
-    # Use an extremely minimal version of the messages page
-    return render_template('minimal_messages.html', title='Messages')
+    # Sample conversation data
+    conversations = [
+        {
+            'id': 1,
+            'name': 'Admin User',
+            'avatar': 'A',
+            'last_message': 'Please review the latest documentation.',
+            'time': '2h ago',
+            'unread': True
+        },
+        {
+            'id': 2,
+            'name': 'John Smith',
+            'avatar': 'J',
+            'last_message': 'When can we schedule the meeting?',
+            'time': '1d ago',
+            'unread': False
+        },
+        {
+            'id': 3,
+            'name': 'Sarah Johnson',
+            'avatar': 'S',
+            'last_message': 'The report has been submitted.',
+            'time': '3d ago',
+            'unread': False
+        },
+        {
+            'id': 4,
+            'name': 'Support Team',
+            'avatar': 'S',
+            'last_message': 'Your ticket has been resolved.',
+            'time': '1w ago',
+            'unread': False
+        }
+    ]
+    
+    # Sample users for the new message form
+    users = [
+        {'id': 1, 'name': 'Admin User'},
+        {'id': 2, 'name': 'John Smith'},
+        {'id': 3, 'name': 'Sarah Johnson'},
+        {'id': 4, 'name': 'Support Team'}
+    ]
+    
+    return render_template('messages.html', 
+                          title='Messages',
+                          conversations=conversations,
+                          users=users)
     
 @user_bp.route('/test')
 @login_required
