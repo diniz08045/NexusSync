@@ -1,120 +1,69 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
     <div class="container-fluid">
-        <button 
-            class="navbar-toggler d-md-none collapsed" 
-            type="button" 
-            id="sidebarToggle" 
-            aria-controls="sidebarMenu" 
-            aria-expanded="false" 
-            aria-label="Toggle navigation">
+        <a class="navbar-brand d-md-none" href="{{ url_for('user.index') }}">
+            <i class="fas fa-sync-alt me-2"></i>{{ app_name }}
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         
-        <a class="navbar-brand me-0 me-md-2" href="{{ url_for('main.index') }}">
-            <i class="fas fa-sync-alt me-2"></i>NexusSync
-        </a>
-        
-        <div class="d-flex align-items-center ms-auto">
+        <div class="d-flex align-items-center">
             <!-- Search form -->
             <form class="d-none d-md-flex me-3" action="{{ url_for('user.search') }}" method="GET">
                 <div class="input-group">
-                    <input 
-                        type="search" 
-                        class="form-control" 
-                        placeholder="Search..." 
-                        name="q"
-                        aria-label="Search">
-                    <button class="btn btn-outline-light" type="submit">
-                        <i class="fas fa-search"></i>
-                    </button>
+                    <input class="form-control" type="search" name="q" placeholder="Search..." aria-label="Search">
+                    <button class="btn btn-outline-light" type="submit"><i class="fas fa-search"></i></button>
                 </div>
             </form>
             
             <!-- Notifications dropdown -->
-            <div class="dropdown mx-2">
-                <button 
-                    class="btn btn-dark position-relative" 
-                    type="button" 
-                    id="notificationsDropdown" 
-                    data-bs-toggle="dropdown" 
-                    aria-expanded="false">
-                    <i class="fas fa-bell"></i>
+            <div class="dropdown me-3">
+                <a class="nav-link text-light position-relative" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-bell fa-lg"></i>
                     {% if current_user.unread_notifications_count() > 0 %}
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge">
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                         {{ current_user.unread_notifications_count() }}
                     </span>
                     {% endif %}
-                </button>
-                <div class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="notificationsDropdown" style="min-width: 300px;">
-                    <div class="dropdown-header d-flex justify-content-between align-items-center">
-                        <span class="fw-bold">Notifications</span>
-                        <a href="{{ url_for('user.notifications') }}" class="text-decoration-none small">View All</a>
+                </a>
+                <div class="dropdown-menu dropdown-menu-end shadow-lg" aria-labelledby="notificationsDropdown" style="min-width: 300px; max-height: 400px; overflow-y: auto;">
+                    <div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom">
+                        <h6 class="m-0 fw-bold">Notifications</h6>
+                        <a href="{{ url_for('user.notifications') }}" class="text-decoration-none small">View all</a>
                     </div>
-                    <div class="dropdown-divider"></div>
-                    {% set notifications = current_user.notifications.filter_by(is_read=False).order_by(Notification.created_at.desc()).limit(5).all() %}
-                    {% if notifications %}
-                        {% for notification in notifications %}
-                        <a class="dropdown-item py-2" href="{{ url_for('user.mark_notification_read', notification_id=notification.id) }}">
-                            <div class="d-flex">
-                                <div class="me-3">
-                                    <i class="fas fa-info-circle text-primary fa-lg"></i>
+                    <div class="notifications-container">
+                        {% if current_user.notifications.filter_by(is_dismissed=False).count() > 0 %}
+                            {% for notification in current_user.notifications.filter_by(is_dismissed=False).order_by(Notification.created_at.desc()).limit(5).all() %}
+                            <a href="{{ url_for('user.mark_notification_read', notification_id=notification.id) }}" class="dropdown-item py-3 px-3 {% if not notification.is_read %}border-start border-4 border-primary{% endif %}">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ notification.title }}</h6>
+                                    <small class="text-muted">{{ notification.created_at|timeago }}</small>
                                 </div>
-                                <div>
-                                    <div class="fw-bold">{{ notification.title }}</div>
-                                    <div class="small text-muted">{{ notification.message|truncate(50) }}</div>
-                                    <div class="small text-muted">{{ notification.created_at|timeago }}</div>
-                                </div>
+                                <p class="mb-0 small text-truncate">{{ notification.message }}</p>
+                            </a>
+                            {% endfor %}
+                        {% else %}
+                            <div class="dropdown-item text-center py-3">
+                                <span class="text-muted">No new notifications</span>
                             </div>
-                        </a>
-                        {% endfor %}
-                    {% else %}
-                        <div class="dropdown-item text-center py-3">
-                            <span class="text-muted">No new notifications</span>
-                        </div>
-                    {% endif %}
+                        {% endif %}
+                    </div>
                 </div>
             </div>
             
             <!-- User dropdown -->
             <div class="dropdown">
-                <button 
-                    class="btn btn-dark d-flex align-items-center" 
-                    type="button" 
-                    id="userDropdown" 
-                    data-bs-toggle="dropdown" 
-                    aria-expanded="false">
-                    <div class="me-2 d-none d-md-block text-end">
-                        <div class="small fw-bold">{{ current_user.first_name or current_user.username }}</div>
-                        <div class="small text-muted">{{ 'Admin' if current_user.is_admin() else 'User' }}</div>
-                    </div>
-                    <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                <a class="nav-link dropdown-toggle text-light d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <div class="avatar bg-primary text-white rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
                         <span>{{ (current_user.first_name or current_user.username)[0]|upper }}</span>
                     </div>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
-                    <li>
-                        <a class="dropdown-item" href="{{ url_for('user.profile') }}">
-                            <i class="fas fa-user me-2"></i> My Profile
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="{{ url_for('user.settings') }}">
-                            <i class="fas fa-cog me-2"></i> Settings
-                        </a>
-                    </li>
-                    {% if current_user.is_admin() %}
-                    <li>
-                        <a class="dropdown-item" href="{{ url_for('admin.index') }}">
-                            <i class="fas fa-shield-alt me-2"></i> Admin Dashboard
-                        </a>
-                    </li>
-                    {% endif %}
+                    <span class="d-none d-md-inline">{{ current_user.first_name or current_user.username }}</span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end shadow-lg" aria-labelledby="userDropdown">
+                    <li><a class="dropdown-item" href="{{ url_for('user.profile') }}"><i class="fas fa-user me-2"></i>My Profile</a></li>
+                    <li><a class="dropdown-item" href="{{ url_for('user.settings') }}"><i class="fas fa-cog me-2"></i>Settings</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li>
-                        <a class="dropdown-item" href="{{ url_for('auth.logout') }}">
-                            <i class="fas fa-sign-out-alt me-2"></i> Sign Out
-                        </a>
-                    </li>
+                    <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt me-2"></i>Sign Out</a></li>
                 </ul>
             </div>
         </div>
