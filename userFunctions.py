@@ -350,8 +350,14 @@ def dismiss_notification(notification_id):
 @login_required
 def messages():
     """View messages and conversations."""
-    # Redirect to the new static messages page
-    return redirect(url_for('user.messages_static'))
+    # Redirect to the test page temporarily to debug
+    return redirect(url_for('user.test_page'))
+    
+@user_bp.route('/test')
+@login_required
+def test_page():
+    """Test page to debug loading issues."""
+    return render_template('test_page.html', title='Test Page')
 
 @user_bp.route('/messages/static')
 @user_bp.route('/messages/static/<conversation_id>')
