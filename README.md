@@ -1,6 +1,6 @@
 # NexusSync
 
-NexusSync is a powerful, secure, and modular Flask-based super admin portal designed to make managing infrastructure, monitoring system performance in real time, and staying ahead of security threats much easier. It’s built with scalability and security at its core, giving super administrators all the tools they need to configure, monitor, and audit their systems with confidence.
+NexusSync is a powerful, secure, and modular Flask-based super admin portal designed to make managing infrastructure, monitoring system performance, and staying ahead of security threats much easier. It’s built with scalability and security at its core, giving super administrators all the tools they need to configure, monitor, and audit their systems with confidence.
 More than just an admin panel, NexusSync is meant to be the starting point for any Flask web application. Whether you're working on a CRM, ERP, ecommerce platform, or any other enterprise-level project, NexusSync lays down a solid foundation you can build on — with the structure, flexibility, and features to grow as your application does.
 
 ---
