@@ -1,1 +1,155 @@
-/home/runner/workspace/templates/superadmin/security_config.html
+{% extends "superadmin/base.html" %}
+
+{% block title %}Security Configuration{% endblock %}
+
+{% block page_title %}Security Configuration{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent border-0">
+                <h5 class="mb-0"><i class="fas fa-shield-alt me-2"></i>Security Settings</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {{ form.hidden_tag() }}
+                    
+                    <h6 class="mb-3 border-bottom pb-2">TLS & SSL Configuration</h6>
+                    <div class="mb-3 form-check form-switch">
+                        {{ form.ssl_enabled(class="form-check-input", role="switch") }}
+                        {{ form.ssl_enabled.label(class="form-check-label") }}
+                        <div class="text-muted">
+                            <small>Force HTTPS for all connections. Requires valid SSL certificate.</small>
+                        </div>
+                    </div>
+                    
+                    <h6 class="mb-3 border-bottom pb-2 mt-4">Proxy Configuration</h6>
+                    <div class="mb-3 form-check form-switch">
+                        {{ form.proxy_enabled(class="form-check-input", role="switch") }}
+                        {{ form.proxy_enabled.label(class="form-check-label") }}
+                        <div class="text-muted">
+                            <small>Enable if the application is behind a reverse proxy like Nginx or Apache.</small>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.proxy_server.label(class="form-label") }}
+                            {{ form.proxy_server(class="form-control") }}
+                            <small class="text-muted">Proxy server hostname or IP address</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.proxy_port.label(class="form-label") }}
+                            {{ form.proxy_port(class="form-control") }}
+                            <small class="text-muted">Proxy server port</small>
+                        </div>
+                    </div>
+                    
+                    <h6 class="mb-3 border-bottom pb-2 mt-4">Web Application Firewall</h6>
+                    <div class="mb-3 form-check form-switch">
+                        {{ form.waf_enabled(class="form-check-input", role="switch") }}
+                        {{ form.waf_enabled.label(class="form-check-label") }}
+                        <div class="text-muted">
+                            <small>Basic protection against common web attacks (SQL injection, XSS, CSRF).</small>
+                        </div>
+                    </div>
+                    
+                    <h6 class="mb-3 border-bottom pb-2 mt-4">Cross-Origin Resource Sharing (CORS)</h6>
+                    <div class="mb-3 form-check form-switch">
+                        {{ form.cors_enabled(class="form-check-input", role="switch") }}
+                        {{ form.cors_enabled.label(class="form-check-label") }}
+                        <div class="text-muted">
+                            <small>Enable if the application needs to serve resources to other domains.</small>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.cors_allowed_origins.label(class="form-label") }}
+                        {{ form.cors_allowed_origins(class="form-control", rows=3) }}
+                        <small class="text-muted">List domains allowed to access resources, one per line (e.g., https://example.com)</small>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i> {{ form.submit.label.text }}
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent border-0">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-lock me-2"></i>Security Status</h5>
+                    <span class="badge bg-success">Protected</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center px-0">
+                        <span><i class="fas fa-check-circle text-success me-2"></i> CSRF Protection</span>
+                        <span class="badge bg-success">Enabled</span>
+                    </li>
+                    <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center px-0">
+                        <span><i class="fas fa-check-circle text-success me-2"></i> Password Hashing</span>
+                        <span class="badge bg-success">Strong</span>
+                    </li>
+                    <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center px-0">
+                        <span><i class="fas fa-check-circle text-success me-2"></i> Session Security</span>
+                        <span class="badge bg-success">Secure</span>
+                    </li>
+                    <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center px-0">
+                        <span><i class="fas fa-exclamation-circle text-warning me-2"></i> SSL/TLS</span>
+                        <span class="badge bg-warning">Optional</span>
+                    </li>
+                    <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center px-0">
+                        <span><i class="fas fa-check-circle text-success me-2"></i> SQL Injection Protection</span>
+                        <span class="badge bg-success">ORM Based</span>
+                    </li>
+                    <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center px-0">
+                        <span><i class="fas fa-check-circle text-success me-2"></i> XSS Protection</span>
+                        <span class="badge bg-success">Templates</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent border-0">
+                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Security Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-lightbulb me-2"></i> Security settings affect how your application handles various security concerns.
+                </div>
+                
+                <h6 class="mt-3">Security Best Practices:</h6>
+                <ul class="text-muted small">
+                    <li>Always use HTTPS in production</li>
+                    <li>Implement rate limiting for login attempts</li>
+                    <li>Keep software and dependencies up to date</li>
+                    <li>Use strong password policies</li>
+                    <li>Enable two-factor authentication</li>
+                    <li>Regularly audit application logs</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card border-0 shadow-sm mb-4 danger-zone">
+            <div class="card-header bg-transparent border-0">
+                <h5 class="text-danger"><i class="fas fa-exclamation-triangle me-2"></i>Security Audit</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <button class="btn btn-outline-danger confirm-action" type="button">
+                        <i class="fas fa-search me-1"></i> Run Security Audit
+                    </button>
+                </div>
+                <small class="text-muted d-block mt-2">Check for security vulnerabilities in the application.</small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

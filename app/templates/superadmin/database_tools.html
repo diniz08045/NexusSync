@@ -1,0 +1,225 @@
+{% extends "superadmin/base.html" %}
+
+{% block title %}Database Tools{% endblock %}
+{% block page_title %}Database Tools{% endblock %}
+
+{% block content %}
+<div class="container">
+  <!-- Nav Tabs -->
+  <ul class="nav nav-tabs mb-4" id="dbToolsTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link {% if active_tab == 'schema' %}active{% endif %}" 
+              id="schema-tab" data-bs-toggle="tab" data-bs-target="#schema" type="button" role="tab" 
+              aria-controls="schema" aria-selected="{% if active_tab == 'schema' %}true{% else %}false{% endif %}">
+        View Schema
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link {% if active_tab == 'query' %}active{% endif %}" 
+              id="query-tab" data-bs-toggle="tab" data-bs-target="#query" type="button" role="tab" 
+              aria-controls="query" aria-selected="{% if active_tab == 'query' %}true{% else %}false{% endif %}">
+        Run SQL Query
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link {% if active_tab == 'backup' %}active{% endif %}" 
+              id="backup-tab" data-bs-toggle="tab" data-bs-target="#backup" type="button" role="tab" 
+              aria-controls="backup" aria-selected="{% if active_tab == 'backup' %}true{% else %}false{% endif %}">
+        Backup Database
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link {% if active_tab == 'restore' %}active{% endif %}" 
+              id="restore-tab" data-bs-toggle="tab" data-bs-target="#restore" type="button" role="tab" 
+              aria-controls="restore" aria-selected="{% if active_tab == 'restore' %}true{% else %}false{% endif %}">
+        Restore Database
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link {% if active_tab == 'cli' %}active{% endif %}" 
+              id="cli-tab" data-bs-toggle="tab" data-bs-target="#cli" type="button" role="tab" 
+              aria-controls="cli" aria-selected="{% if active_tab == 'cli' %}true{% else %}false{% endif %}">
+        CLI Tools
+      </button>
+    </li>
+  </ul>
+
+  <!-- Tab Content -->
+  <div class="tab-content" id="dbToolsTabContent">
+  
+    <!-- View Schema Tab Pane -->
+    <div class="tab-pane fade {% if active_tab == 'schema' %}show active{% endif %}" id="schema" role="tabpanel" aria-labelledby="schema-tab">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-transparent border-0">
+          <h5 class="mb-0"><i class="fas fa-table me-2"></i>Database Schema</h5>
+        </div>
+        <div class="card-body">
+          {% if schema %}
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Table</th>
+                  <th>Columns</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for table, columns in schema.items() %}
+                <tr>
+                  <td>{{ table }}</td>
+                  <td>{{ columns | join(', ') }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <p>No schema information available.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <!-- Run SQL Query Tab Pane -->
+    <div class="tab-pane fade {% if active_tab == 'query' %}show active{% endif %}" id="query" role="tabpanel" aria-labelledby="query-tab">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-transparent border-0">
+          <h5 class="mb-0"><i class="fas fa-play me-2"></i>Run SQL Query</h5>
+        </div>
+        <div class="card-body">
+          <form id="query-form" method="post" action="{{ url_for('superadmin.database_tools', tab='query') }}">
+            {{ query_form.hidden_tag() }}
+            <div class="mb-3">
+              <label for="query" class="form-label">SQL Query</label>
+              {{ query_form.query(class="form-control", id="query", rows="5", placeholder="Enter your SQL query here") }}
+            </div>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-play me-1"></i> Execute Query
+            </button>
+          </form>
+          {% if query_result %}
+          <hr>
+          <h6>Query Result</h6>
+          <div class="table-responsive">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  {% for column in query_result.columns %}
+                    <th>{{ column }}</th>
+                  {% endfor %}
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in query_result.rows %}
+                  <tr>
+                    {% for cell in row %}
+                      <td>{{ cell }}</td>
+                    {% endfor %}
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <!-- Backup Database Tab Pane -->
+    <div class="tab-pane fade {% if active_tab == 'backup' %}show active{% endif %}" id="backup" role="tabpanel" aria-labelledby="backup-tab">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-transparent border-0">
+          <h5 class="mb-0"><i class="fas fa-download me-2"></i>Backup Database</h5>
+        </div>
+        <div class="card-body">
+          <p>Click the button below to generate and download a backup of the database.</p>
+          <form method="post" action="{{ url_for('superadmin.backup_database') }}">
+            <!-- CSRF token is required if you have CSRFProtect enabled -->
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-database me-1"></i> Backup Database
+            </button>
+          </form>
+          {% if backup_message %}
+          <div class="alert alert-info mt-3">
+            {{ backup_message }}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <!-- Restore Database Tab Pane -->
+    <div class="tab-pane fade {% if active_tab == 'restore' %}show active{% endif %}" id="restore" role="tabpanel" aria-labelledby="restore-tab">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-transparent border-0">
+          <h5 class="mb-0"><i class="fas fa-upload me-2"></i>Restore Database</h5>
+        </div>
+        <div class="card-body">
+          <p>Select a backup file to restore the database from.</p>
+          <form method="post" action="{{ url_for('superadmin.restore_database') }}" enctype="multipart/form-data">
+            <div class="mb-3">
+              <label for="backupFile" class="form-label">Backup File</label>
+              <input type="file" class="form-control" id="backupFile" name="backup_file" required>
+            </div>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-upload me-1"></i> Restore Database
+            </button>
+          </form>
+          {% if restore_message %}
+          <div class="alert alert-info mt-3">
+            {{ restore_message }}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <!-- CLI Tools Tab Pane -->
+    <div class="tab-pane fade {% if active_tab == 'cli' %}show active{% endif %}" id="cli" role="tabpanel" aria-labelledby="cli-tab">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-transparent border-0">
+          <h5 class="mb-0"><i class="fas fa-terminal me-2"></i>CLI Tools</h5>
+        </div>
+        <div class="card-body">
+          <form method="post" action="{{ url_for('superadmin.database_tools', tab='cli') }}">
+            {{ cli_form.hidden_tag() }}
+            <div class="mb-3">
+              <label for="cli-command" class="form-label">Select Command</label>
+              {{ cli_form.command(class="form-select", id="cli-command") }}
+            </div>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-play me-1"></i> Run Command
+            </button>
+          </form>
+          {% if cli_output %}
+          <hr>
+          <h6>CLI Output</h6>
+          <pre>{{ cli_output }}</pre>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Optional: Link back to the Database Config page -->
+  <a href="{{ url_for('superadmin.database_config') }}" class="btn btn-secondary mt-3">
+    <i class="fas fa-chevron-left me-1"></i> Back to Database Config
+  </a>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function(){
+    // When the query tab is about to be hidden, clear the value of the input with id "query"
+    $('button[data-bs-toggle="tab"]').on('hide.bs.tab', function(e) {
+      var target = $(e.target).attr('data-bs-target');
+      if (target === "#query") {
+        console.log("Query tab is hiding; clearing input.");
+        $("#query").val("");
+      }
+    });
+  });
+</script>
+{% endblock %}

@@ -1,1 +1,328 @@
-/home/runner/workspace/templates/superadmin/ip_management.html
+{% extends "superadmin/base.html" %}
+{% block title %}IP Address Management{% endblock %}
+{% block page_title %}IP Address Management{% endblock %}
+
+{% block content %}
+  <!-- ───────── FIRST ROW: IP ACCESS + INFO/RECENT ───────── -->
+  <div class="row">
+    <!-- IP Access Control Form -->
+    <div class="col-md-8">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-transparent border-0">
+          <h5 class="mb-0"><i class="fas fa-network-wired me-2"></i>IP Access Control</h5>
+        </div>
+        <div class="card-body">
+          <form method="post">
+            {{ form.hidden_tag() }}
+            <div class="mb-4">
+              <label class="form-label">IP Whitelist</label>
+              {{ form.whitelist(class="form-control", rows=6, placeholder="One IP/CIDR per line.") }}
+              <small class="text-muted d-block">Example: 192.168.1.0/24 or 10.0.0.5</small>
+            </div>
+            <div class="mb-4">
+              <label class="form-label">IP Blacklist</label>
+              {{ form.blacklist(class="form-control", rows=6, placeholder="One IP/CIDR per line.") }}
+            </div>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save me-1"></i> {{ form.submit.label.text }}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info & Recent Attempts -->
+    <div class="col-md-4">
+      <!-- Info Card -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-transparent border-0">
+          <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Access Control Info</h5>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-info">
+            <i class="fas fa-lightbulb me-2"></i> Restrict which IPs can access your app.
+          </div>
+          <ul class="text-muted small">
+            <li><strong>Whitelist:</strong> Only these IPs (if not empty).</li>
+            <li><strong>Blacklist:</strong> Always denied.</li>
+            <li>If whitelist empty + blacklist non‑empty → block only those listed.</li>
+            <li>If both empty → everyone allowed.</li>
+          </ul>
+          <h6>CIDR Examples:</h6>
+          <ul class="text-muted small">
+            <li>10.0.0.0/8</li>
+            <li>172.16.0.0/12</li>
+            <li>192.168.0.0/16</li>
+          </ul>
+          <div class="alert alert-warning mt-3">
+            <i class="fas fa-exclamation-triangle me-2"></i> Whitelist yourself to avoid lock‑out!
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Attempts -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-transparent border-0">
+          <h5 class="mb-0"><i class="fas fa-history me-2"></i>Recent Access Attempts</h5>
+        </div>
+        <div class="card-body p-0">
+          <div style="max-height:200px; overflow-y:auto;">
+            <div class="list-group list-group-flush">
+              {% for attempt in recent_attempts %}
+                <div class="list-group-item bg-transparent">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <h6 class="mb-1">{{ attempt.ip }}</h6>
+                      <p class="text-muted small mb-0">{{ attempt.note }}</p>
+                    </div>
+                    <span class="badge bg-{{ 'success' if attempt.status=='Allowed' else 'danger' }}">
+                      {{ attempt.status }}
+                    </span>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        <div class="card-footer bg-transparent">
+          <a href="{{ url_for('superadmin.audit_logs') }}" class="btn btn-sm btn-outline-primary">
+            <i class="fas fa-list me-1"></i> View All Logs
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────── SECOND ROW: SECURITY INTELLIGENCE TABS ───────── -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-transparent border-0">
+          <h5 class="mb-0"><i class="fas fa-shield-alt me-2"></i>Security Intelligence</h5>
+        </div>
+        <div class="card-body">
+          <!-- Nav tabs -->
+          <ul class="nav nav-tabs mb-3" id="intelTabs" role="tablist">
+            {% set tabs = [
+              ('drop','DROP List'),
+              ('geoip','GeoIP'),
+              ('asn','ASN'),
+              ('correlate','Correlate'),
+              ('scan','Port Scan'),
+              ('honeypot','Honeypot'),
+              ('evaluate','Evaluate IP'),
+              ('rules','Rules'),
+            ] %}
+            {% for key,label in tabs %}
+              <li class="nav-item" role="presentation">
+                <button
+                  class="nav-link{% if loop.first %} active{% endif %}"
+                  id="tab-{{key}}"
+                  data-bs-toggle="tab"
+                  data-bs-target="#pane-{{key}}"
+                  type="button"
+                  role="tab"
+                  aria-controls="pane-{{key}}"
+                  aria-selected="{{ 'true' if loop.first else 'false' }}"
+                >{{ label }}</button>
+              </li>
+            {% endfor %}
+          </ul>
+
+          <!-- Tab panes -->
+          <div class="tab-content">
+            <!-- DROP -->
+            <div class="tab-pane fade show active" id="pane-drop" role="tabpanel">
+              <h6>Spamhaus DROP List</h6>
+              <div class="d-flex gap-2 mb-2">
+                <button class="btn btn-sm btn-outline-secondary" id="refresh-drop">
+                  <i class="fas fa-sync-alt me-1"></i> Refresh
+                </button>
+                <a href="{{ url_for('superadmin.download_drop_list') }}"
+                   class="btn btn-sm btn-outline-secondary">
+                  <i class="fas fa-download me-1"></i> Download TXT
+                </a>
+              </div>
+              <div class="border rounded" style="max-height:200px; overflow:auto;">
+                <ul class="list-group list-group-flush" id="drop-list">
+                  {% for net in drop_list %}
+                    <li class="list-group-item py-1">{{ net }}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </div>
+
+            <!-- GeoIP -->
+            <div class="tab-pane fade" id="pane-geoip" role="tabpanel">
+              <h6>GeoIP Lookup</h6>
+              <div class="input-group input-group-sm mb-2">
+                <input type="text" id="geoip-input" class="form-control" placeholder="Enter IP">
+                <button class="btn btn-outline-primary" id="geoip-go">
+                  <i class="fas fa-search me-1"></i> Go
+                </button>
+              </div>
+              <div id="geoip-result" class="card border-0 shadow-sm mb-3" style="display:none;">
+                <div class="card-body small text-break" style="white-space: pre-wrap; word-break: break-word;"></div>
+              </div>
+            </div>
+
+            <!-- ASN -->
+            <div class="tab-pane fade" id="pane-asn" role="tabpanel">
+              <h6>ASN Lookup</h6>
+              <div class="input-group input-group-sm mb-2">
+                <input type="text" id="asn-input" class="form-control" placeholder="Enter IP">
+                <button class="btn btn-outline-primary" id="asn-go">
+                  <i class="fas fa-search me-1"></i> Go
+                </button>
+              </div>
+              <div id="asn-result" class="card border-0 shadow-sm mb-3" style="display:none;">
+                <div class="card-body small text-break" style="white-space: pre-wrap; word-break: break-word;"></div>
+              </div>
+            </div>
+
+            <!-- Correlate -->
+            <div class="tab-pane fade" id="pane-correlate" role="tabpanel">
+              <h6>Correlate IP</h6>
+              <div class="input-group input-group-sm mb-2">
+                <input type="text" id="corr-input" class="form-control" placeholder="Enter IP">
+                <button class="btn btn-outline-primary" id="corr-go">
+                  <i class="fas fa-search me-1"></i> Go
+                </button>
+              </div>
+              <div id="corr-result" class="card border-0 shadow-sm mb-3" style="display:none;">
+                <div class="card-body small text-break" style="white-space: pre-wrap; word-break: break-word;"></div>
+              </div>
+            </div>
+
+            <!-- Port Scan -->
+            <div class="tab-pane fade" id="pane-scan" role="tabpanel">
+              <h6>Port Scan</h6>
+              <div class="input-group input-group-sm mb-2">
+                <input type="text" id="scan-input" class="form-control" placeholder="Enter IP">
+                <button class="btn btn-outline-primary" id="scan-go">
+                  <i class="fas fa-search me-1"></i> Go
+                </button>
+              </div>
+              <div id="scan-result" class="card border-0 shadow-sm mb-3" style="display:none;">
+                <div class="card-body small text-break" style="white-space: pre-wrap; word-break: break-word;"></div>
+              </div>
+            </div>
+
+            <!-- Honeypot -->
+            <div class="tab-pane fade" id="pane-honeypot" role="tabpanel">
+              <h6>Honeypot Events</h6>
+              <div class="row g-2 mb-2">
+                <div class="col"><input type="text" id="honeypot-input" class="form-control form-control-sm" placeholder="Enter IP"></div>
+                <div class="col-2"><input type="number" id="honeypot-hours" class="form-control form-control-sm" value="24" min="1"></div>
+                <div class="col-2 d-grid">
+                  <button class="btn btn-outline-primary btn-sm" id="honeypot-go">
+                    <i class="fas fa-search me-1"></i> Go
+                  </button>
+                </div>
+              </div>
+              <div id="honeypot-result" class="card border-0 shadow-sm mb-3" style="display:none;">
+                <div class="card-body small text-break" style="white-space: pre-wrap; word-break: break-word;"></div>
+              </div>
+            </div>
+
+            <!-- Evaluate -->
+            <div class="tab-pane fade" id="pane-evaluate" role="tabpanel">
+              <h6>Evaluate IP</h6>
+              <div class="input-group input-group-sm mb-2">
+                <input type="text" id="eval-input" class="form-control" placeholder="Enter IP">
+                <button class="btn btn-outline-primary" id="eval-go">
+                  <i class="fas fa-search me-1"></i> Go
+                </button>
+              </div>
+              <div id="eval-result" class="card border-0 shadow-sm mb-3" style="display:none;">
+                <div class="card-body small text-break" style="white-space: pre-wrap; word-break: break-word;"></div>
+              </div>
+            </div>
+
+            <!-- Rules -->
+            <div class="tab-pane fade" id="pane-rules" role="tabpanel">
+              <h6>Blocklist Rules</h6>
+              <table class="table table-sm mb-0">
+                <thead><tr><th>Name</th><th>Action</th><th>Priority</th></tr></thead>
+                <tbody id="rules-body"></tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // API base now matches your in‑blueprint routes:
+  const apiBase = "{{ url_for('superadmin.ip_management')|replace('/ip-management','/api/security-intel') }}";
+
+  // Generic fetch + render into card-body
+  async function call(tab, url) {
+    const pane = document.getElementById('pane-'+tab);
+    const card = pane.querySelector('.card') || pane;
+    const body = pane.querySelector('.card-body') || pane;
+    body.textContent = 'Loading…';
+    body.parentElement.style.display = 'block';
+    try {
+      const res = await fetch(url);
+      if (!res.ok) {
+        body.textContent = `Error ${res.status} ${res.statusText}`;
+        return;
+      }
+      const txt = await res.text();
+      try {
+        const json = JSON.parse(txt);
+        body.textContent = JSON.stringify(json,null,2);
+      } catch {
+        body.textContent = txt.trim();
+      }
+    } catch(e) {
+      body.textContent = 'Error: '+e;
+    }
+  }
+
+  // DROP refresh
+  document.getElementById('refresh-drop').onclick = async () => {
+    const ul = document.getElementById('drop-list');
+    ul.innerHTML = '<li class="list-group-item">Loading…</li>';
+    const res = await fetch("{{ url_for('superadmin.download_drop_list') }}");
+    const txt = await res.text();
+    ul.innerHTML = '';
+    txt.split('\n').forEach(line=>{
+      const li = document.createElement('li');
+      li.className = 'list-group-item py-1';
+      li.textContent = line;
+      ul.appendChild(li);
+    });
+  };
+
+  // Bind each Go button
+  document.getElementById('geoip-go').onclick      = ()=> call('geoip',     apiBase+'/geoip/'+encodeURIComponent(document.getElementById('geoip-input').value));
+  document.getElementById('asn-go').onclick        = ()=> call('asn',       apiBase+'/asn/'+encodeURIComponent(document.getElementById('asn-input').value));
+  document.getElementById('corr-go').onclick       = ()=> call('correlate', apiBase+'/correlate/'+encodeURIComponent(document.getElementById('corr-input').value));
+  document.getElementById('scan-go').onclick       = ()=> call('scan',      apiBase+'/scan/'+encodeURIComponent(document.getElementById('scan-input').value));
+  document.getElementById('honeypot-go').onclick   = ()=> {
+    let hrs = document.getElementById('honeypot-hours').value;
+    call('honeypot', apiBase+'/honeypot/events?hours='+encodeURIComponent(hrs));
+  };
+  document.getElementById('eval-go').onclick       = ()=> call('evaluate',  apiBase+'/blocklist/evaluate/'+encodeURIComponent(document.getElementById('eval-input').value));
+
+  // Rules: fetch once when tab shown
+  document.getElementById('tab-rules').addEventListener('shown.bs.tab', async ()=>{
+    const tbody = document.getElementById('rules-body');
+    tbody.innerHTML = '<tr><td colspan="3">Loading…</td></tr>';
+    const res = await fetch(apiBase+'/blocklist/rules');
+    const json= await res.json();
+    tbody.innerHTML = '';
+    json.rules.forEach(r=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${r.name}</td><td>${r.action}</td><td>${r.priority}</td>`;
+      tbody.appendChild(tr);
+    });
+  });
+</script>
+{% endblock %}

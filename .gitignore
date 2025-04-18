@@ -1,0 +1,29 @@
+# Byte-compiled / cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.env
+.env.*
+
+# IDE settings
+.vscode/
+.idea/
+
+# System-specific files
+.DS_Store
+Thumbs.db
+
+# Testing and coverage output
+.pytest_cache/
+.coverage
+htmlcov/
+coverage/
+test-results.xml
+
+# Reports and static analysis
+.mypy_cache/
+.cache/
+.tox/

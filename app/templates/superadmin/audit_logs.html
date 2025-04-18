@@ -1,1 +1,230 @@
-/home/runner/workspace/templates/superadmin/audit_logs.html
+{% extends "superadmin/base.html" %}
+
+{% block title %}Audit Logs{% endblock %}
+{% block page_title %}Security Audit Logs{% endblock %}
+
+{% block content %}
+  <!-- Scrollable Details Column Styling -->
+  <style>
+    .details-scroll {
+      max-height: 100px;
+      overflow-y: auto;
+      word-break: break-word;
+      padding-right: 0.25rem;
+    }
+  </style>
+
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+      <h5 class="mb-0"><i class="fas fa-history me-2"></i>Superadmin Activity Logs</h5>
+      <div class="d-flex gap-2">
+        {# --- Export CSV (keeps filters) --- #}
+        <form method="get" action="{{ url_for('superadmin.audit_logs') }}" class="m-0 d-inline-flex">
+          <input type="hidden" name="format" value="csv">
+          <input type="hidden" name="action" value="{{ filters.action }}">
+          <input type="hidden" name="date_from" value="{{ filters.date_from }}">
+          <input type="hidden" name="date_to" value="{{ filters.date_to }}">
+          <input type="hidden" name="search" value="{{ filters.search }}">
+          <input type="hidden" name="ip"     value="{{ filters.ip }}">
+          <button
+            type="submit"
+            class="btn btn-outline-secondary btn-sm d-inline-flex align-items-center"
+            title="Export as CSV">
+            <i class="fas fa-file-csv me-1"></i>Export CSV
+          </button>
+        </form>
+
+        {# --- Clear Logs --- #}
+        <form
+          method="post"
+          action="{{ url_for('superadmin.clear_audit_logs') }}"
+          class="m-0 d-inline-flex"
+          onsubmit="return confirm('Really clear all logs?');">
+          <button
+            type="submit"
+            class="btn btn-outline-danger btn-sm d-inline-flex align-items-center"
+            title="Clear Logs">
+            <i class="fas fa-trash-alt me-1"></i>Clear Logs
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div class="card-body">
+      {# --- single GET-form for filtering --- #}
+      <form class="row g-2 mb-3" method="get" action="{{ url_for('superadmin.audit_logs') }}">
+        <div class="col-md-1">
+          <select name="action" class="form-select form-select-sm">
+            <option value="">All Actions</option>
+            {% for act in action_choices %}
+              <option value="{{ act }}"
+                      {% if filters.action == act %}selected{% endif %}>
+                {{ act.replace('_',' ').title() }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+      
+        <div class="col-md-2">
+          <input type="date" name="date_from" class="form-control form-control-sm" value="{{ filters.date_from }}" placeholder="From date">
+        </div>
+        
+        <div class="col-md-2">
+          <input type="date" name="date_to" class="form-control form-control-sm" value="{{ filters.date_to }}" placeholder="To date">
+        </div>
+      
+        <div class="col-md-2">
+          <input
+            type="text"
+            name="ip"
+            class="form-control form-control-sm"
+            value="{{ filters.ip }}"
+            placeholder="Filter by IP">
+        </div>
+      
+        <div class="col-md-3">
+          <input
+            type="text"
+            name="search"
+            class="form-control form-control-sm"
+            value="{{ filters.search }}"
+            placeholder="Search details...">
+        </div>
+      
+        <div class="col-md-2">
+          <button type="submit" class="btn btn-outline-primary btn-sm w-100" style="height: 30px;">
+            <i class="fas fa-filter me-1"></i> Filter
+          </button>
+        </div>
+      </form>
+      
+
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>Action</th>
+              <th>Details</th>
+              <th>IP Address</th>
+              <th>User Agent</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if logs %}
+              {% set colors = {
+                'LOGIN':'success','LOGOUT':'secondary',
+                'CONFIG_CHANGE':'primary','FAILED_LOGIN':'danger'
+              } %}
+              {% for log in logs %}
+                <tr>
+                  <td><small>{{ log.timestamp.strftime('%b %d, %Y %I:%M %p') }}</small></td>
+                  <td>
+                    {% set badge = colors.get(log.action, 'info') %}
+                    <span class="badge bg-{{ badge }}">
+                      {{ log.action.replace('_',' ') }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="details-scroll">
+                      <small>{{ log.details }}</small>
+                    </div>
+                  </td>
+                  <td><small>{{ log.ip_address }}</small></td>
+                  <td>
+                    <small class="text-truncate d-inline-block" style="max-width:250px;">
+                      {{ log.user_agent }}
+                    </small>
+                  </td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="5" class="text-center py-4">
+                  <i class="fas fa-info-circle me-2"></i>No audit logs found.
+                </td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+
+      {% if pagination.pages > 1 %}
+<nav aria-label="Audit log pagination" class="mt-3">
+  <ul class="pagination justify-content-center mb-0">
+    {# Previous #}
+    {% if pagination.has_prev %}
+      <li class="page-item">
+        <a class="page-link"
+           href="{{ url_for('superadmin.audit_logs', page=pagination.prev_num, **filters) }}">
+          Previous
+        </a>
+      </li>
+    {% else %}
+      <li class="page-item disabled">
+        <span class="page-link">Previous</span>
+      </li>
+    {% endif %}
+  
+    {# Numbered pages with ellipses #}
+    {% for p in pagination.iter_pages(left_edge=1, left_current=2, right_current=2, right_edge=1) %}
+      {% if p %}
+        <li class="page-item {% if p == pagination.page %}active{% endif %}">
+          <a class="page-link"
+             href="{{ url_for('superadmin.audit_logs', page=p, **filters) }}">
+            {{ p }}
+          </a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <span class="page-link">…</span>
+        </li>
+      {% endif %}
+    {% endfor %}
+  
+    {# Next #}
+    {% if pagination.has_next %}
+      <li class="page-item">
+        <a class="page-link"
+           href="{{ url_for('superadmin.audit_logs', page=pagination.next_num, **filters) }}">
+          Next
+        </a>
+      </li>
+    {% else %}
+      <li class="page-item disabled">
+        <span class="page-link">Next</span>
+      </li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
+    </div>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Filtering functionality (if you have corresponding IDs)
+    document.getElementById('apply-filters').addEventListener('click', function() {
+        const actionFilter = document.getElementById('action-filter').value;
+        const dateFrom = document.getElementById('date-from').value;
+        const dateTo = document.getElementById('date-to').value;
+        const searchFilter = document.getElementById('search-filter').value;
+        const ipFilter = document.getElementById('ip-filter').value;
+        
+        const url = new URL(window.location);
+        if (actionFilter) url.searchParams.set('action', actionFilter);
+        else url.searchParams.delete('action');
+        if (dateFrom) url.searchParams.set('date_from', dateFrom); 
+        else url.searchParams.delete('date_from');
+        if (dateTo) url.searchParams.set('date_to', dateTo); 
+        else url.searchParams.delete('date_to');
+        if (searchFilter) url.searchParams.set('search', searchFilter);
+        else url.searchParams.delete('search');
+        if (ipFilter)     url.searchParams.set('ip', ipFilter);
+        else url.searchParams.delete('ip');
+        
+        window.location = url;
+    });
+</script>
+{% endblock %}

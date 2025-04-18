@@ -1,1 +1,493 @@
-/home/runner/workspace/templates/superadmin/system_monitoring.html
+{% extends "superadmin/base.html" %}
+
+{% block title %}System Monitoring{% endblock %}
+{% block page_title %}System Monitoring & Analytics{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6 col-lg-3 mb-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-1">CPU Usage</h6>
+                        <h2 class="mb-0" id="cpu-usage">--<small class="text-muted">%</small></h2>
+                    </div>
+                    <div class="bg-primary bg-opacity-10 p-3 rounded">
+                        <i class="fas fa-microchip fa-2x text-primary"></i>
+                    </div>
+                </div>
+                <div class="progress mt-3" style="height: 5px;">
+                    <div class="progress-bar bg-primary" id="cpu-bar" role="progressbar" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-3 mb-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-1">Memory Usage</h6>
+                        <h2 class="mb-0" id="memory-usage">--<small class="text-muted">MB</small></h2>
+                    </div>
+                    <div class="bg-success bg-opacity-10 p-3 rounded">
+                        <i class="fas fa-memory fa-2x text-success"></i>
+                    </div>
+                </div>
+                <div class="progress mt-3" style="height: 5px;">
+                    <div class="progress-bar bg-success" id="memory-bar" role="progressbar" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-3 mb-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-1">Disk Usage</h6>
+                        <h2 class="mb-0" id="disk-usage">--<small class="text-muted">GB</small></h2>
+                    </div>
+                    <div class="bg-warning bg-opacity-10 p-3 rounded">
+                        <i class="fas fa-hdd fa-2x text-warning"></i>
+                    </div>
+                </div>
+                <div class="progress mt-3" style="height: 5px;">
+                    <div class="progress-bar bg-warning" id="disk-bar" role="progressbar" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-3 mb-3">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-1">Database Size</h6>
+                        <h2 class="mb-0" id="db-size">--<small class="text-muted">MB</small></h2>
+                    </div>
+                    <div class="bg-info bg-opacity-10 p-3 rounded">
+                        <i class="fas fa-database fa-2x text-info"></i>
+                    </div>
+                </div>
+                <div class="progress mt-3" style="height: 5px;">
+                    <div class="progress-bar bg-info" id="db-bar" role="progressbar" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent border-0">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-chart-area me-2"></i>System Resource Trends</h5>
+                    <div class="btn-group btn-group-sm">
+                        <button class="btn btn-outline-secondary active">Live</button>
+                        <button class="btn btn-outline-secondary">Day</button>
+                        <button class="btn btn-outline-secondary">Week</button>
+                        <button class="btn btn-outline-secondary">Month</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- Chart inserted inside the original placeholder container -->
+                <div class="rounded" style="height: 400px;">
+                    <canvas id="resourceChart" style="width: 100%; height: 100%;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent border-0">
+                <h5 class="mb-0"><i class="fas fa-heartbeat me-2"></i>System Health</h5>
+            </div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-server text-success me-2"></i> Web Server
+                        </div>
+                        <span class="badge bg-success">Healthy</span>
+                    </li>
+                    <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-database text-success me-2"></i> Database
+                        </div>
+                        <span class="badge bg-success">Healthy</span>
+                    </li>
+                    <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-envelope text-warning me-2"></i> Email Service
+                        </div>
+                        <span class="badge bg-warning">Needs Config</span>
+                    </li>
+                    <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-search text-success me-2"></i> Search Service
+                        </div>
+                        <span class="badge bg-success">Healthy</span>
+                    </li>
+                    <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-file text-success me-2"></i> File Storage
+                        </div>
+                        <span class="badge bg-success">Healthy</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-footer bg-transparent">
+                <button class="btn btn-sm btn-outline-primary w-100">
+                    <i class="fas fa-sync-alt me-1"></i> Run System Diagnostics
+                </button>
+            </div>
+        </div>
+        
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent border-0">
+                <h5 class="mb-0"><i class="fas fa-tachometer-alt me-2"></i>System Load</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <small>CPU Load (last 5 min)</small>
+                        <small id="sys-cpu-load">--<small class="text-muted">%</small></small>
+                    </div>
+                    <div class="progress" style="height: 6px;">
+                        <div class="progress-bar bg-success" id="sys-cpu-bar" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <small>Memory Pressure</small>
+                        <small id="sys-memory-pressure">--<small class="text-muted">%</small></small>
+                    </div>
+                    <div class="progress" style="height: 6px;">
+                        <div class="progress-bar bg-success" id="sys-memory-bar" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="mb-0">
+                    <div class="d-flex justify-content-between mb-1">
+                        <small>I/O Wait</small>
+                        <small id="sys-io-wait">--<small class="text-muted">%</small></small>
+                    </div>
+                    <div class="progress" style="height: 6px;">
+                        <div class="progress-bar bg-success" id="sys-io-bar" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent border-0">
+                <h5 class="mb-0"><i class="fas fa-users me-2"></i>User Activity</h5>
+            </div>
+            <div class="card-body">
+                <div style="height: 250px; background-color: var(--bs-gray-800);" class="rounded d-flex align-items-center justify-content-center mb-3">
+                    <div class="text-center">
+                        <i class="fas fa-chart-bar fa-3x text-muted mb-3"></i>
+                        <h5>User Activity Graph</h5>
+                        <p class="text-muted">Active users over time</p>
+                    </div>
+                </div>
+                
+                <div class="row text-center">
+                    <div class="col-4">
+                        <h3>12</h3>
+                        <small class="text-muted">Active Users</small>
+                    </div>
+                    <div class="col-4">
+                        <h3>156</h3>
+                        <small class="text-muted">Total Users</small>
+                    </div>
+                    <div class="col-4">
+                        <h3>38</h3>
+                        <small class="text-muted">New This Month</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent border-0">
+                <h5 class="mb-0"><i class="fas fa-exchange-alt me-2"></i>Recent API Requests</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Endpoint</th>
+                                <th>Method</th>
+                                <th>Status</th>
+                                <th>Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><small>/api/users</small></td>
+                                <td><span class="badge bg-primary">GET</span></td>
+                                <td><span class="badge bg-success">200</span></td>
+                                <td><small>42ms</small></td>
+                            </tr>
+                            <tr>
+                                <td><small>/api/clients</small></td>
+                                <td><span class="badge bg-success">POST</span></td>
+                                <td><span class="badge bg-success">201</span></td>
+                                <td><small>128ms</small></td>
+                            </tr>
+                            <tr>
+                                <td><small>/api/tickets/45</small></td>
+                                <td><span class="badge bg-info">PUT</span></td>
+                                <td><span class="badge bg-success">200</span></td>
+                                <td><small>86ms</small></td>
+                            </tr>
+                            <tr>
+                                <td><small>/api/auth/login</small></td>
+                                <td><span class="badge bg-success">POST</span></td>
+                                <td><span class="badge bg-danger">401</span></td>
+                                <td><small>96ms</small></td>
+                            </tr>
+                            <tr>
+                                <td><small>/api/users/search</small></td>
+                                <td><span class="badge bg-primary">GET</span></td>
+                                <td><span class="badge bg-success">200</span></td>
+                                <td><small>155ms</small></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent text-center">
+                <a href="#" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-chart-line me-1"></i> View API Analytics
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{{ super() }}
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+
+<script>
+    Chart.register(ChartDataLabels);
+    
+    let cpuData = [];
+    let memoryData = [];
+    let timeLabels = [];
+    let liveInterval = null;
+    
+    const resourceChart = new Chart(document.getElementById('resourceChart'), {
+        type: 'line',
+        data: {
+            labels: timeLabels,
+            datasets: [
+                {
+                    label: 'CPU Usage (%)',
+                    data: cpuData,
+                    borderColor: '#0d6efd',
+                    fill: false,
+                    tension: 0.3
+                },
+                {
+                    label: 'Memory Usage (%)',
+                    data: memoryData,
+                    borderColor: '#198754',
+                    fill: false,
+                    tension: 0.3
+                }
+            ]
+        },
+        options: {
+            animation: false,
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    grid: {
+                        color: 'rgba(255,255,255,0.05)'
+                    }
+                },
+                x: {
+                    ticks: { autoSkip: true, maxTicksLimit: 12 },
+                    grid: { display: false }
+                }
+            },
+            plugins: {
+                legend: { position: 'top' },
+                tooltip: {
+                    callbacks: {
+                        label: (ctx) => `${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}%`
+                    }
+                },
+                datalabels: {
+                    color: '#999',
+                    anchor: 'end',
+                    align: 'top',
+                    offset: 4,
+                    formatter: (value) => `${value.toFixed(1)}%`,
+                    font: { weight: 'bold' }
+                }
+            }
+        },
+        plugins: [ChartDataLabels]
+    });
+    
+    function updateSystemMetrics() {
+    fetch('/superadmin/system-metrics')
+        .then(res => res.json())
+        .then(data => {
+            const now = new Date().toLocaleTimeString();
+
+            if (timeLabels.length >= 30) {
+                timeLabels.shift();
+                cpuData.shift();
+                memoryData.shift();
+            }
+
+            timeLabels.push(now);
+            cpuData.push(data.cpu_percent);
+            memoryData.push(data.memory_percent);
+            resourceChart.update();
+
+            // Update top cards with 2 decimals for CPU usage.
+            document.getElementById('cpu-usage').innerHTML = `${data.cpu_percent.toFixed(2)}<small class="text-muted">%</small>`;
+            document.getElementById('cpu-bar').style.width = `${data.cpu_percent}%`;
+
+            document.getElementById('memory-usage').innerHTML = `${data.memory_used}<small class="text-muted">MB</small>`;
+            document.getElementById('memory-bar').style.width = `${data.memory_percent}%`;
+
+            document.getElementById('disk-usage').innerHTML = `${data.disk_used}<small class="text-muted">GB</small>`;
+            document.getElementById('disk-bar').style.width = `${data.disk_percent}%`;
+
+            document.getElementById('db-size').innerHTML = `${data.db_size_mb}<small class="text-muted">MB</small>`;
+            document.getElementById('db-bar').style.width = `${Math.min(data.db_size_mb / 2000 * 100, 100)}%`;
+
+            // Update system load card:
+            if (data.cpu_load_5min === null) {
+                document.getElementById('sys-cpu-load').innerHTML = `Not supported`;
+                document.getElementById('sys-cpu-bar').style.width = `0%`;
+            } else {
+                document.getElementById('sys-cpu-load').innerHTML = `${data.cpu_load_5min.toFixed(2)}<small class="text-muted">%</small>`;
+                document.getElementById('sys-cpu-bar').style.width = `${data.cpu_load_5min}%`;
+            }
+
+            document.getElementById('sys-memory-pressure').innerHTML = `${data.memory_pressure.toFixed(2)}<small class="text-muted">%</small>`;
+            document.getElementById('sys-memory-bar').style.width = `${data.memory_pressure}%`;
+
+            document.getElementById('sys-io-wait').innerHTML = `${data.io_wait_percent.toFixed(2)}<small class="text-muted">%</small>`;
+            document.getElementById('sys-io-bar').style.width = `${data.io_wait_percent}%`;
+        })
+        .catch(err => console.error('Error fetching live metrics:', err));
+}
+    
+    function startLiveMetrics() {
+        stopLiveMetrics();
+        updateSystemMetrics(); 
+        liveInterval = setInterval(updateSystemMetrics, 1000);
+    }
+    
+    function stopLiveMetrics() {
+        if (liveInterval) {
+            clearInterval(liveInterval);
+            liveInterval = null;
+        }
+    }
+    
+    function loadHistoricalMetrics(range) {
+        stopLiveMetrics();
+        fetch(`/superadmin/system-metrics/history?range=${range}`)
+            .then(res => res.json())
+            .then(data => {
+                timeLabels.length = 0;
+                cpuData.length = 0;
+                memoryData.length = 0;
+    
+                data.forEach(entry => {
+                    const time = new Date(entry.timestamp).toLocaleTimeString();
+                    timeLabels.push(time);
+                    cpuData.push(entry.cpu_percent);
+                    memoryData.push(entry.memory_percent);
+                });
+    
+                const last = data[data.length - 1];
+                if (last) {
+                    document.getElementById('cpu-usage').innerHTML = `${last.cpu_percent}<small class="text-muted">%</small>`;
+                    document.getElementById('cpu-bar').style.width = `${last.cpu_percent}%`;
+    
+                    document.getElementById('memory-usage').innerHTML = `--<small class="text-muted">MB</small>`;
+                    document.getElementById('memory-bar').style.width = `${last.memory_percent}%`;
+                }
+    
+                resourceChart.update();
+            });
+    }
+    
+    function exportToCSV() {
+        let csv = 'Time,CPU (%),Memory (%)\n';
+        for (let i = 0; i < timeLabels.length; i++) {
+            csv += `${timeLabels[i]},${cpuData[i]},${memoryData[i]}\n`;
+        }
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'system_metrics.csv';
+        a.click();
+        window.URL.revokeObjectURL(url);
+    }
+    
+    function exportToImage() {
+        const canvas = document.getElementById('resourceChart');
+        const url = canvas.toDataURL('image/png');
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'system_metrics_chart.png';
+        a.click();
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        startLiveMetrics();
+    
+        document.querySelectorAll('.btn-group.btn-group-sm .btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.btn-group .btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+    
+                const label = btn.innerText.trim().toLowerCase();
+                if (label === 'live') {
+                    startLiveMetrics();
+                } else {
+                    loadHistoricalMetrics(label);
+                }
+            });
+        });
+    });
+</script>
+
+<!-- Export Buttons -->
+<div class="mt-3 text-end">
+    <button class="btn btn-outline-light btn-sm me-2" onclick="exportToCSV()">Export CSV</button>
+    <button class="btn btn-outline-light btn-sm" onclick="exportToImage()">Save PNG</button>
+</div>
+{% endblock %}

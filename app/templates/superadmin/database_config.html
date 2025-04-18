@@ -1,1 +1,259 @@
-/home/runner/workspace/templates/superadmin/database_config.html
+{% extends "superadmin/base.html" %}
+
+{% block title %}Database Configuration{% endblock %}
+{% block page_title %}Database Configuration & API Keys{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-8">
+    <!-- Database Connection Card -->
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-header bg-transparent border-0">
+        <h5 class="mb-0"><i class="fas fa-database me-2"></i>Database Connection</h5>
+      </div>
+      <div class="card-body">
+        <div class="alert alert-info">
+          <i class="fas fa-info-circle me-2"></i> Database connection changes require a server restart to take effect.
+        </div>
+        <form method="post">
+          {{ form.hidden_tag() }}
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              {{ form.db_host.label(class="form-label") }}
+              {{ form.db_host(class="form-control") }}
+              <small class="text-muted">Database server hostname or IP address</small>
+            </div>
+            <div class="col-md-6 mb-3">
+              {{ form.db_port.label(class="form-label") }}
+              {{ form.db_port(class="form-control") }}
+              <small class="text-muted">Database server port (usually 5432 for PostgreSQL)</small>
+            </div>
+          </div>
+          <div class="mb-3">
+            {{ form.db_name.label(class="form-label") }}
+            {{ form.db_name(class="form-control") }}
+            <small class="text-muted">Name of the database to connect to</small>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              {{ form.db_user.label(class="form-label") }}
+              {{ form.db_user(class="form-control") }}
+              <small class="text-muted">Username for database authentication</small>
+            </div>
+            <div class="col-md-6 mb-3">
+              {{ form.db_password.label(class="form-label") }}
+              {{ form.db_password(class="form-control") }}
+              <small class="text-muted">Password for database authentication</small>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save me-1"></i> {{ form.submit.label.text }}
+          </button>
+        </form>
+      </div>
+    </div>
+    
+    <!-- API Keys Card (unchanged) -->
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-header bg-transparent border-0">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="mb-0"><i class="fas fa-key me-2"></i>API Keys</h5>
+          <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addApiKeyModal">
+            <i class="fas fa-plus me-1"></i> Add New
+          </button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Service</th>
+                <th>API Key</th>
+                <th>Last Modified</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Example rows; replace with dynamic data -->
+              <tr>
+                <td>SendGrid</td>
+                <td><code class="text-muted">SG.*********************</code></td>
+                <td><small>2023-04-15</small></td>
+                <td>
+                  <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-primary">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-outline-danger confirm-action">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>Twilio</td>
+                <td><code class="text-muted">AC*********************</code></td>
+                <td><small>2023-03-22</small></td>
+                <td>
+                  <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-primary">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-outline-danger confirm-action">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+    
+  <!-- Right Column -->
+  <div class="col-lg-4">
+    <!-- Database Status Card -->
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-header bg-transparent border-0">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="mb-0"><i class="fas fa-server me-2"></i>Database Status</h5>
+          <span class="badge {{ 'bg-success' if db_status.status == 'Connected' else 'bg-danger' }}">
+            {{ db_status.status }}
+          </span>
+        </div>
+      </div>
+      <div class="card-body">
+        <table class="table table-sm">
+          <tbody>
+            <tr>
+              <td>Database Type</td>
+              <td class="text-end">{{ db_status.db_type }}</td>
+            </tr>
+            <tr>
+              <td>Server Version</td>
+              <td class="text-end">{{ db_status.server_version }}</td>
+            </tr>
+            <tr>
+              <td>Connection Pool</td>
+              <td class="text-end">{{ db_status.connection_pool }}</td>
+            </tr>
+            <tr>
+              <td>SSL Encrypted</td>
+              <td class="text-end">
+                {% if db_status.ssl_encrypted %}
+                  <span class="badge bg-success">Yes</span>
+                {% else %}
+                  <span class="badge bg-danger">No</span>
+                {% endif %}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="d-grid gap-2 mt-3">
+          <a href="{{ url_for('superadmin.test_db_connection') }}" class="btn btn-sm btn-outline-primary">
+            <i class="fas fa-sync me-1"></i> Test Connection
+          </a>
+        </div>
+      </div>
+    </div>
+        
+    <!-- Database Tools Card -->
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-header bg-transparent border-0">
+        <h5 class="mb-0"><i class="fas fa-cog me-2"></i>Database Tools</h5>
+      </div>
+      <div class="card-body">
+        <div class="list-group list-group-flush">
+          <a href="{{ url_for('superadmin.database_tools', tab='schema') }}" class="list-group-item list-group-item-action bg-transparent px-0 py-2 d-flex align-items-center">
+            <i class="fas fa-table me-2 text-primary"></i>
+            <div>
+              <h6 class="mb-0">View Schema</h6>
+              <small class="text-muted">View database tables and relationships</small>
+            </div>
+          </a>
+          <a href="{{ url_for('superadmin.database_tools', tab='query') }}" class="list-group-item list-group-item-action bg-transparent px-0 py-2 d-flex align-items-center">
+            <i class="fas fa-play me-2 text-primary"></i>
+            <div>
+              <h6 class="mb-0">Run SQL Query</h6>
+              <small class="text-muted">Execute custom SQL statements</small>
+            </div>
+          </a>
+          <form method="post" action="{{ url_for('superadmin.backup_database') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit"
+                    class="list-group-item list-group-item-action bg-transparent px-0 py-2 d-flex align-items-center border-0">
+              <i class="fas fa-download me-2 text-primary"></i>
+              <div>
+                <h6 class="mb-0">Backup Database</h6>
+                <small class="text-muted">Create a complete database backup</small>
+              </div>
+            </button>
+          </form>
+          <a href="{{ url_for('superadmin.restore_database') }}" class="list-group-item list-group-item-action bg-transparent px-0 py-2 d-flex align-items-center">
+            <i class="fas fa-upload me-2 text-primary"></i>
+            <div>
+              <h6 class="mb-0">Restore Database</h6>
+              <small class="text-muted">Restore from a backup file</small>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+        
+    <!-- Danger Zone -->
+    <div class="card border-0 shadow-sm mb-4 danger-zone">
+      <div class="card-header bg-transparent border-0">
+        <h5 class="text-danger"><i class="fas fa-exclamation-triangle me-2"></i>Danger Zone</h5>
+      </div>
+      <div class="card-body">
+        <div class="d-grid gap-2">
+          <button class="btn btn-outline-danger confirm-action" type="button">
+            <i class="fas fa-redo-alt me-1"></i> Migrate Database
+          </button>
+          <button class="btn btn-outline-danger confirm-action" type="button">
+            <i class="fas fa-trash-alt me-1"></i> Clear All Data
+          </button>
+        </div>
+        <small class="text-muted d-block mt-2">These actions cannot be undone. Please proceed with caution.</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add API Key Modal -->
+<div class="modal fade" id="addApiKeyModal" tabindex="-1" aria-labelledby="addApiKeyModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addApiKeyModalLabel">Add New API Key</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form method="post" action="{{ url_for('superadmin.database_config', action='add_api_key') }}">
+          <div class="mb-3">
+            <label for="service-name" class="form-label">Service Name</label>
+            <input type="text" class="form-control" id="service-name" name="service_name" required>
+            <small class="text-muted">Name of the service this API key is for</small>
+          </div>
+          <div class="mb-3">
+            <label for="api-key" class="form-label">API Key</label>
+            <input type="text" class="form-control" id="api-key" name="api_key" required>
+            <small class="text-muted">The API key or token for the service</small>
+          </div>
+          <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="mask-key" name="mask_key" checked>
+            <label class="form-check-label" for="mask-key">Mask API key in the UI</label>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">Add API Key</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

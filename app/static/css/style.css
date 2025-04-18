@@ -1,43 +1,85 @@
 /* Custom CSS for NexusSync */
 
-/* Sidebar styling */
-.sidebar {
-    height: 100vh;
-    position: sticky;
+/* ========== LAYOUT ========== */
+
+/* Fixed Sidebar */
+#sidebar {
+    background-color: #0d2238;  /* Darker tone for sidebar background */
+    color: #ccc;                /* Lighter text for contrast */
+    width: 240px;               /* Set sidebar width */
+    height: 100vh;              /* Full viewport height */
+    overflow-y: auto;           /* Scroll if content exceeds viewport */
+    position: fixed;            /* Fixed positioning */
     top: 0;
-    padding-top: 70px;
-    overflow-y: auto;
+    left: 0;
+    z-index: 1040;              /* Below top navbar */
+    padding-top: 0.5rem;        /* Space for brand */
+    border-right: 1px solid rgba(255, 255, 255, 0.1);  /* Subtle border to separate sidebar from content */
 }
 
-.sidebar .nav-link {
-    color: #adb5bd;
+/* Sidebar inner areas */
+.sidebar-brand,
+.sidebar-links {
+    padding: 1rem;
+    background-color: #0d2238;  /* Matching sidebar background */
+}
+
+#sidebar .nav-link {
+    color: #adb5bd;             /* Muted gray text */
     font-weight: 500;
-    padding: 0.5rem 1rem;
-    border-radius: 0.25rem;
+    padding: 0.6rem 1rem;        /* Slightly increased padding for comfort */
+    border-radius: 0.3rem;       /* Slightly more rounded corners */
     margin-bottom: 0.2rem;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-.sidebar .nav-link.active {
+#sidebar .nav-link i {
+    margin-right: 0.5rem;
+}
+
+#sidebar .nav-link.active {
     color: #fff;
-    background-color: rgba(13, 110, 253, 0.25);
+    background-color: rgba(13, 110, 253, 0.25);  /* Highlight color for active link */
+    /* Optional: You can add a left border if you prefer a more prominent indicator */
+    /* border-left: 3px solid #0d6efd; */
 }
 
-.sidebar .nav-link:hover {
+#sidebar .nav-link:hover {
     color: #fff;
     background-color: rgba(255, 255, 255, 0.1);
 }
 
-.sidebar .sidebar-heading {
+#sidebar .sidebar-heading {
     font-size: 0.75rem;
     text-transform: uppercase;
+    color: #6c757d;              /* Slightly muted for headings */
 }
 
-/* Custom navbar styles */
+/* ========== FIXED TOP NAVBAR ========== */
+.top-navbar {
+    position: fixed;
+    top: 0;
+    left: 240px;  /* Same as sidebar width */
+    right: 0;
+    height: 60px; /* Adjust as needed */
+    z-index: 1050; /* Above sidebar */
+}
+
+/* Main Content Area */
+#mainContent {
+    margin-top: 60px;   /* Same as top navbar height */
+    margin-left: 240px;  /* Same as sidebar width */
+    padding: 20px;
+}
+
+/* ========== NAVBAR & BRAND ========== */
 .navbar-brand {
     font-weight: 600;
 }
 
-/* Custom card styles */
+/* ========== CARDS ========== */
 .card {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -47,7 +89,13 @@
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2) !important;
 }
 
-/* Dashboard widgets */
+.login-card {
+    max-width: 450px;
+    width: 100%;
+    margin: 0 1rem;
+    border-radius: 0.5rem;
+}
+
 .stats-card {
     border-left: 4px solid #0d6efd;
     transition: all 0.3s ease;
@@ -62,50 +110,54 @@
     opacity: 0.25;
 }
 
-/* Table enhancements */
+.card-body {
+    padding: 2rem;
+}
+
+.card-footer {
+    font-size: 0.9rem;
+}
+
+/* ========== TABLES ========== */
 .table-hover tbody tr:hover {
     background-color: rgba(13, 110, 253, 0.1);
 }
 
-/* Form stylings */
+/* ========== FORMS ========== */
 .form-control:focus {
     border-color: #0d6efd;
     box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
 }
 
-/* Notification badge styles */
+/* ========== NOTIFICATION BADGE ========== */
 .badge-notify {
     position: absolute;
     top: -5px;
     right: -5px;
 }
 
-/* Animations */
+/* ========== ANIMATIONS ========== */
 .fade-in {
     animation: fadeIn 0.5s ease-in;
 }
-
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
 }
 
-/* Ticket status styles */
+/* ========== TICKET/STATUS STYLES ========== */
 .status-open {
     background-color: rgba(25, 135, 84, 0.1);
     color: #198754;
 }
-
 .status-pending {
     background-color: rgba(255, 193, 7, 0.1);
     color: #ffc107;
 }
-
 .status-closed {
     background-color: rgba(108, 117, 125, 0.1);
     color: #6c757d;
 }
-
 .status-urgent {
     background-color: rgba(220, 53, 69, 0.1);
     color: #dc3545;
@@ -115,67 +167,56 @@
 .priority-low {
     border-left: 3px solid #198754;
 }
-
 .priority-medium {
     border-left: 3px solid #ffc107;
 }
-
 .priority-high {
     border-left: 3px solid #dc3545;
 }
 
-/* Custom scrollbar */
+/* ========== CUSTOM SCROLLBAR ========== */
 ::-webkit-scrollbar {
     width: 8px;
 }
-
 ::-webkit-scrollbar-track {
     background: rgba(0, 0, 0, 0.1);
 }
-
 ::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.2);
     border-radius: 4px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.3);
 }
 
-/* Mobile responsive adjustments */
+/* ========== MOBILE RESPONSIVE ADJUSTMENTS ========== */
 @media (max-width: 768px) {
-    .sidebar {
-        position: fixed;
-        top: 56px;
-        left: 0;
-        width: 100%;
-        z-index: 1030;
-        padding-top: 1rem;
-        max-height: calc(100vh - 56px);
-        overflow-y: auto;
+    /* For mobile, if you plan to implement a slide-in sidebar, customize here. */
+    #sidebar {
         transform: translateX(-100%);
         transition: transform 0.3s ease;
+        z-index: 1050;
     }
-    
-    .sidebar.show {
+    #sidebar.show {
         transform: translateX(0);
     }
-    
-    .stats-card {
-        margin-bottom: 1rem;
+    .top-navbar {
+        left: 0 !important;
+        width: 100%;
+    }
+    #mainContent {
+        margin-left: 0 !important;
     }
 }
 
-/* Fix sticky footer */
+/* ========== FLEX & FOOTER ========== */
 html, body {
     height: 100%;
 }
-
 body {
     display: flex;
     flex-direction: column;
 }
-
 main {
     flex: 1 0 auto;
 }

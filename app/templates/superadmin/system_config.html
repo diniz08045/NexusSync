@@ -1,1 +1,626 @@
-/home/runner/workspace/templates/superadmin/system_config.html
+{% extends "superadmin/base.html" %}
+
+{# 
+  Title Block: Sets the browser/tab title for the page.
+  Using "System Configuration Settings" as the page title.
+#}
+{% block title %}System Configuration Settings{% endblock %}
+
+{# 
+  Page Title Block: Displays the header title at the top of the page content.
+#}
+{% block page_title %}
+  System Configuration Settings
+{% endblock %}
+
+{% block content %}
+  {# --- Spacer for Vertical Positioning --- #}
+  <div style="min-height: 100px;"></div>
+
+  {# ====================================================================
+         Begin System Configuration Section (General System Settings,
+         Inline Configurations, and Environment Variables)
+      ==================================================================== #}
+  <div class="row align-items-stretch">
+      <div class="col-md-8 d-flex flex-column">
+          {# --------- General System Settings Form Card --------- #}
+          <div class="card border-0 shadow-sm mb-4 h-100">
+              <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center">
+                  <h5 class="mb-0">
+                    <i class="fas fa-cogs me-2"></i>General System Settings
+                  </h5>
+                  <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addConfigModal">
+                      <i class="fas fa-plus me-1"></i> Add Config
+                  </button>
+              </div>
+              <div class="card-body d-flex flex-column">
+                  <form method="post" action="{{ url_for('superadmin.system_config') }}">
+                      {{ config_form.hidden_tag() }}
+                      <div class="mb-3">
+                          {{ config_form.app_name.label(class="form-label") }}
+                          {{ config_form.app_name(class="form-control") }}
+                          {% if config_form.app_name.errors %}
+                              <div class="text-danger">
+                                  {% for error in config_form.app_name.errors %}
+                                      <small>{{ error }}</small>
+                                  {% endfor %}
+                              </div>
+                          {% endif %}
+                          <small class="text-muted">
+                              The application name displayed throughout the system.
+                          </small>
+                      </div>
+                      <div class="mb-3 form-check form-switch">
+                          {{ config_form.debug_mode(class="form-check-input", role="switch") }}
+                          {{ config_form.debug_mode.label(class="form-check-label") }}
+                          <div class="text-muted">
+                              <small>
+                                Enables detailed error messages. <strong>Not recommended for production.</strong>
+                              </small>
+                          </div>
+                      </div>
+                      <div class="mb-3 form-check form-switch">
+                          {{ config_form.maintenance_mode(class="form-check-input", role="switch") }}
+                          {{ config_form.maintenance_mode.label(class="form-check-label") }}
+                          <div class="text-muted">
+                              <small>Restricts access to superadmins only while active.</small>
+                          </div>
+                      </div>
+                      <div class="mt-auto">
+                        <div class="d-flex align-items-center">
+                            <button type="submit" name="config_submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i> {{ config_form.submit.label.text }}
+                            </button>
+                            <a href="{{ url_for('superadmin.export_config') }}" class="btn btn-warning ms-2">
+                                <i class="fas fa-download me-1"></i> Export Configuration
+                            </a>
+                        </div>
+                      </div>
+                  </form>
+              </div>
+          </div>
+
+          {# --------- All Configuration Entries Table with Inline Editing --------- #}
+          <div class="card border-0 shadow-sm mb-4 h-100">
+              <div class="card-header bg-transparent border-0">
+                  <h5 class="mb-0">
+                    <i class="fas fa-list-alt me-2"></i>All Configuration Entries
+                  </h5>
+              </div>
+              <div class="card-body d-flex flex-column">
+                  {% if configs %}
+                  <div class="table-responsive flex-grow-1" style="max-height: 660px; overflow-y: auto; padding-right: 12px;">
+                      <table class="table table-sm table-hover align-middle">
+                          <thead>
+                              <tr>
+                                  <th>Key</th>
+                                  <th>Value</th>
+                                  <th>Updated At</th>
+                                  <th class="text-end">Actions</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              {% for config in configs %}
+                              <tr>
+                                  <td>
+                                      <code>{{ config.key }}</code>
+                                      {% if config.updated_at is none %}
+                                          <span class="badge bg-secondary ms-2">ENV</span>
+                                      {% endif %}
+                                  </td>
+                                  {# Inline editing form for configuration value #}
+                                  <form method="post" action="{{ url_for('superadmin.update_config', key=config.key) }}" class="d-flex w-100">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                      <td>
+                                          <input type="text" name="value" class="form-control form-control-sm"
+                                                 value="{{ config.value }}"
+                                                 {% if config.updated_at is none %}readonly{% endif %}>
+                                      </td>
+                                      <td class="small text-muted align-middle">
+                                          {{ config.updated_at.strftime('%Y-%m-%d %H:%M:%S') if config.updated_at else '—' }}
+                                      </td>
+                                      <td class="text-end align-middle">
+                                          <div class="d-flex justify-content-end align-items-center gap-2">
+                                              {% if config.updated_at is not none %}
+                                              <button type="submit" class="btn btn-link p-0 border-0" title="Save">
+                                                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 30 30" fill="#40C057">
+                                                      <path d="M14.147,19.267c-0.188,0.188-0.442,0.293-0.707,0.293s-0.52-0.105-0.707-0.293L9.28,15.814 
+                                                      c-0.391-0.391-0.391-1.023,0-1.414c0.391-0.391,1.023-0.391,1.414,0l2.746,2.746L25.674,4.911
+                                                      C25.318,4.364,24.702,4,24,4H6C4.895,4,4,4.895,4,6v18c0,1.105,0.895,2,2,2h18c1.105,0,2-0.895,
+                                                      2-2V7.414L14.147,19.267z"></path>
+                                                  </svg>
+                                              </button>
+                                              {% endif %}
+                                          </div>
+                                      </td>
+                                  </form>
+                                  {% if config.updated_at is not none %}
+                                  <td class="text-end align-middle">
+                                      <form action="{{ url_for('superadmin.delete_config', key=config.key) }}" method="post">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                          <button type="submit" class="btn btn-link p-0 border-0" onclick="return confirm('Delete {{ config.key }}?');" title="Delete">
+                                              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                                  <path d="M 10 2 L 9 3 L 4 3 L 4 5 L 5 5 L 5 20 
+                                                      C 5 20.522 5.191 21.055 5.568 21.432 
+                                                      C 5.945 21.809 6.478 22 7 22 
+                                                      L 17 22 C 17.522 22 18.055 21.809 
+                                                      18.432 21.432 C 18.809 21.055 19 20.522 
+                                                      19 20 L 19 5 L 20 5 L 20 3 L 15 3 
+                                                      L 14 2 L 10 2 z M 7 5 L 17 5 
+                                                      L 17 20 L 7 20 L 7 5 z M 9 7 
+                                                      L 9 18 L 11 18 L 11 7 L 9 7 z 
+                                                      M 13 7 L 13 18 L 15 18 L 15 7 L 13 7 z"/>
+                                              </svg>
+                                          </button>
+                                      </form>
+                                  </td>
+                                  {% endif %}
+                              </tr>
+                              {% endfor %}
+                          </tbody>
+                      </table>
+                  </div>
+                  {% else %}
+                      <div class="text-muted">No system configuration entries found.</div>
+                  {% endif %}
+              </div>
+          </div>
+
+          {# --------- Environment Variables Card --------- #}
+          <div class="card border-0 shadow-sm mb-4 h-100">
+              <div class="card-header bg-transparent border-0">
+                  <h5 class="mb-0">
+                    <i class="fas fa-sliders-h me-2"></i>System Environment Variables
+                  </h5>
+              </div>
+              <div class="card-body d-flex flex-column">
+                  <div class="alert alert-secondary">
+                      <i class="fas fa-info-circle me-2"></i> 
+                      These are environment variables set on the server.
+                  </div>
+                  <div class="table-responsive flex-grow-1">
+                      <table class="table table-sm">
+                          <thead>
+                              <tr>
+                                  <th>Variable</th>
+                                  <th>Value</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              <tr>
+                                  <td>FLASK_ENV</td>
+                                  <td><code>{{ config_env.FLASK_ENV }}</code></td>
+                              </tr>
+                              <tr>
+                                  <td>FLASK_APP</td>
+                                  <td><code>{{ config_env.FLASK_APP }}</code></td>
+                              </tr>
+                              <tr>
+                                  <td>DATABASE_URL</td>
+                                  <td><code class="text-muted">{{ config_env.DATABASE_URL }}</code></td>
+                              </tr>
+                              <tr>
+                                  <td>SESSION_SECRET</td>
+                                  <td><code class="text-muted">{{ config_env.SESSION_SECRET }}</code></td>
+                              </tr>
+                          </tbody>
+                      </table>
+                  </div>
+                  <div class="d-grid gap-2 mt-3">
+                      <form method="post" action="{{ url_for('superadmin.regenerate_session_secret') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                          <button type="submit" class="btn btn-warning">
+                              <i class="fas fa-sync-alt me-1"></i> Regenerate Session Secret
+                          </button>
+                      </form>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+      {# ====================================================================
+             End of left main column; now beginning side panel (right column)
+          ==================================================================== #}
+      <div class="col-md-4 d-flex flex-column">
+          {# ----- Configuration Info Card ----- #}
+          <div class="card border-0 shadow-sm mb-4 h-100">
+              <div class="card-header bg-transparent border-0">
+                  <h5 class="mb-0">
+                      <i class="fas fa-info-circle me-2"></i>Configuration Info
+                  </h5>
+              </div>
+              <div class="card-body d-flex flex-column">
+                  <div class="alert alert-info mb-3">
+                      <i class="fas fa-lightbulb me-2"></i> 
+                      Changes to system configuration will be applied immediately.
+                  </div>
+                  <div class="mb-4">
+                      <h6>Impact of Settings:</h6>
+                      <ul class="text-muted small">
+                          <li>
+                              <strong>Debug Mode</strong> - Enables error reporting and auto-reload.
+                          </li>
+                          <li>
+                              <strong>Maintenance Mode</strong> - Restricts access to non-superadmins.
+                          </li>
+                      </ul>
+                  </div>
+                  <h6 class="border-top pt-3">Related Configuration</h6>
+                  <div class="list-group list-group-flush">
+                      <a href="{{ url_for('superadmin.security_config') }}" class="list-group-item list-group-item-action bg-transparent px-0">
+                          <i class="fas fa-lock me-2"></i> Security Configuration
+                      </a>
+                      <a href="{{ url_for('superadmin.startup_config') }}" class="list-group-item list-group-item-action bg-transparent px-0">
+                          <i class="fas fa-play me-2"></i> Startup Configuration
+                      </a>
+                      <a href="#" class="list-group-item list-group-item-action bg-transparent px-0">
+                          <i class="fas fa-flask me-2"></i> Experimental Features
+                      </a>
+                      <a href="#" class="list-group-item list-group-item-action bg-transparent px-0">
+                          <i class="fas fa-clock me-2"></i> Scheduler & Background Jobs
+                      </a>
+                      <a href="#" class="list-group-item list-group-item-action bg-transparent px-0">
+                          <i class="fas fa-user-shield me-2"></i> Roles & Permissions
+                      </a>
+                      <a href="#" class="list-group-item list-group-item-action bg-transparent px-0">
+                          <i class="fas fa-compass me-2"></i> UI Preferences
+                      </a>
+                      <a href="#" class="list-group-item list-group-item-action bg-transparent px-0">
+                          <i class="fas fa-bug me-2"></i> Logging & Debugging
+                      </a>
+                  </div>
+                  <div class="text-muted small mt-2">
+                      Quick access to advanced modules and system-level tools.
+                  </div>
+              </div>
+          </div>
+
+          {# ----- Danger Zone Card ----- #}
+          <div class="card border-0 shadow-sm mb-4 h-100">
+              <div class="card-header bg-transparent border-0">
+                  <h5 class="text-danger">
+                      <i class="fas fa-exclamation-triangle me-2"></i>Danger Zone
+                  </h5>
+              </div>
+              <div class="card-body d-flex flex-column">
+                {# Reset System Configuration Form #}
+                <form method="post" action="#" class="mb-3">
+                    {{ form.hidden_tag() }}
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-danger" type="submit">
+                            <i class="fas fa-sync-alt me-1"></i> Reset System Configuration
+                        </button>
+                    </div>
+                    <small class="text-muted d-block mt-2">
+                        Reset all system configurations to their default values.
+                    </small>
+                </form>
+                  {# Clear Application Cache Form #}
+                  <form method="post" action="#" class="mb-3">
+                    {{ form.hidden_tag() }}
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-danger" type="submit">
+                            <i class="fas fa-broom me-1"></i> Clear Application Cache
+                        </button>
+                    </div>
+                    <small class="text-muted d-block mt-2">
+                        Clears in-memory and Redis cache (if configured).
+                    </small>
+                </form>
+                {# Delete All Audit Logs Form #}
+                <form method="post" action="#" class="mb-3" onsubmit="return confirm('This will permanently delete all audit logs. Are you sure?')">
+                    {{ form.hidden_tag() }}
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-danger" type="submit">
+                            <i class="fas fa-trash-alt me-1"></i> Delete All Audit Logs
+                        </button>
+                    </div>
+                    <small class="text-muted d-block mt-2">
+                        Only if rotating or exporting logs securely.
+                    </small>
+                </form>
+                {# Force Logout All Users Form #}
+                <form method="post" action="{{ url_for('superadmin.force_logout') }}" class="mb-3" 
+                      onsubmit="return confirm('Force logout all users? This will terminate all active sessions.')">
+                    {{ form.hidden_tag() }}
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-danger" type="submit">
+                            <i class="fas fa-user-slash me-1"></i> Force Logout All Users
+                        </button>
+                    </div>
+                    <small class="text-muted">
+                        This will invalidate all current sessions across the system.
+                    </small>
+                </form>
+                  {# Restart Application Form #}
+                  <form method="post" action="{{ url_for('superadmin.restart_application') }}" class="mb-3" 
+                  onsubmit="return confirm('Restart application now? Users may experience brief downtime.')">
+                  {{ form.hidden_tag() }}
+                <div class="d-grid gap-2">
+                    <button class="btn btn-outline-danger" type="submit">
+                        <i class="fas fa-redo-alt me-1"></i> Restart Application
+                    </button>
+                </div>
+                <small class="text-muted">
+                    Soft reload by restarting the server process.
+                </small>
+            </form>
+                  {# Wipe System Metrics Form #}
+                  <form method="post" action="{{ url_for('superadmin.wipe_system_metrics') }}" class="mb-3"
+      onsubmit="return confirm('Delete all system performance metrics? This action cannot be undone.')">
+      {{ form.hidden_tag() }}
+    <div class="d-grid gap-2">
+        <button class="btn btn-outline-danger" type="submit">
+            <i class="fas fa-chart-bar me-1"></i> Wipe System Metrics
+        </button>
+    </div>
+    <small class="text-muted">
+        Removes all collected system analytics data from the database.
+    </small>
+</form>
+              </div>
+          </div>
+      </div>
+  </div>
+  {# ====================================================================
+         End System Configuration Section
+      ==================================================================== #}
+
+  <hr class="my-5">
+
+  {# Begin System Time Configuration Section #}
+<div class="row align-items-stretch">
+    {# Left Column: System Time Configuration (8 columns) #}
+    <div class="col-md-8 d-flex flex-column">
+        <div class="card border-0 shadow-sm mb-4 h-100">
+            <div class="card-header bg-transparent border-0">
+                <h5 class="mb-0">
+                    <i class="fas fa-clock me-2"></i>System Time Configuration
+                </h5>
+            </div>
+            <div class="card-body d-flex flex-column">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i> These settings control how time and dates are handled throughout the application.
+                </div>
+                <form method="post" action="{{ url_for('superadmin.system_config') }}">
+                    {{ time_form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ time_form.timezone.label(class="form-label") }}
+                        {{ time_form.timezone(class="form-select") }}
+                        {% if time_form.timezone.errors %}
+                            <div class="text-danger">
+                                {% for error in time_form.timezone.errors %}
+                                    <small>{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <small class="text-muted">The default timezone for the application.</small>
+                    </div>
+                    <button type="submit" name="time_submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i> {{ time_form.submit.label.text }}
+                    </button>
+                </form>
+                <hr class="my-4">
+                <h6>Current System Time</h6>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="card bg-dark py-3">
+                            <div class="card-body text-center">
+                                <h2 class="mb-0" id="current-time">{{ now.strftime('%H:%M:%S') }}</h2>
+                                <p class="text-muted mb-0">Local Time</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card bg-dark py-3">
+                            <div class="card-body text-center">
+                                <h2 class="mb-0">{{ now.strftime('%Y-%m-%d') }}</h2>
+                                <p class="text-muted mb-0">Server Date</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Right Column: Info Panels (4 columns) #}
+    <div class="col-md-4 d-flex flex-column">
+        {# ----- Time Configuration Info Card ----- #}
+        <div class="card border-0 shadow-sm mb-4 h-100">
+            <div class="card-header bg-transparent border-0">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>Time Configuration Info
+                </h5>
+            </div>
+            <div class="card-body d-flex flex-column">
+                <h6>Why Timezone Settings Matter:</h6>
+                <ul class="text-muted small">
+                    <li>Ensures correct timestamp storage in the database</li>
+                    <li>Affects scheduled jobs and automation</li>
+                    <li>Users see dates and times in their local context</li>
+                    <li>Important for logs and audit trails</li>
+                </ul>
+                <div class="alert alert-warning mt-3 mt-auto">
+                    <i class="fas fa-exclamation-triangle me-2"></i> 
+                    Changing the timezone will not affect historical data timestamps.
+                </div>
+            </div>
+        </div>
+        
+        {# ----- Date & Time Formats Card ----- #}
+        <div class="card border-0 shadow-sm mb-4 h-100">
+            <div class="card-header bg-transparent border-0">
+                <h5 class="mb-0">
+                    <i class="fas fa-calendar-alt me-2"></i>Date & Time Formats
+                </h5>
+            </div>
+            <div class="card-body d-flex flex-column">
+                <div class="table-responsive flex-grow-1">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Format Type</th>
+                                <th>Format</th>
+                                <th>Example</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-muted small">
+                            <tr>
+                                <td>Standard Date</td>
+                                <td><code>%Y-%m-%d</code></td>
+                                <td>{{ now.strftime('%Y-%m-%d') }}</td>
+                            </tr>
+                            <tr>
+                                <td>Short Date</td>
+                                <td><code>%d/%m/%Y</code></td>
+                                <td>{{ now.strftime('%d/%m/%Y') }}</td>
+                            </tr>
+                            <tr>
+                                <td>US Date</td>
+                                <td><code>%m/%d/%Y</code></td>
+                                <td>{{ now.strftime('%m/%d/%Y') }}</td>
+                            </tr>
+                            <tr>
+                                <td>Standard Time</td>
+                                <td><code>%H:%M:%S</code></td>
+                                <td>{{ now.strftime('%H:%M:%S') }}</td>
+                            </tr>
+                            <tr>
+                                <td>12-Hour Time</td>
+                                <td><code>%I:%M %p</code></td>
+                                <td>{{ now.strftime('%I:%M %p') }}</td>
+                            </tr>
+                            <tr>
+                                <td>Full DateTime</td>
+                                <td><code>%Y-%m-%d %H:%M:%S</code></td>
+                                <td>{{ now.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{# ====================================================================
+       End System Time Configuration Section
+   ==================================================================== #}
+
+  <hr class="my-5">
+
+  {# ---------------------- Add Config Modal ---------------------- #}
+<!-- Add Config Modal -->
+<div class="modal fade" id="addConfigModal" tabindex="-1" aria-labelledby="addConfigModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form method="post" action="{{ url_for('superadmin.add_config') }}">
+          <!-- ← CSRF token must be the first child of the form -->
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  
+          <div class="modal-header">
+            <h5 class="modal-title" id="addConfigModalLabel">Add Configuration</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+  
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="config-key" class="form-label">Key</label>
+              <input type="text" name="key" id="config-key" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label for="config-value" class="form-label">Value</label>
+              <input type="text" name="value" id="config-value" class="form-control" required>
+            </div>
+          </div>
+  
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-success">Add Config</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+  <!-- Select2 CSS with Bootstrap 5 theme -->
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+  <!-- Include jQuery (if not already loaded) -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- Include Select2 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+  
+  {# Custom CSS overrides for the Select2 dropdown (dark theme) #}
+  <style>
+    .select2-container--bootstrap-5 .select2-dropdown {
+      background-color: #1a2a39 !important;
+      border-color: #2a3a4a !important;
+      color: #fff !important;
+    }
+    .select2-container--bootstrap-5 .select2-results__option {
+      color: #fff !important;
+      background-color: #1a2a39 !important;
+    }
+    .select2-container--bootstrap-5 .select2-results__option--highlighted[aria-selected] {
+      background-color: #0d6efd !important;
+      color: #fff !important;
+    }
+    .select2-container--bootstrap-5 .select2-selection--single {
+      background-color: #1a2a39 !important;
+      color: #fff !important;
+      border-color: #2a3a4a !important;
+    }
+    .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+      color: #fff !important;
+    }
+    .select2-container--bootstrap-5 .select2-selection--single .select2-selection__arrow b {
+      border-color: #fff transparent transparent transparent !important;
+    }
+    .select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field {
+      background-color: #1a2a39 !important;
+      color: #fff !important;
+      border: 1px solid #2a3a4a !important;
+    }
+    .select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field::placeholder {
+      color: #bbb !important;
+    }
+  </style>
+  
+  {# Include Moment.js and Moment-Timezone (from cdnjs) #}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data.min.js"></script>
+  
+  {# Pass the configured timezone from the server context via tz_value #}
+  <script>
+      var configuredTimezone = "{{ tz_value|default('UTC') }}";
+      console.log("Configured Timezone: ", configuredTimezone);
+  </script>
+  
+  {# Custom JavaScript for initializing Select2 and updating the live clock #}
+  <script>
+    $(document).ready(function () {
+        $('#timezone').select2({
+          theme: 'bootstrap-5',
+          width: '100%',
+          placeholder: 'Select your time zone',
+          allowClear: true
+        });
+    });
+  
+    // Timezone-aware live clock update using moment-timezone.
+    function updateClock() {
+        var now = moment().tz(configuredTimezone);
+        var clockElement = document.getElementById('current-time');
+        if (clockElement) {
+            clockElement.textContent = now.format('HH:mm:ss');
+        }
+    }
+    // Update every second.
+    setInterval(updateClock, 1000);
+    updateClock();
+  </script>
+{% endblock %}

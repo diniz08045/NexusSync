@@ -1,201 +1,224 @@
 from datetime import datetime
 from flask_login import UserMixin
-from werkzeug.security import generate_password_hash, check_password_hash
-from app import db
+from werkzeug.security import check_password_hash, generate_password_hash
+
+from app.extensions import db
 from app.models.role import user_roles
 
+
+# ==========================================
+# Model: User
+# ==========================================
 class User(UserMixin, db.Model):
+    """
+    Represents a user in the system. Includes authentication, authorization,
+    activity tracking, and role-based access control.
+    """
+
     id = db.Column(db.Integer, primary_key=True)
+
+    # Credentials
     username = db.Column(db.String(64), unique=True, nullable=False, index=True)
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)
     password_hash = db.Column(db.String(256), nullable=False)
+
+    # Personal info
     first_name = db.Column(db.String(64))
     last_name = db.Column(db.String(64))
+    department = db.Column(db.String(64), index=True)
+
+    # Account status
     is_active = db.Column(db.Boolean, default=True)
     is_email_confirmed = db.Column(db.Boolean, default=False)
+    two_factor_enabled = db.Column(db.Boolean, default=False)
+
+    # Activity tracking
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     last_login = db.Column(db.DateTime)
-    last_ip = db.Column(db.String(45))  # IPv6 can be up to 45 chars
+    last_ip = db.Column(db.String(45))  # IPv6-safe
     last_user_agent = db.Column(db.String(256))
-    two_factor_enabled = db.Column(db.Boolean, default=False)
-    department = db.Column(db.String(64), index=True)  # Department for dashboard routing
-    
+
     # Relationships
-    roles = db.relationship('Role', secondary=user_roles, backref=db.backref('users', lazy='dynamic'))
-    notifications = db.relationship('Notification', backref='user', lazy='dynamic')
-    password_reset_tokens = db.relationship('PasswordResetToken', backref='user', lazy='dynamic')
-    two_factor_tokens = db.relationship('TwoFactorToken', backref='user', lazy='dynamic')
-    
+    roles = db.relationship("Role", secondary=user_roles, backref=db.backref("users", lazy="dynamic"))
+    password_reset_tokens = db.relationship("PasswordResetToken", backref="user", lazy="dynamic")
+    two_factor_tokens = db.relationship("TwoFactorToken", backref="user", lazy="dynamic")
+
+    # ==========================
+    # Authentication Methods
+    # ==========================
     def set_password(self, password):
-        """Set the user's password."""
-        # Using the default method pbkdf2:sha256 which is secure
+        """Hashes and stores the user's password."""
         self.password_hash = generate_password_hash(password)
-    
+
     def check_password(self, password):
-        """Check the user's password."""
+        """Validates a raw password against the stored hash."""
         return check_password_hash(self.password_hash, password)
-        
+
     def record_login(self, ip_address=None, user_agent=None, successful=True):
         """
-        Record a login attempt for the user.
-        
-        Args:
-            ip_address: The IP address of the login attempt
-            user_agent: The user agent string from the login attempt
-            successful: Whether the login was successful
+        Logs a login attempt and updates last login info if successful.
         """
         from app.models.login_attempt import LoginAttempt
-        from app import db
-        
-        # Record the login attempt
-        attempt = LoginAttempt(
+
+        db.session.add(LoginAttempt(
             user_id=self.id,
             ip_address=ip_address,
             user_agent=user_agent,
-            successful=successful
-        )
-        db.session.add(attempt)
-        
+            successful=successful,
+        ))
+
         if successful:
-            # Update user's last login information
             self.last_login = datetime.utcnow()
             self.last_ip = ip_address
             self.last_user_agent = user_agent
-            
+
         db.session.commit()
-        
+
     @staticmethod
     def validate_password_complexity(password):
         """
-        Validate password complexity:
-        - At least 8 characters
-        - Contains at least one uppercase letter
-        - Contains at least one lowercase letter
-        - Contains at least one digit
-        - Contains at least one special character
+        Enforces password strength rules.
+        Must include uppercase, lowercase, digit, and special character.
         """
         import re
-        
         if len(password) < 8:
             return False, "Password must be at least 8 characters long"
-            
-        if not re.search(r'[A-Z]', password):
+        if not re.search(r"[A-Z]", password):
             return False, "Password must contain at least one uppercase letter"
-            
-        if not re.search(r'[a-z]', password):
+        if not re.search(r"[a-z]", password):
             return False, "Password must contain at least one lowercase letter"
-            
-        if not re.search(r'\d', password):
+        if not re.search(r"\d", password):
             return False, "Password must contain at least one digit"
-            
         if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
             return False, "Password must contain at least one special character"
-            
         return True, "Password meets complexity requirements"
-    
+
+    # ==========================
+    # Role & Access Control
+    # ==========================
     def add_role(self, role):
-        """Add a role to the user."""
+        """Assigns a role to the user if not already assigned."""
         if not self.has_role(role.name):
             self.roles.append(role)
-    
+
     def remove_role(self, role):
-        """Remove a role from the user."""
+        """Removes a role from the user if it exists."""
         if self.has_role(role.name):
             self.roles.remove(role)
-    
+
     def has_role(self, role_name):
-        """Check if the user has a role."""
-        return any(role.name == role_name for role in self.roles)
-    
+        """Returns True if user has a specific role."""
+        return any(role.name.lower() == role_name.lower() for role in self.roles)
+
     def is_admin(self):
-        """Check if the user is an admin."""
-        return self.has_role('admin')
-    
+        """Check if user has admin role."""
+        return self.has_role("admin")
+
+    @property
+    def is_superadmin(self):
+        """Check if user has superadmin role."""
+        return self.has_role("superadmin")
+
+    # ==========================
+    # Utility
+    # ==========================
     def unread_notifications_count(self):
-        """Get the count of unread notifications."""
+        """Returns count of unread and undismissed notifications."""
         return self.notifications.filter_by(is_read=False, is_dismissed=False).count()
-    
+
     def to_dict(self):
-        """Convert user to dictionary."""
+        """Serializes user object to dictionary."""
         return {
-            'id': self.id,
-            'username': self.username,
-            'email': self.email,
-            'first_name': self.first_name,
-            'last_name': self.last_name,
-            'is_active': self.is_active,
-            'is_email_confirmed': self.is_email_confirmed,
-            'created_at': self.created_at.isoformat(),
-            'last_login': self.last_login.isoformat() if self.last_login else None,
-            'two_factor_enabled': self.two_factor_enabled,
-            'department': self.department,
-            'roles': [role.name for role in self.roles]
+            "id": self.id,
+            "username": self.username,
+            "email": self.email,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "is_active": self.is_active,
+            "is_email_confirmed": self.is_email_confirmed,
+            "created_at": self.created_at.isoformat(),
+            "last_login": self.last_login.isoformat() if self.last_login else None,
+            "two_factor_enabled": self.two_factor_enabled,
+            "department": self.department,
+            "roles": [role.name for role in self.roles],
         }
-    
+
     def __repr__(self):
-        return f'<User {self.username}>'
+        return f"<User {self.username}>"
 
 
+# ==========================================
+# Model: PasswordResetToken
+# ==========================================
 class PasswordResetToken(db.Model):
+    """
+    Secure one-time token for user password reset requests.
+    """
+
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     token = db.Column(db.String(64), unique=True, nullable=False, index=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     expires_at = db.Column(db.DateTime, nullable=False)
     is_used = db.Column(db.Boolean, default=False)
-    ip_address = db.Column(db.String(45))  # IP address that requested the reset
-    
+    ip_address = db.Column(db.String(45))  # IP address that initiated reset
+
     @staticmethod
     def generate_token():
-        """Generate a random token using the secrets module for cryptographic security."""
+        """Generate a secure token."""
         import secrets
-        return secrets.token_urlsafe(48)  # 64 bytes of randomness
-    
+        return secrets.token_urlsafe(48)
+
     def is_valid(self):
-        """Check if token is valid (not expired and not used)."""
-        now = datetime.utcnow()
-        return not self.is_used and now < self.expires_at
-    
+        """Returns True if token is still valid (not used or expired)."""
+        return not self.is_used and datetime.utcnow() < self.expires_at
+
     def invalidate(self):
-        """Mark token as used to prevent reuse."""
+        """Marks token as used."""
         self.is_used = True
-    
+
     def __repr__(self):
-        return f'<PasswordResetToken {self.id}>'
+        return f"<PasswordResetToken {self.id}>"
 
 
+# ==========================================
+# Model: TwoFactorToken
+# ==========================================
 class TwoFactorToken(db.Model):
+    """
+    Temporary token used for 2FA verification.
+    """
+
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     token = db.Column(db.String(6), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     expires_at = db.Column(db.DateTime, nullable=False)
     is_used = db.Column(db.Boolean, default=False)
-    attempts = db.Column(db.Integer, default=0)  # Track failed attempts
-    ip_address = db.Column(db.String(45))  # IP address used for token request
-    
+    attempts = db.Column(db.Integer, default=0)  # Number of failed attempts
+    ip_address = db.Column(db.String(45))       # IP address of the request
+
     @staticmethod
     def generate_token():
-        """Generate a random 6-digit token using secrets for cryptographic security."""
+        """Generate a random 6-digit token (string)."""
         import secrets
-        # More secure than random.randint
         return str(secrets.randbelow(900000) + 100000)
-    
+
     def is_valid(self):
-        """Check if token is valid (not expired, not used, and not too many attempts)."""
-        now = datetime.utcnow()
-        MAX_ATTEMPTS = 5  # Max number of failed attempts before token is invalid
-        return (not self.is_used and 
-                now < self.expires_at and 
-                self.attempts < MAX_ATTEMPTS)
-    
+        """Check if the token is valid for use."""
+        return (
+            not self.is_used
+            and datetime.utcnow() < self.expires_at
+            and self.attempts < 5
+        )
+
     def increment_attempts(self):
-        """Increment failed attempts counter."""
+        """Increment failed attempt counter."""
         self.attempts += 1
-        
+
     def invalidate(self):
-        """Mark token as used to prevent reuse."""
+        """Mark token as used."""
         self.is_used = True
-    
+
     def __repr__(self):
-        return f'<TwoFactorToken {self.id}>'
+        return f"<TwoFactorToken {self.id}>"
