@@ -79,16 +79,29 @@ It is intended to be a **foundational base for any Flask web application**. Whet
 
 ## 🖼️ Screenshots
 
-### 🔧 System Configuration
-![System Config](docs/screenshots/config-editor.png)
+### 🏠 Landing Page
+![Landing Page](docs/screenshots/Screenshot%202025-04-18%20122452.png)
 
-### 📊 Live Monitoring Dashboard
-![Monitoring](docs/screenshots/monitoring-graph.png)
+### 🔐 Login Portal
+![Login Portal](docs/screenshots/Screenshot%202025-04-18%20122537.png)
 
-### 🧠 Threat Intelligence View
-![Threat Intel](docs/screenshots/threat-intel.png)
+### 🧑‍💼 Super Admin Dashboard
+![Super Admin Dashboard](docs/screenshots/Screenshot%202025-04-18%20122625.png)
 
----
+### ⚙️ System Configuration
+![System Configuration](docs/screenshots/Screenshot%202025-04-18%20122700.png)
+
+### 🌐 IP & Threat Intelligence Management
+![IP & Threat Intelligence Management](docs/screenshots/Screenshot%202025-04-18%20122911.png)
+
+### 📈 Monitoring Dashboard
+![Monitoring Dashboard](docs/screenshots/Screenshot%202025-04-18%20122952.png)
+
+### 📝 Audit Logs
+![Audit Logs](docs/screenshots/Screenshot%202025-04-18%20123032.png)
+
+### ✉️ Email Configuration
+![Email Configuration](docs/screenshots/Screenshot%202025-04-18%20123103.png)
 
 ## 🏗️ Project Structure
 
