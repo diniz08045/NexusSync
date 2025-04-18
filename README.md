@@ -1,79 +1,76 @@
 # NexusSync
 
-NexusSync is a secure, modular Flask-based super admin portal built for managing infrastructure configurations, real-time system monitoring, and proactive threat intelligence. Designed with security and extensibility in mind, it offers powerful tools for super administrators to control and audit their systems efficiently.
+NexusSync is a powerful, secure, and modular Flask-based super admin portal designed to make managing infrastructure, monitoring system performance in real time, and staying ahead of security threats much easier. It’s built with scalability and security at its core, giving super administrators all the tools they need to configure, monitor, and audit their systems with confidence.
 
-It is intended to be a **foundational base for any Flask web application**. Whether you're building a CRM, ERP, Ecommerce site, or any other enterprise-grade platform, NexusSync provides the backend architecture and admin capabilities needed to scale quickly and securely.
-
+More than just an admin panel, NexusSync is meant to be the starting point for any Flask web application. Whether you're working on a CRM, ERP, ecommerce platform, or any other enterprise-level project, NexusSync lays down a solid foundation you can build on — with the structure, flexibility, and features to grow as your application does.
 ---
 
 ## 🚀 Features
 
 - 🧩 **Core Functionalities**
-
-  - Main system configuration with editable key-value entries for friendly setup
-  - Change superadmin password
-  - All superadmin actions are logged
-  - Audit log viewing, filtering, exporting, and wiping
+ 
+  - Centralized system configuration.
+  - Key x Value entries for a friendly setup.
+  - Necessary fallbacks. (Temporary until project completion).
+  - Change superadmin password.
+  - All actions are logged via a centralized logger.
+  - Audit log viewing, filtering, exporting, and wiping.
 
 - 🛢️ **Database Tools**
 
-  - Health check & diagnostics
-  - Export and import database backups
-  - Run custom SQL queries safely inside the web app
-  - Basic and extended database configuration management
+  - Health check & diagnostics.
+  - Export and import database backups.
+  - Run custom SQL queries safely inside the web app.
+  - Basic and extended database configuration management.
 
 - 🌐 **IP Management**
 
-  - IP whitelist and blacklist configuration
-  - Manual banning of IPs or ranges
-  - Integration with Spamhaus DROP list
-  - Integration with AbuseIPDB for risk scoring
+  - IP whitelist and blacklist configuration.
+  - Manual banning of IPs or ranges.
+  - Integration with Spamhaus DROP list.
+  - Integration with AbuseIPDB for risk scoring.
 
-- 🧠 **Threat Intelligence**
+- 🧠 **Threat Intelligence** (EXPERIMENTAL AT THIS STAGE)
 
-  - Early warning system with port scanning and honeypot correlation
-  - Threat scoring from local + external sources
-  - GeoIP and ASN analysis for context
-  - Partially working advanced correlation engine (in progress)
+  - Early warning system with port scanning and honeypot correlation.
+  - Threat scoring from local + external sources.
+  - GeoIP and ASN analysis for context.
+  - Partially working advanced correlation engine (in progress).
 
 - 📊 **System Monitoring**
 
-  - Real-time CPU, memory, disk, and DB metrics
-  - Historical monitoring with timeline graphing
-  - Wipe metric history
-  - Export metrics as PNG or CSV (coming soon for anomaly detection)
+  - Real-time CPU, memory, disk, and DB metrics.
+  - Historical monitoring with timeline graphing.
+  - Wipe metric history.
+  - Export metrics as PNG or CSV.
+  - Anomaly detection based on metrics (Coming Soon).
 
 - 📬 **Email & Notifications**
 
-  - Email server setup and test tool (partially implemented)
-
-  - SMTP configuration UI
-
-  - Superadmin and user roles
-
-  - IP whitelisting, session locking, and brute-force protection
+  - Email server setup and test tool (Partially implemented).
+  - SMTP configuration UI.
+  - Editable email templates in the UI (Coming Soon).
+  - Email contacts lists and broadcast system (Coming Soon).
 
 - ⚙️ **System Configuration**
 
-  - Live-editable config values stored in the database
-  - Add/edit environment variables from the admin UI
+  - Live-editable config values stored in the database.
+  - Startup Config Defaults.
+  - Add/edit environment variables from the admin UI (Partially implemented).
+  - 
 
 - 📊 **System Monitoring**
 
-  - Real-time CPU, memory, disk, and database usage
-  - Export metrics as CSV or image
-
-- 🧠 **Threat Intelligence**
-
-  - Correlation engine (AbuseIPDB + local analysis)
-  - Honeypot logging, port scanning, and early warning system
-  - GeoIP + ASN lookup, Spamhaus DROP list integration
+  - Real-time CPU, memory, disk, and database usage.
+  - Export metrics as CSV or image.
+  - Identifiying anomalies through metrics statistics (Coming Soon).
 
 - 🛡️ **Security & Logging**
 
-  - Role-based access control
-  - CSP & HTTPS enforcement
-  - SIEM export in CEF, LEEF, JSON, and syslog formats
+  - OWASP Secure Coding Practices (Planned).
+  - Role-based access control.
+  - CSP & HTTPS enforcement. (HTTPS is currently experimental)
+  - SIEM export in CEF, LEEF, JSON, and syslog formats (Under Development).
 
 ---
 
@@ -251,7 +248,7 @@ Or configure everything from the SuperAdmin dashboard.
 
 ---
 
-## 🔗 Entry Points
+## 🔗 Application Entry Points
 
 - **Main Landing Page:** [http://127.0.0.1:5000/](http://127.0.0.1:5000/)
 - **Superadmin Login:** [http://127.0.0.1:5000/superadmin/login](http://127.0.0.1:5000/superadmin/login)
