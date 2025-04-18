@@ -183,29 +183,48 @@ SuperAdminPortal/
 
 ## ⚙️ Setup
 
-### Prerequisites
+### ✅ Prerequisites
 
 - Python 3.10+
-- pip
-- SQLite or PostgreSQL
+- pip installed
+- git installed
+- A terminal or command prompt
 
 ### Installation
 
-```bash
-# Clone the repo
+🪟 For Windows Users
+# Clone the repository
 git clone https://github.com/sudo0xn14r/NexusSync.git
 cd NexusSync
 
 # Create a virtual environment
 python -m venv venv
-source venv/bin/activate  # or venv\Scripts\activate on Windows
+
+# Activate the environment (Windows)
+venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
 
 # Run the app
 python main.py
-```
+
+🐧 For Linux/macOS Users
+# Clone the repository
+git clone https://github.com/sudo0xn14r/NexusSync.git
+cd NexusSync
+
+# Create a virtual environment
+python3 -m venv venv
+
+# Activate the environment (Linux/macOS)
+source venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run the app
+python3 main.py
 
 ---
 
