@@ -167,18 +167,23 @@ SuperAdminPortal/
 ```
 ---
 
-## ⚙️ Setup
+⚙️ Setup
+✅ Prerequisites
 
-### ✅ Prerequisites
+Make sure you have the following installed:
 
-- Python 3.10+
-- pip installed
-- git installed
-- A terminal or command prompt
+    Python 3.10+
 
+    pip
+
+    git
+
+    A terminal or command prompt
+    
 ### Installation
 
-🪟 For Windows Users
+🪟 Windows Installation
+
 # Clone the repository
 git clone https://github.com/sudo0xn14r/NexusSync.git
 cd NexusSync
@@ -186,7 +191,7 @@ cd NexusSync
 # Create a virtual environment
 python -m venv venv
 
-# Activate the environment (Windows)
+# Activate the environment
 venv\Scripts\activate
 
 # Install dependencies
@@ -195,7 +200,8 @@ pip install -r requirements.txt
 # Run the app
 python main.py
 
-🐧 For Linux/macOS Users
+🐧 Linux/macOS Installation
+
 # Clone the repository
 git clone https://github.com/sudo0xn14r/NexusSync.git
 cd NexusSync
@@ -203,7 +209,7 @@ cd NexusSync
 # Create a virtual environment
 python3 -m venv venv
 
-# Activate the environment (Linux/macOS)
+# Activate the environment
 source venv/bin/activate
 
 # Install dependencies
@@ -211,29 +217,27 @@ pip install -r requirements.txt
 
 # Run the app
 python3 main.py
-
 ---
 
-## 🔐 Configuration
+🔐 Configuration
+🔑 Default Credentials
 
-### 🔑 Default Credentials
+You can log in using the built-in superadmin account:
 
-The application ships with a default superadmin account for initial access:
+    Username: superadmin
 
-- **Username:** `superadmin`
-- **Password:** `iamthesuperadmin123!`
+    Password: iamthesuperadmin123!
 
+🔧 Optional .env File
 
-Create a `.env` or use environment variables:
+You can also create a .env file for easier configuration:
 
-```bash
 SECRET_KEY=your-secret-key
 FLASK_ENV=development
 SQLALCHEMY_DATABASE_URI=sqlite:///instance/app.db
 ABUSEIPDB_API_KEY=your-api-key
-```
 
-Or configure everything from the SuperAdmin dashboard.
+Alternatively, all of this can be configured directly from the SuperAdmin dashboard.
 
 ---
 
