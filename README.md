@@ -50,12 +50,7 @@ More than just an admin panel, NexusSync is meant to be the starting point for a
   - Live-editable config values stored in the database.
   - Startup Config Defaults.
   - Add/edit environment variables from the admin UI (Partially implemented).
-
-- 📊 **System Monitoring**
-  - Real-time CPU, memory, disk, and database usage.
-  - Export metrics as CSV or image.
-  - Identifiying anomalies through metrics statistics (Coming Soon).
-
+  - 
 - 🛡️ **Security & Logging**
   - OWASP Secure Coding Practices (Planned).
   - Role-based access control.
