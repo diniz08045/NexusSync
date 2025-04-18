@@ -8,7 +8,6 @@ More than just an admin panel, NexusSync is meant to be the starting point for a
 ## 🚀 Features
 
 - 🧩 **Core Functionalities**
- 
   - Centralized system configuration.
   - Key x Value entries for a friendly setup.
   - Necessary fallbacks. (Temporary until project completion).
@@ -17,28 +16,24 @@ More than just an admin panel, NexusSync is meant to be the starting point for a
   - Audit log viewing, filtering, exporting, and wiping.
 
 - 🛢️ **Database Tools**
-
   - Health check & diagnostics.
   - Export and import database backups.
   - Run custom SQL queries safely inside the web app.
   - Basic and extended database configuration management.
 
 - 🌐 **IP Management**
-
   - IP whitelist and blacklist configuration.
   - Manual banning of IPs or ranges.
   - Integration with Spamhaus DROP list.
   - Integration with AbuseIPDB for risk scoring.
 
 - 🧠 **Threat Intelligence** (EXPERIMENTAL AT THIS STAGE)
-
   - Early warning system with port scanning and honeypot correlation.
   - Threat scoring from local + external sources.
   - GeoIP and ASN analysis for context.
   - Partially working advanced correlation engine (in progress).
 
 - 📊 **System Monitoring**
-
   - Real-time CPU, memory, disk, and DB metrics.
   - Historical monitoring with timeline graphing.
   - Wipe metric history.
@@ -46,27 +41,22 @@ More than just an admin panel, NexusSync is meant to be the starting point for a
   - Anomaly detection based on metrics (Coming Soon).
 
 - 📬 **Email & Notifications**
-
   - Email server setup and test tool (Partially implemented).
   - SMTP configuration UI.
   - Editable email templates in the UI (Coming Soon).
   - Email contacts lists and broadcast system (Coming Soon).
 
 - ⚙️ **System Configuration**
-
   - Live-editable config values stored in the database.
   - Startup Config Defaults.
   - Add/edit environment variables from the admin UI (Partially implemented).
-  - 
 
 - 📊 **System Monitoring**
-
   - Real-time CPU, memory, disk, and database usage.
   - Export metrics as CSV or image.
   - Identifiying anomalies through metrics statistics (Coming Soon).
 
 - 🛡️ **Security & Logging**
-
   - OWASP Secure Coding Practices (Planned).
   - Role-based access control.
   - CSP & HTTPS enforcement. (HTTPS is currently experimental)
@@ -175,7 +165,6 @@ SuperAdminPortal/
 ├── main.py
 └── project_tree.py
 ```
-
 ---
 
 ## ⚙️ Setup
